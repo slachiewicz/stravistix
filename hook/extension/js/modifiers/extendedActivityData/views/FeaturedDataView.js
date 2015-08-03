@@ -77,8 +77,7 @@ var FeaturedDataView = AbstractDataView.extend(function(base) {
                 this.insertContentAtGridPosition(6, 0, this.analysisData.gradeData.gradeProfile, 'Grade Profile', '', 'displayAdvancedGradeData');
             }
 
-            if (this.analysisData.powerData && this.analysisData.heartRateData) {
-                console.log(this.analysisData);
+            if (this.analysisData.powerData && this.analysisData.heartRateData && this.userSettings.displayAdvancedGradeData && this.userSettings.displayAdvancedPowerData) {
                 this.insertContentAtGridPosition(7, 0, (this.analysisData.powerData.weightedPower / this.analysisData.heartRateData.TRIMPPerHour * 10).toFixed(1), 'Freshness Score', '', 'displayAdvancedHrData'); // Avg watt /kg
             }
 

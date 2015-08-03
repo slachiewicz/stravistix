@@ -39,7 +39,7 @@ var AbstractExtendedActivityDataModifier = Fiber.extend(function(base) {
 
         placeSummaryPanel: function(panelAdded) {
 
-            this.makeSummaryGrid(2, 3);
+            this.makeSummaryGrid(2, 4);
 
             this.insertContentSummaryGridContent();
 
@@ -136,6 +136,9 @@ var AbstractExtendedActivityDataModifier = Fiber.extend(function(base) {
             this.insertContentAtGridPosition(0, 1, TRIMP, 'TRaining IMPulse', '', 'displayAdvancedHrData');
             this.insertContentAtGridPosition(1, 1, activityHeartRateReserve, 'Heart Rate Reserve Avg', activityHeartRateReserveUnit, 'displayAdvancedHrData');
 
+            if (this.analysisData_.powerData && this.analysisData_.heartRateData && this.userSettings_.displayAdvancedGradeData && this.userSettings_.displayAdvancedPowerData) {
+                this.insertContentAtGridPosition(0, 2, (this.analysisData_.powerData.weightedPower / this.analysisData_.heartRateData.TRIMPPerHour * 10).toFixed(1), 'Freshness', '', 'displayAdvancedHrData');
+            }
             // ...
             var climbTime = '-';
             var climbTimeExtra = '';
@@ -144,7 +147,7 @@ var AbstractExtendedActivityDataModifier = Fiber.extend(function(base) {
                 climbTimeExtra = '<span class="summarySubGridTitle">(' + (this.analysisData_.gradeData.upFlatDownInSeconds.up / this.analysisData_.gradeData.upFlatDownInSeconds.total * 100).toFixed(0) + '% of time)</span>';
             }
 
-            this.insertContentAtGridPosition(0, 2, climbTime, 'Time climbing', climbTimeExtra, 'displayAdvancedGradeData');
+            this.insertContentAtGridPosition(0, 3, climbTime, 'Time climbing', climbTimeExtra, 'displayAdvancedGradeData');
 
         },
 

@@ -39,7 +39,7 @@ var CyclingExtendedActivityDataModifier = AbstractExtendedActivityDataModifier.e
             if (this.analysisData_.gradeData && this.userSettings_.displayAdvancedGradeData) {
                 climbSpeed = (this.analysisData_.gradeData.upFlatDownMoveData.up * speedUnitFactor).toFixed(1);
             }
-            this.insertContentAtGridPosition(1, 2, climbSpeed, 'Avg climbing speed', speedUnitPerhour, 'displayAdvancedGradeData');
+            this.insertContentAtGridPosition(1, 3, climbSpeed, 'Avg climbing speed', speedUnitPerhour, 'displayAdvancedGradeData');
         },
 
         setDataViewsNeeded: function() {
