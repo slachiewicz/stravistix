@@ -57,18 +57,20 @@ StravistiX.prototype = {
         // Common
         this.handleMenu_();
         this.handleRemoteLinks_();
-        this.handleOpenStreetMapModifier_();
+        this.handleWindyTyModifier_();
         this.handleActivityScrolling_();
         this.handleDefaultLeaderboardFilter_();
         this.handleSegmentRankPercentage_();
         this.handleActivityGoogleMapType_();
         this.handleHidePremium_();
         this.handleHideFeed_();
+        this.handleDisplayFlyByFeedModifier_();
 
         // Bike
         this.handleExtendedActivityData_();
         this.handleNearbySegments_();
         this.handleActivityBikeOdo_();
+        this.handleActivitySegmentTimeComparison_();
 
         // Run
         this.handleRunningGradeAdjustedPace_();
@@ -79,8 +81,13 @@ StravistiX.prototype = {
 
         this.handleVirtualPartner_();
 
+        this.handleAthletesStats();
+
         // Must be done at the end
         this.handleTrackTodayIncommingConnection_();
+        this.handleGoogleMapsComeBackModifier();
+
+
     },
 
     /**
@@ -101,7 +108,7 @@ StravistiX.prototype = {
      */
     handleExtensionHasJustUpdated_: function() {
 
-        // Clear localstorage 
+        // Clear localstorage
         // Especially for activies data stored in cache
         console.log("ExtensionHasJustUpdated, localstorage clear");
         localStorage.clear();
@@ -111,7 +118,7 @@ StravistiX.prototype = {
         }
 
         // Display ribbon update message
-        this.handleUpdateRibbon_();
+        this.handleUpdatePopup_();
 
         // Send update info to ga
         var updatedToEvent = {
@@ -129,21 +136,74 @@ StravistiX.prototype = {
     /**
      *
      */
-    handleUpdateRibbon_: function() {
+    handleUpdatePopup_: function() {
 
-        var title = 'StravistiX updated/installed to <strong>v' + this.appResources_.extVersion + '</strong>';
+        var updateMessageObj = {
+            title: 'StravistiX updated/installed to <strong>v' + this.appResources_.extVersion + '</strong>',
+            hotFixes: [
+                'Fix map display problem while cropping an activity. Google maps API was loaded twice.'
+            ],
+            features: [
+                'Google Maps are revived. Currently for activities only at the moment (You can disable this in extension settings)',
+                'Add on/off extension settings for the segment time comparison on activities pages'
+            ],
+            fixes: [
+                'When segment time comparison may not be displayed',
+                'When no longer seeing extended stats on turbo activities'
+            ]
+        };
+
         var message = '';
-        // message += '<h6>- Exporting segment effort as Virtual Partner for your GPS through activity page</h6>';
-        // message += '<h6><strong>Since 0.6.1:</strong></h6>';
-        // message += '<h6>- OpenStreetMap map flipper for activities added</h6>';
-        // message += '<h6>- StravaPlus is named StravistiX (= Strava + Statistics + Xtended) </h6>';
-        // message += '<h6>- Customs zones for each Xtended data have been implemented</h6>';
-        message += '<h5>- Added average speed while climbing, on flat and downhill for extended grade data</h5>';
-        message += '<h5>- Added summary panel for some extended data in actitivies</h5>';
-        message += '<h4><a target="_blank" href="' + this.appResources_.settingsLink + '#/donate">Donate to help this project to grow up</a></h4>';
-        message += '<h4><a target="_blank" href="https://twitter.com/champagnethomas">Follow upcoming updates here</a></h4>';
 
-        $.fancybox('<h2>' + title + '</h2>' + message);
+        message += '<h3><strong>YEAH version <i>1</i> is now out !!! And Google Maps REVIVED !!</strong></h3>';
+
+        if (!_.isEmpty(updateMessageObj.hotFixes)) {
+            message += '<h5><strong>HOTFIXES ' + this.appResources_.extVersion + ':</strong></h5>';
+            _.each(updateMessageObj.hotFixes, function(hotFix) {
+                message += '<h5>- ' + hotFix + '</h5>';
+            });
+        };
+
+        var baseVersion = this.appResources_.extVersion.split('.');
+        baseVersion = baseVersion[0] + '.' + baseVersion[1] + '.x';
+
+        if (!_.isEmpty(updateMessageObj.features)) {
+            message += '<h5><strong>NEW in ' + baseVersion + ':</strong></h5>';
+            _.each(updateMessageObj.features, function(feature) {
+                message += '<h5>- ' + feature + '</h5>';
+            });
+        };
+
+        if (!_.isEmpty(updateMessageObj.fixes)) {
+            message += '<h5><strong>FIXED in ' + baseVersion + ':</strong></h5>';
+            _.each(updateMessageObj.fixes, function(fix) {
+                message += '<h5>- ' + fix + '</h5>';
+            });
+        };
+
+        message += '<h5><strong>The following update is delayed at the moment:</strong></h5>';
+        message += '<h5>Like an activity, segments efforts will have their own extended statistics with graphs and tables. This feature implies some hard change and impacts on current code. Need more time than expected. Sorry !</h5>';
+        message += '<a style="font-size: 16px;" class="button btn-block btn-primary" target="_blank" id="extendedStatsButton" href="' + this.appResources_.settingsLink + '#/donate">';
+        message += '<strong>Donate to help this project to grow up, Thanks :)</strong>';
+        message += '</a>';
+
+        $.fancybox('<h2>' + updateMessageObj.title + '</h2>' + message);
+    },
+
+    /**
+     *
+     */
+    handleAthletesStats: function() {
+
+        // If we are not on the athletes page then return...
+        if (!window.location.pathname.match(new RegExp("/athletes/" + this.athleteId_ + "$", "g"))) {
+            return;
+        }
+
+        if (env.debugMode) console.log("Execute handleAthletesStats()");
+
+        var athleteStatsModifier = new AthleteStatsModifier();
+        athleteStatsModifier.modify();
     },
 
     /**
@@ -182,23 +242,36 @@ StravistiX.prototype = {
 
         if (env.debugMode) console.log("Execute handleRemoteLinks_()");
 
-        var remoteLinksModifier = new RemoteLinksModifier(this.userSettings_.highLightStravistiXFeature, this.appResources_, (this.athleteIdAuthorOfActivity_ === this.athleteId_));
-        remoteLinksModifier.modify();
+        this.remoteLinksModifier = new RemoteLinksModifier(this.userSettings_.highLightStravistiXFeature, this.appResources_, (this.athleteIdAuthorOfActivity_ === this.athleteId_));
+        this.remoteLinksModifier.modify();
     },
 
-    handleOpenStreetMapModifier_: function() {
+    handleWindyTyModifier_: function() {
 
         // If we are not on a segment or activity page then return...
-        if (!window.location.pathname.match(/^\/segments\/(\d+)$/) && !window.location.pathname.match(/^\/activities/)) {
+        if (!window.location.pathname.match(/^\/activities/)) {
             return;
         }
 
-        if (env.debugMode) console.log("Execute handleOpenStreetMapModifier_()");
+        if (!window.pageView) {
+            return;
+        }
 
-        var openStreetMapModifier = new OpenStreetMapModifier();
-        openStreetMapModifier.modify();
+        // Avoid running Extended data at the moment
+        if (window.pageView.activity().get('type') != "Ride") {
+            return;
+        }
+
+        // If home trainer skip (it will use gps data to locate weather data)
+        if (window.pageView.activity().get('trainer')) {
+            return;
+        }
+
+        if (env.debugMode) console.log("Execute handleWindyTyModifier_()");
+
+        var windyTyModifier = new WindyTyModifier(this.activityId_, this.appResources_);
+        windyTyModifier.modify();
     },
-
 
 
     /**
@@ -314,6 +387,19 @@ StravistiX.prototype = {
         hideFeedModifier.modify();
     },
 
+    handleDisplayFlyByFeedModifier_: function() {
+
+        // Test if where are on dashboard page
+        if (!window.location.pathname.match(/^\/dashboard/)) {
+            return;
+        }
+
+        if (env.debugMode) console.log("Execute handleDisplayFlyByFeedModifier_()");
+
+        var displayFlyByFeedModifier = new DisplayFlyByFeedModifier();
+        displayFlyByFeedModifier.modify();
+    },
+
     /**
      *
      */
@@ -370,6 +456,14 @@ StravistiX.prototype = {
 
             }.bind(this)
         );
+
+        // Send opened activity type to ga for stats
+        var updatedToEvent = {
+            categorie: 'Analyse',
+            action: 'openedActivityType',
+            name: activityType
+        };
+        _spTrack('send', 'event', updatedToEvent.categorie, updatedToEvent.action, updatedToEvent.name);
     },
 
     /**
@@ -436,6 +530,36 @@ StravistiX.prototype = {
             activityBikeOdoModifier.modify();
 
         }.bind(this));
+    },
+
+    /**
+     *
+     */
+    handleActivitySegmentTimeComparison_: function() {
+
+        // Test where are on an activity...
+        if (!window.location.pathname.match(/^\/activities/)) {
+            return;
+        }
+
+        if (_.isUndefined(window.pageView)) {
+            return;
+        }
+
+        // Only cycling is supported
+        if (window.pageView.activity().attributes.type != "Ride") {
+            return;
+        }
+
+        // Only for own activities
+        if (this.athleteId_ != this.athleteIdAuthorOfActivity_) {
+            return;
+        }
+
+        if (env.debugMode) console.log("Execute handleActivitySegmentTimeComparison_()");
+
+        var activitySegmentTimeComparisonModifier = new ActivitySegmentTimeComparisonModifier(this.userSettings_);
+        activitySegmentTimeComparisonModifier.modify();
     },
 
     /**
@@ -524,6 +648,25 @@ StravistiX.prototype = {
 
         var virtualPartnerModifier = new VirtualPartnerModifier(this.activityId_);
         virtualPartnerModifier.modify();
+    },
+
+    handleGoogleMapsComeBackModifier: function() {
+
+        if (window.location.pathname.match(/\/truncate/)) { // Skipping on activity cropping
+            return;
+        }
+
+        if (!this.userSettings_.reviveGoogleMaps) {
+            return;
+        }
+
+        // Test where are on an activity...
+        if (!window.location.pathname.match(/^\/activities/)) {
+            return;
+        }
+
+        var googleMapsComeBackModifier = new GoogleMapsComeBackModifier(this.activityId_, this.appResources_, this.userSettings_);
+        googleMapsComeBackModifier.modify();
     },
 
     /**

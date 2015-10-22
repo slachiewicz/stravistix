@@ -64,6 +64,7 @@ Content.prototype = {
 
     loadDependencies: function loadDependencies(finishLoading) {
 
+
         var loader = new Loader();
         var dependencies = _.union(this.jsDependencies_, this.cssDependencies);
         loader.require(dependencies, function() {
@@ -139,7 +140,7 @@ var appResources = {
     settingsLink: chrome.extension.getURL('/options/app/index.html'),
     menuIconBlack: chrome.extension.getURL('/icons/ic_menu_24px_black.svg'),
     menuIconOrange: chrome.extension.getURL('/icons/ic_menu_24px_orange.svg'),
-    remoteViewIcon: chrome.extension.getURL('/icons/ic_launch_24px.svg'),
+    remoteViewIcon: chrome.extension.getURL('/icons/ic_open_in_new_24px.svg'),
     pollIcon: chrome.extension.getURL('/icons/ic_poll_24px.svg'),
     veloviewerIcon: chrome.extension.getURL('/icons/veloviewer.ico'),
     raceshapeIcon: chrome.extension.getURL('/icons/raceshape.ico'),
@@ -156,6 +157,8 @@ var appResources = {
     aboutIcon: chrome.extension.getURL('/icons/ic_info_outline_24px.svg'),
     eyeIcon: chrome.extension.getURL('/icons/ic_remove_red_eye_24px.svg'),
     bikeIcon: chrome.extension.getURL('/icons/ic_directions_bike_24px.svg'),
+    mapIcon: chrome.extension.getURL('/icons/ic_map_24px.svg'),
+    wheatherIcon: chrome.extension.getURL('/icons/ic_wb_sunny_24px.svg'),
     twitterIcon: chrome.extension.getURL('/icons/twitter.svg'),
     systemUpdatesIcon: chrome.extension.getURL('/icons/ic_system_update_24px.svg'),
     donateIcon: chrome.extension.getURL('/icons/ic_attach_money_24px.svg'),
@@ -184,13 +187,15 @@ var jsDependencies = [
     'js/Follow.js',
     'js/modifiers/ActivityScrollingModifier.js',
     'js/modifiers/RemoteLinksModifier.js',
-    'js/modifiers/OpenStreetMapModifier.js',
+    'js/modifiers/WindyTyModifier.js',
     'js/modifiers/DefaultLeaderboardFilterModifier.js',
     'js/modifiers/MenuModifier.js',
     'js/modifiers/SegmentRankPercentageModifier.js',
     'js/modifiers/VirtualPartnerModifier.js',
     'js/modifiers/ActivityGoogleMapTypeModifier.js',
     'js/modifiers/HidePremiumModifier.js',
+    'js/modifiers/AthleteStatsModifier.js',
+    'js/modifiers/ActivitySegmentTimeComparisonModifier.js',
 
     // Extended data views
     'js/modifiers/extendedActivityData/views/AbstractDataView.js',
@@ -202,6 +207,7 @@ var jsDependencies = [
     'js/modifiers/extendedActivityData/views/CyclingCadenceDataView.js',
     'js/modifiers/extendedActivityData/views/RunningCadenceDataView.js',
     'js/modifiers/extendedActivityData/views/PowerDataView.js',
+    'js/modifiers/extendedActivityData/views/ElevationDataView.js',
     'js/modifiers/extendedActivityData/views/AbstractGradeDataView.js',
     'js/modifiers/extendedActivityData/views/CyclingGradeDataView.js',
     'js/modifiers/extendedActivityData/views/RunnningGradeDataView.js',
@@ -213,11 +219,13 @@ var jsDependencies = [
     'js/modifiers/extendedActivityData/GenericExtendedActivityDataModifier.js',
 
     'js/modifiers/HideFeedModifier.js',
+    'js/modifiers/DisplayFlyByFeedModifier.js',
     'js/modifiers/ActivityBikeOdoModifier.js',
     'js/modifiers/ActivityQRCodeDisplayModifier.js',
     'js/modifiers/RunningGradeAdjustedPaceModifier.js',
     'js/modifiers/RunningHeartRateModifier.js',
     'js/modifiers/NearbySegmentsModifier.js',
+    'js/modifiers/GoogleMapsComeBackModifier.js'
 ];
 
 var cssDependencies = [
