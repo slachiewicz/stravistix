@@ -157,7 +157,7 @@ var build = function() {
         // Switch to dist/ folder
         process.chdir(DIST_FOLDER);
 
-        var buildName = generateBuildName(DIST_FOLDER + '/manifest.json');
+        var buildName = generateBuildName(DIST_FOLDER + '/manifest.json', 'zip');
         var outputPath = BUILD_FOLDER + '/' + buildName;
         var archiver = require('archiver');
         var output = fs.createWriteStream(outputPath);
@@ -179,7 +179,6 @@ var build = function() {
             if (err) {
                 throw err;
             }
-
             console.log('done:', base, bytes);
         });
     });
@@ -188,27 +187,27 @@ var build = function() {
 
 var pack = function() {
 
-    var updateManifestFileForPackaging = function(manifestData) {
-        // Update manifest file to add update url
+    var updateDistManifestFileForPacking = function(manifestFile) {
+
+        var manifestData = JSON.parse(fs.readFileSync(manifestFile).toString());
         manifestData.update_url = AUTOUPDATE_URL + '/update.xml';
         manifestData.version_name = manifestData.version + ' Developer Preview';
-        fs.writeFile(join(DIST_FOLDER, '/manifest.json'), JSON.stringify(manifestData));
+        fs.writeFileSync(manifestFile, JSON.stringify(manifestData));
     };
 
     dist(function() {
 
         ChromeExtension = require("crx");
-        
+
         console.log('Packaging crx file from dist/ folder...');
         console.log('Creating ' + PACK_FOLDER + ' folder...');
         fs.mkdirSync(PACK_FOLDER);
 
-        var manifestData = JSON.parse(fs.readFileSync(DIST_FOLDER + '/manifest.json').toString());
-        updateManifestFileForPackaging(manifestData);
+        // Some change into dist manifest file... add update url .. edit version..
+        updateDistManifestFileForPacking(DIST_FOLDER + '/manifest.json');
 
         // Setup crx name
-        var d = new Date();
-        var crxFilename = 'StravistiX_v' + manifestData.version + '_' + d.toDateString().split(' ').join('_') + '_' + d.toLocaleTimeString().split(':').join('_') + '.crx';
+        var crxFilename = generateBuildName(DIST_FOLDER + '/manifest.json', 'crx');
 
         var crx = new ChromeExtension({
             codebase: AUTOUPDATE_URL + crxFilename,
@@ -232,15 +231,15 @@ var pack = function() {
 
                 // Write update XML file
                 var updateXML = crx.generateUpdateXML();
-                fs.writeFile(join(PACK_FOLDER, 'update.xml'), updateXML);
-                console.log('update.xml file saved at ' + crxPath);
+                var updateXMLPath = join(PACK_FOLDER, 'update.xml');
+                fs.writeFile(updateXMLPath, updateXML);
+                console.log('update.xml file saved at ' + updateXMLPath);
             });
         });
     });
 };
 
 var clean = function(callback) {
-
     console.log('Cleaning builds/, dist/ pack/ and node_modules/ folders...');
     deleteFolderRecursive('node_modules');
     deleteFolderRecursive(EXT_FOLDER + 'node_modules');
@@ -265,23 +264,6 @@ var showUsage = function() {
     console.log('clean: Clean builds/, dist/ and node_modules/ folders');
 };
 
-
-/**
- *  Cleanup distribution directory
- */
-/*
-var cleanDistributionFolder = function() {
-
-    if (fs.existsSync(DIST_FOLDER)) {
-        console.log('Clean distribution folder');
-        deleteFolderRecursive(DIST_FOLDER);
-        fs.mkdirSync(DIST_FOLDER);
-    } else {
-        console.log('Create distribution folder');
-        fs.mkdirSync(DIST_FOLDER);
-    }
-}
-*/
 /**
  *
  */
@@ -302,8 +284,14 @@ var deleteFolderRecursive = function(path) {
 /**
  *
  */
-var generateBuildName = function(manifestFile) {
+var generateBuildName = function(manifestFile, type) {
+
+    if (!type && type != 'zip' && type != 'crx') {
+        console.error('ERROR: build type must be "zip" or "crx", exit');
+        process.exit(1);
+    }
     var manifestData = JSON.parse(fs.readFileSync(manifestFile).toString());
+    
     var d = new Date();
-    return 'StravistiX_v' + manifestData.version + '_' + d.toDateString().split(' ').join('_') + '_' + d.toLocaleTimeString().split(':').join('_') + '.zip';
+    return 'StravistiX_v' + manifestData.version + '_' + d.toDateString().split(' ').join('_') + '_' + (d.toLocaleTimeString().split(':').join('_')).replace(' ', '_') + '.' + type;
 };
