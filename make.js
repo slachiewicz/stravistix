@@ -1,17 +1,21 @@
 var fs = require('fs');
 var path = require('path');
+var join = path.join;
 var nodeCopy;
+var ChromeExtension;
 
 var HOOK_FOLDER = __dirname + '/hook/';
 var EXT_FOLDER = HOOK_FOLDER + 'extension/';
 var DIST_FOLDER = __dirname + '/dist/';
 var BUILD_FOLDER = __dirname + '/builds/';
+var PACK_FOLDER = __dirname + '/pack/';
+var AUTOUPDATE_URL = 'http://champagne.thomas.free.fr/stravistix/builds/';
 
 var action = process.argv.slice(2)[0];
 
 setTimeout(function() {
 
-    if (typeof action === 'undefined' || (action !== 'init' && action !== 'dist' && action !== 'build' && action !== 'clean')) {
+    if (typeof action === 'undefined' || (action !== 'init' && action !== 'dist' && action !== 'build' && action !== 'pack' && action !== 'clean')) {
 
         showUsage();
 
@@ -33,6 +37,10 @@ setTimeout(function() {
 
             case 'clean':
                 clean();
+                break;
+
+            case 'pack':
+                pack();
                 break;
         }
     }
@@ -99,10 +107,6 @@ var dist = function(callback) {
 
         // Init finish require are now possible
         nodeCopy = require('ncp').ncp;
-
-        // Clean dist/ folder or create it..
-        cleanDistributionFolder();
-
         console.log('Making distribution folder...');
 
         var options = {
@@ -182,13 +186,68 @@ var build = function() {
 };
 
 
+var pack = function() {
+
+    var updateManifestFileForPackaging = function(manifestData) {
+        // Update manifest file to add update url
+        manifestData.update_url = AUTOUPDATE_URL + '/update.xml';
+        manifestData.version_name = manifestData.version + ' Developer Preview';
+        fs.writeFile(join(DIST_FOLDER, '/manifest.json'), JSON.stringify(manifestData));
+    };
+
+    dist(function() {
+
+        ChromeExtension = require("crx");
+        
+        console.log('Packaging crx file from dist/ folder...');
+        console.log('Creating ' + PACK_FOLDER + ' folder...');
+        fs.mkdirSync(PACK_FOLDER);
+
+        var manifestData = JSON.parse(fs.readFileSync(DIST_FOLDER + '/manifest.json').toString());
+        updateManifestFileForPackaging(manifestData);
+
+        // Setup crx name
+        var d = new Date();
+        var crxFilename = 'StravistiX_v' + manifestData.version + '_' + d.toDateString().split(' ').join('_') + '_' + d.toLocaleTimeString().split(':').join('_') + '.crx';
+
+        var crx = new ChromeExtension({
+            codebase: AUTOUPDATE_URL + crxFilename,
+            rootDirectory: DIST_FOLDER,
+            privateKey: fs.readFileSync(join(__dirname, 'hook/extension.pem'))
+        });
+
+        // Package it
+        crx.load().then(function(crx) {
+
+            crx.pack().then(function(crxBuffer) {
+
+                var crxPath = PACK_FOLDER + crxFilename;
+
+                console.log('Writing crx file to ' + crxPath);
+
+                fs.writeFile(crxPath, crxBuffer, function(err) {
+                    if (err) throw err;
+                    console.log('crx saved at ' + crxPath);
+                });
+
+                // Write update XML file
+                var updateXML = crx.generateUpdateXML();
+                fs.writeFile(join(PACK_FOLDER, 'update.xml'), updateXML);
+                console.log('update.xml file saved at ' + crxPath);
+            });
+        });
+    });
+};
+
 var clean = function(callback) {
-    console.log('Cleaning builds/, dist/ and node_modules/ folders...');
+
+    console.log('Cleaning builds/, dist/ pack/ and node_modules/ folders...');
     deleteFolderRecursive('node_modules');
     deleteFolderRecursive(EXT_FOLDER + 'node_modules');
     deleteFolderRecursive(DIST_FOLDER);
     deleteFolderRecursive(BUILD_FOLDER);
-    console.log('builds/, dist/ and node_modules/ folders cleaned');
+    deleteFolderRecursive(PACK_FOLDER);
+    console.log('builds/, dist/ pack/ and node_modules/ folders cleaned');
     if (callback) {
         callback();
     }
@@ -199,7 +258,7 @@ var clean = function(callback) {
  */
 var showUsage = function() {
     console.log('Usage:');
-    console.log('node ' + path.basename(__filename) + ' <init|dist|build|clean>\r\n');
+    console.log('node ' + path.basename(__filename) + ' <init|dist|build|clean|pack>\r\n');
     console.log('init: Install dependencies');
     console.log('dist: Create distribution folder');
     console.log('build: Create archive of distribution folder');
@@ -210,6 +269,7 @@ var showUsage = function() {
 /**
  *  Cleanup distribution directory
  */
+/*
 var cleanDistributionFolder = function() {
 
     if (fs.existsSync(DIST_FOLDER)) {
@@ -221,7 +281,7 @@ var cleanDistributionFolder = function() {
         fs.mkdirSync(DIST_FOLDER);
     }
 }
-
+*/
 /**
  *
  */
