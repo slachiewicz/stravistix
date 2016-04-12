@@ -99,6 +99,7 @@ StorageManager.prototype = {
         //TODO handle setToStorage local storage in StorageManager
         else if (this.storageType == 'local') {
 
+
             chrome.storage.local.get(null, function(allData) {
                 allData[key] = value;
                 chrome.storage.local.set(allData);

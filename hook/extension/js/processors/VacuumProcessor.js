@@ -462,7 +462,7 @@ VacuumProcessor.prototype = {
                 deferred.reject('Unable to get models' + textStatus);
             } else { // No errors...
 
-                if (_.isEmpty(data.models)) { // No more activities to fetch, resolving promise here
+                if (activitiesList.length >= data.total /*_.isEmpty(data.models)*/) { // No more activities to fetch, resolving promise here
                     console.log('Resolving with ' + activitiesList.length + ' activities found');
                     deferred.resolve(activitiesList);
                 } else {

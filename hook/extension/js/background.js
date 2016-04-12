@@ -40,6 +40,7 @@ chrome.runtime.onMessageExternal.addListener(
 chrome.runtime.onInstalled.addListener(function(details) {
 
     var thisVersion = chrome.runtime.getManifest().version;
+
     var storageManager;
 
     if (details.reason == "install") {

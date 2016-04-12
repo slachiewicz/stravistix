@@ -451,17 +451,17 @@ StravistiX.prototype = {
 
             self.vacuumProcessor_.fetchActivitiesRecursive(untilTimestamp).then(function success(activities) {
 
-                console.warn(activities);
-
-                // Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function (response) {
-                //     console.debug(response);
-                // });
+                // console.warn(activities);
+                console.log('send set to storage to ' + self.extensionId_);
+                Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function (response) {
+                    console.debug(response);
+                });
 
             }, function error(err) {
 
             }, function progress(percentage) {
 
-                console.warn(percentage);
+                console.log('fetching progress @ ' + percentage);
 
             });
         });
