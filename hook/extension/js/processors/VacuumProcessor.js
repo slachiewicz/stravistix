@@ -430,4 +430,76 @@ VacuumProcessor.prototype = {
         var activityName = $(".activity-summary-container").find('.marginless.activity-name').text().trim();
         return (activityName) ? activityName : null;
     },
+
+
+    fetchActivities: function() {
+
+        var fetchedActivitiesDeferred = $.Deferred();
+
+        var self = this;
+        var fetchActivitiesRequests = [];
+        var myActivitiesUrl = '/athlete/training_activities?new_activity_only=false&per_page=2000&page=';
+
+        fetchActivitiesRequests.push($.ajax({
+
+            url: myActivitiesUrl + "1", // Fetch first page
+
+            success: function(data) {
+
+                var fetchedActivities = [];
+
+                // Now fetch seconds and others...
+                for (i = 2, max = Math.ceil(data.total / data.perPage); i <= max; i++) {
+                    fetchActivitiesRequests.push($.ajax(myActivitiesUrl + i));
+                }
+
+                $.when(self, fetchActivitiesRequests).done(function() {
+                    _.each(fetchActivitiesRequests, function (request) {
+                        // var request = fetchActivitiesRequests[i];
+                        // console.warn(request.responseJSON);
+                        request.then(function (result, error) {
+                            console.debug(result);
+                            console.error(error);
+                        });
+
+                        /*if (request.responseJSON && request.responseJSON.models && request.responseJSON.models.length) {
+                            fetchedActivities.push(request.responseJSON.models);
+                            //console.debug(request.responseJSON.models);
+                            // currentActivities = currentActivities.concat(request.responseJSON.models);
+                        }*/
+                    });
+                    fetchedActivities = _.flatten(fetchedActivities);
+                    fetchedActivitiesDeferred.resolve(fetchedActivities);
+                });
+            }
+        }));
+
+        return fetchedActivitiesDeferred.promise();
+    },
+
+    fetchActivitiesStreams: function() {
+
+        var fetchedActivitiesStreamDeferred = $.Deferred();
+
+        this.fetchActivities().then(
+
+
+
+            function(activities) {
+                console.warn(activities);
+
+                _.each(activities, function(activity) {
+                    // Request stream and process...
+                    // console.debug(activity);
+                });
+
+            },
+            function(error) {
+                console.error(error);
+            }
+        );
+
+        return fetchedActivitiesStreamDeferred.promise();
+    }
+
 };

@@ -65,6 +65,7 @@ StravistiX.prototype = {
         this.handleHidePremium_();
         this.handleHideFeed_();
         this.handleDisplayFlyByFeedModifier_();
+        this.handleActivitySync();
 
         // Bike
         this.handleExtendedActivityData_();
@@ -438,6 +439,14 @@ StravistiX.prototype = {
 
         var displayFlyByFeedModifier = new DisplayFlyByFeedModifier();
         displayFlyByFeedModifier.modify();
+    },
+
+    handleActivitySync: function() {
+        window.sync = function () {
+
+            this.vacuumProcessor_.fetchActivitiesStreams();
+
+        }.bind(this);
     },
 
     /**
