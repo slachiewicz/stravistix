@@ -441,29 +441,6 @@ StravistiX.prototype = {
         displayFlyByFeedModifier.modify();
     },
 
-    handleActivitySync: function() {
-
-        var self = this;
-
-        window.sync = function() {
-
-            var untilTimestamp = false;
-
-            self.vacuumProcessor_.fetchActivitiesRecursive(untilTimestamp).then(function success(activities) {
-                // console.warn(activities);
-                console.log('send set to storage to ' + self.extensionId_);
-                Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function(response) {
-                    console.debug(response);
-                });
-
-            }, function error(err) {
-                console.error(err);
-            }, function progress(percentage) {
-                console.log('fetching progress @ ' + percentage);
-            });
-        };
-    },
-
     /**
      *
      */
@@ -954,5 +931,47 @@ StravistiX.prototype = {
             if (env.debugMode) console.log("Cookie 'stravistix_daily_connection_done' exist, DO NOT TRACK IncomingConnection");
 
         }
-    }
+    },
+
+    handleActivitySync: function() {
+
+        var self = this;
+
+        window.sync = function() {
+
+            var sync = new Sync();
+
+            sync.fetchActivities().then(function success(activities) {
+
+                console.debug(activities);
+                // Save to chrome storage
+                Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function(response) {
+                    console.debug(response);
+                });
+
+            }, function error(err) {
+
+                console.error(err);
+
+            }, function progress(percentage) {
+
+                console.log('fetching progress @ ' + percentage);
+
+            });
+
+
+        };
+    },
+};
+
+function Sync() {
+    this.vacuumProcessor = new VacuumProcessor();
+    this.untilTimestamp = false;
+}
+
+Sync.prototype = {
+
+    fetchActivities: function() {
+        return this.vacuumProcessor.fetchActivitiesRecursive(this.untilTimestamp);
+    },
 };

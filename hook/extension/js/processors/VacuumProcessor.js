@@ -454,9 +454,9 @@ VacuumProcessor.prototype = {
         promiseActivitiesRequest.then(function(data, textStatus, jqXHR) {
 
             // Success
-            console.log(data);
-            console.log(textStatus);
-            console.log(jqXHR);
+            // console.log(data);
+            // console.log(textStatus);
+            // console.log(jqXHR);
 
             if (textStatus !== 'success') {
                 deferred.reject('Unable to get models' + textStatus);
@@ -478,9 +478,9 @@ VacuumProcessor.prototype = {
 
             deferred.reject([jqXHR, textStatus, errorThrown]);
             // Fail
-            console.error(jqXHR);
-            console.error(textStatus);
-            console.error(errorThrown);
+            // console.error(jqXHR);
+            // console.error(textStatus);
+            // console.error(errorThrown);
         });
 
         return deferred.promise();
