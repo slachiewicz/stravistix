@@ -133,7 +133,7 @@ VacuumProcessor.prototype = {
     /**
      * @returns Common activity stats given by Strava throught right panel
      */
-    getActivityCommonStats: function () {
+    getActivityCommonStats: function() {
 
         var actStatsContainer = $(".activity-summary-container");
 
@@ -288,7 +288,7 @@ VacuumProcessor.prototype = {
 
         var url = "/activities/" + this.getActivityId() + "/streams?stream_types[]=watts_calc&stream_types[]=watts&stream_types[]=velocity_smooth&stream_types[]=time&stream_types[]=distance&stream_types[]=cadence&stream_types[]=heartrate&stream_types[]=grade_smooth&stream_types[]=altitude&stream_types[]=latlng";
 
-        $.ajax(url).done(function (jsonResponse) {
+        $.ajax(url).done(function(jsonResponse) {
 
             var hasPowerMeter = true;
 
@@ -340,10 +340,10 @@ VacuumProcessor.prototype = {
                 type: 'GET',
                 crossDomain: true, // enable this
                 dataType: 'jsonp',
-                success: function (xhrResponseText) {
+                success: function(xhrResponseText) {
                     segmentsUnify.cycling = xhrResponseText;
                 },
-                error: function (err) {
+                error: function(err) {
                     console.error(err);
                 }
             }),
@@ -359,15 +359,15 @@ VacuumProcessor.prototype = {
                 type: 'GET',
                 crossDomain: true, // enable this
                 dataType: 'jsonp',
-                success: function (xhrResponseText) {
+                success: function(xhrResponseText) {
                     segmentsUnify.running = xhrResponseText;
                 },
-                error: function (err) {
+                error: function(err) {
                     console.error(err);
                 }
             })
 
-        ).then(function () {
+        ).then(function() {
             callback(segmentsUnify);
         });
 
@@ -381,10 +381,10 @@ VacuumProcessor.prototype = {
         $.ajax({
             url: '/stream/segments/' + segmentId,
             type: 'GET',
-            success: function (xhrResponseText) {
+            success: function(xhrResponseText) {
                 callback(xhrResponseText);
             },
-            error: function (err) {
+            error: function(err) {
                 console.error(err);
             }
         });
@@ -394,7 +394,7 @@ VacuumProcessor.prototype = {
     /**
      * @returns Array of bikes/odo
      */
-    getBikeOdoOfAthlete: function (athleteId, callback) {
+    getBikeOdoOfAthlete: function(athleteId, callback) {
 
         if (_.isUndefined(window.pageView)) {
             callback(null);
@@ -408,10 +408,10 @@ VacuumProcessor.prototype = {
 
         var url = location.protocol + "//www.strava.com/athletes/" + athleteId;
 
-        $.ajax(url).always(function (data) {
+        $.ajax(url).always(function(data) {
 
             var bikeOdoArray = {};
-            _.each($(data.responseText).find('div.gear>table>tbody>tr'), function (element) {
+            _.each($(data.responseText).find('div.gear>table>tbody>tr'), function(element) {
                 var bikeName = $(element).find('td').first().text().trim();
                 var bikeOdo = $(element).find('td').last().text().trim();
                 bikeOdoArray[btoa(unescape(encodeURIComponent(bikeName)))] = bikeOdo;
@@ -431,7 +431,7 @@ VacuumProcessor.prototype = {
         return (activityName) ? activityName : null;
     },
 
-    fetchActivitiesRecursive: function (untilTimestamp, page, deferred, activitiesList) {
+    fetchActivitiesRecursive: function(untilTimestamp, page, deferred, activitiesList) {
 
         var self = this;
 
@@ -451,7 +451,7 @@ VacuumProcessor.prototype = {
 
         var promiseActivitiesRequest = $.ajax(activitiesUrl);
 
-        promiseActivitiesRequest.then(function (data, textStatus, jqXHR) {
+        promiseActivitiesRequest.then(function(data, textStatus, jqXHR) {
 
             // Success
             console.log(data);
@@ -462,21 +462,19 @@ VacuumProcessor.prototype = {
                 deferred.reject('Unable to get models' + textStatus);
             } else { // No errors...
 
-                if (activitiesList.length >= data.total /*_.isEmpty(data.models)*/) { // No more activities to fetch, resolving promise here
+                if (activitiesList.length >= data.total) { // No more activities to fetch, resolving promise here
                     console.log('Resolving with ' + activitiesList.length + ' activities found');
                     deferred.resolve(activitiesList);
                 } else {
 
                     // Append activities
                     activitiesList = _.flatten(_.union(activitiesList, data.models));
-
                     deferred.notify(activitiesList.length / data.total * 100);
-
                     self.fetchActivitiesRecursive(untilTimestamp, page + 1, deferred, activitiesList);
                 }
             }
 
-        }, function (jqXHR, textStatus, errorThrown) {
+        }, function(jqXHR, textStatus, errorThrown) {
 
             deferred.reject([jqXHR, textStatus, errorThrown]);
             // Fail
@@ -487,77 +485,4 @@ VacuumProcessor.prototype = {
 
         return deferred.promise();
     },
-
-
-    /////////////////////////////////////
-    fetchActivities: function () {
-
-        var fetchedActivitiesDeferred = $.Deferred();
-
-        var self = this;
-        var fetchActivitiesRequests = [];
-        var myActivitiesUrl = '/athlete/training_activities?new_activity_only=false&per_page=2000&page=';
-
-        fetchActivitiesRequests.push($.ajax({
-
-            url: myActivitiesUrl + "1", // Fetch first page
-
-            success: function (data) {
-
-                var fetchedActivities = [];
-
-                // Now fetch seconds and others...
-                for (i = 2, max = Math.ceil(data.total / data.perPage); i <= max; i++) {
-                    fetchActivitiesRequests.push($.ajax(myActivitiesUrl + i));
-                }
-
-                $.when(self, fetchActivitiesRequests).done(function () {
-                    _.each(fetchActivitiesRequests, function (request) {
-                        // var request = fetchActivitiesRequests[i];
-                        // console.warn(request.responseJSON);
-                        request.then(function (result, error) {
-                            console.debug(result);
-                            console.error(error);
-                        });
-
-                        /*if (request.responseJSON && request.responseJSON.models && request.responseJSON.models.length) {
-                            fetchedActivities.push(request.responseJSON.models);
-                            //console.debug(request.responseJSON.models);
-                            // currentActivities = currentActivities.concat(request.responseJSON.models);
-                        }*/
-                    });
-                    fetchedActivities = _.flatten(fetchedActivities);
-                    fetchedActivitiesDeferred.resolve(fetchedActivities);
-                });
-            }
-        }));
-
-        return fetchedActivitiesDeferred.promise();
-    },
-
-    fetchActivitiesStreams: function () {
-
-        var fetchedActivitiesStreamDeferred = $.Deferred();
-
-        this.fetchActivities().then(
-
-
-
-            function (activities) {
-                console.warn(activities);
-
-                _.each(activities, function (activity) {
-                    // Request stream and process...
-                    // console.debug(activity);
-                });
-
-            },
-            function (error) {
-                console.error(error);
-            }
-        );
-
-        return fetchedActivitiesStreamDeferred.promise();
-    }
-
 };

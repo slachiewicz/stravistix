@@ -1,5 +1,13 @@
 app.controller("CommonSettingsController", ['$scope', 'Notifier', '$timeout', '$location', function($scope, Notifier, $timeout, $location) {
 
+    // To move in factory
+    ChromeStorageModule.fetchComputedActivities(function (activities) {
+        console.debug(activities);
+        _.each(activities, function (item) {
+            console.debug(item.name);
+        });
+    });
+
     // Define options structure
     $scope.sections = settingsSectionsModule.data;
 
@@ -109,7 +117,7 @@ app.controller("CommonSettingsController", ['$scope', 'Notifier', '$timeout', '$
         if (option) {
             Notifier(option.optionTitle, option.optionHtml);
         }
-    }
+    };
 
     // Trigger auto click on activity page extended data click
     var viewOptionHelperId = $location.search().viewOptionHelperId;

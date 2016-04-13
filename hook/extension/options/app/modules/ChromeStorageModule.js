@@ -14,3 +14,9 @@ ChromeStorageModule.updateUserSetting = function(key, value, callback) {
         callback();
     });
 };
+
+ChromeStorageModule.fetchComputedActivities = function(callback) {
+    chrome.storage.local.get({fetchedActivities: null}, function(computedActivities) {
+        callback(computedActivities.fetchedActivities);
+    });
+};
