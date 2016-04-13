@@ -939,15 +939,19 @@ StravistiX.prototype = {
 
         window.sync = function() {
 
-            var sync = new Sync();
+            var sync = new Sync(self.appResources_, self.userSettings_.userHrrZones, self.userSettings_.zones);
 
-            sync.fetchActivities().then(function success(activities) {
+            sync.start();
+
+            /*
+                        // Save to chrome storage
+                        Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function(response) {
+                            console.debug(response);
+                        });
+            */
+            /*sync.fetchActivities().then(function success(activities) {
 
                 console.debug(activities);
-                // Save to chrome storage
-                Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function(response) {
-                    console.debug(response);
-                });
 
             }, function error(err) {
 
@@ -958,13 +962,16 @@ StravistiX.prototype = {
                 console.log('fetching progress @ ' + percentage);
 
             });
-
+*/
 
         };
     },
 };
 
-function Sync() {
+function Sync(appResources, userHrrZones, zones) {
+    this.appResources = appResources;
+    this.userHrrZones = userHrrZones;
+    this.zones = zones;
     this.vacuumProcessor = new VacuumProcessor();
     this.untilTimestamp = false;
 }
@@ -973,5 +980,83 @@ Sync.prototype = {
 
     fetchActivities: function() {
         return this.vacuumProcessor.fetchActivitiesRecursive(this.untilTimestamp);
+    },
+
+    computeActivity: function(activity) {
+
+        // Create worker blob URL if not exist
+        if (!self.computeAnalysisWorkerBlobURL) {
+
+            // Create a blob from 'ComputeAnalysisWorker' function variable as a string
+            var blob = new Blob(['(', ComputeAnalysisWorker.toString(), ')()'], {
+                type: 'application/javascript'
+            });
+
+            // Keep track of blob URL to reuse it
+            self.computeAnalysisWorkerBlobURL = URL.createObjectURL(blob);
+        }
+
+        // Lets create that worker/thread!
+        self.computeAnalysisThread = new Worker(self.computeAnalysisWorkerBlobURL);
+
+        // Send user and activity data to the thread
+        // He will compute them in the background
+        self.computeAnalysisThread.postMessage({
+            activityType: activity.type,
+            isTrainer: activity.trainer,
+            appResources: self.appResources,
+            userSettings: {
+                userGender: userGender,
+                userRestHr: userRestHr,
+                userMaxHr: userMaxHr,
+                userFTP: userFTP,
+                zones: self.zones,
+                userHrrZones: self.userHrrZones,
+            },
+            params: {
+                athleteWeight: 73, // TODO Replace
+                hasPowerMeter: false, // TODO Replace
+                activityStatsMap: activityStatsMap,
+                activityStream: activityStream,
+                bounds: bounds
+            }
+        });
+
+        // Listen messages from thread. Thread will send to us the result of computation
+        self.computeAnalysisThread.onmessage = function(messageFromThread) {
+
+            callback(messageFromThread.data);
+
+            // Finish and kill thread
+            self.computeAnalysisThread.terminate();
+
+        }.bind(this);
+    },
+
+    start: function() {
+
+        var self = this;
+
+        var deferred = $.Deferred();
+
+        self.fetchActivities().then(function success(activities) {
+
+            console.debug(activities);
+            // TODO For each activity, compute Extended Stats
+            _.each(activities, function(activity) {
+
+                // ... self.computeActivity(activity);
+
+            });
+
+        }, function error(err) {
+
+            deferred.reject(err);
+
+        }, function progress(percentage) {
+            console.log('fetching activities progress @ ' + percentage + '%');
+        });
+
+        return deferred.promise();
     },
 };
