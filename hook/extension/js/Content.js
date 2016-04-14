@@ -192,6 +192,7 @@ var jsDependencies = [
     'modules/qrcode.min.js',
     'modules/vv.mapFlipper.js',
     'modules/jquery.appear.js',
+    'modules/Sync.js',
     'js/processors/VacuumProcessor.js',
     'js/processors/ActivityProcessor.js',
     'js/processors/BikeOdoProcessor.js',
