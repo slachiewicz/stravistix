@@ -463,7 +463,7 @@ VacuumProcessor.prototype = {
             } else { // No errors...
 
                 // overridde data total
-                data.total = 40;
+                data.total = 20;
 
                 if (activitiesList.length >= data.total) { // No more activities to fetch, resolving promise here
                     console.log('Resolving with ' + activitiesList.length + ' activities found');
@@ -493,7 +493,7 @@ VacuumProcessor.prototype = {
         return deferred.promise();
     },
 
-    fetchActivitiesStreamById: function (activityId) {
+    fetchActivityStreamById: function (activityId) {
 
         var self = this;
 
