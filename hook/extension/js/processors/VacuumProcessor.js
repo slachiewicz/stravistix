@@ -440,7 +440,7 @@ VacuumProcessor.prototype = {
         }
 
         if (!deferred) {
-            deferred = $.Deferred();
+            deferred = Q.defer();
         }
 
         if (!activitiesList) {
@@ -452,11 +452,6 @@ VacuumProcessor.prototype = {
         var promiseActivitiesRequest = $.ajax(activitiesUrl);
 
         promiseActivitiesRequest.then(function success(data, textStatus, jqXHR) {
-
-            // Success
-            // console.log(data);
-            // console.log(textStatus);
-            // console.log(jqXHR);
 
             if (textStatus !== 'success') {
                 deferred.reject('Unable to get models' + textStatus);
@@ -484,20 +479,17 @@ VacuumProcessor.prototype = {
                 textStatus: textStatus,
                 errorThrown: errorThrown
             });
-            // Fail
-            // console.error(jqXHR);
-            // console.error(textStatus);
-            // console.error(errorThrown);
+            
         });
 
-        return deferred.promise();
+        return deferred.promise;
     },
 
     fetchActivityStreamById: function (activityId) {
 
         var self = this;
 
-        var deferred = $.Deferred();
+        var deferred = Q.defer();
 
         var activityStreamUrl = "/activities/" + activityId + "/streams?stream_types[]=watts_calc&stream_types[]=watts&stream_types[]=velocity_smooth&stream_types[]=time&stream_types[]=distance&stream_types[]=cadence&stream_types[]=heartrate&stream_types[]=grade_smooth&stream_types[]=altitude&stream_types[]=latlng";
 
@@ -513,6 +505,6 @@ VacuumProcessor.prototype = {
             });
         });
 
-        return deferred.promise();
+        return deferred.promise;
     }
 };

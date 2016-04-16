@@ -1,19 +1,3 @@
-// Put somewhere in your scripting environment
-if (jQuery.when.all===undefined) {
-    jQuery.when.all = function(deferreds) {
-        var deferred = new jQuery.Deferred();
-        $.when.apply(jQuery, deferreds).then(
-            function() {
-                deferred.resolve(Array.prototype.slice.call(arguments));
-            },
-            function() {
-                deferred.fail(Array.prototype.slice.call(arguments));
-            });
-
-        return deferred;
-    };
-}
-
 function Sync(appResources, userHrrZones, zones) {
     this.appResources = appResources;
     this.userHrrZones = userHrrZones;
@@ -32,32 +16,22 @@ Sync.prototype = {
 
         var self = this;
 
-        var deferred = $.Deferred();
+        var deferred = Q.defer();
 
         // Start fetching missing activities
         self.fetchActivities(untilTimestamp).then(function success(activities) {
-
-
             var promisesOfActivitiesStreamById = [];
-
             // For each activity, fetch his stream and compute extended stats
             _.each(activities, function (activity) {
-
                 // Getting promise of stream for each activity...
                 promisesOfActivitiesStreamById.push(self.vacuumProcessor.fetchActivityStreamById(activity.id));
-
             });
 
-            $.when.all(promisesOfActivitiesStreamById).then(function success(results) {
-
-                // TODO Use https://github.com/cujojs/when insteadof jquery for promises
+            Q.all(promisesOfActivitiesStreamById).then(function success(results) {
                 console.log(results);
-                console.log(arguments);
-
             }, function error(err) {
                 deferred.reject(err);
             });
-
 
         }, function error(err) {
 
@@ -70,10 +44,10 @@ Sync.prototype = {
             });
         });
 
-        return deferred.promise();
+        return deferred.promise;
     },
 
-
+    // TODO To move out in a processor ?!
     computeActivity: function (activity) {
         /*
                 // Create worker blob URL if not exist
