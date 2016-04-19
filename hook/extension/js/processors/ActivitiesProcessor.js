@@ -61,7 +61,7 @@ ActivitiesProcessor.prototype = {
             'avgPower': null, // Toughness Score will not be computed
             'energyOutput': activityWithStream.energyOutput,
             'elapsedTime': activityWithStream.elapsed_time_raw,
-            'averageSpeed':  null, // TODO find ???
+            'averageSpeed':  null, // Toughness Score will not be computed
             'averageHeartRate':  null, // TODO find ???
             'maxHeartRate':  null, // TODO find ???
         };
