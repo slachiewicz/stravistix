@@ -161,10 +161,6 @@ VacuumProcessor.prototype = {
             $('[data-glossary-term*=definition-weighted-average-power]').parent().parent().children().first().text(),
             false, false, false, false);
 
-        // Get Energy Output
-        var energyOutput = this.formatActivityDataValue_(
-            actStatsContainer.find('.inline-stats.section.secondary-stats').children().first().next().children().first().text(),
-            false, false, false, true);
 
         // Get Elapsed Time
         var elapsedTime = this.formatActivityDataValue_(
@@ -211,7 +207,6 @@ VacuumProcessor.prototype = {
             'elevation': elevation,
             'avgPower': avgPower,
             'weightedPower': weightedPower,
-            'energyOutput': energyOutput,
             'elapsedTime': elapsedTime,
             'averageSpeed': averageSpeed
         };
