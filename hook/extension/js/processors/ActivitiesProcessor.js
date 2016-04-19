@@ -58,12 +58,12 @@ ActivitiesProcessor.prototype = {
             'distance': activityWithStream.distance,
             'movingTime': activityWithStream.moving_time_raw,
             'elevation': activityWithStream.elevation_gain,
-            'avgPower': null, // Toughness Score will not be computed
             'energyOutput': activityWithStream.energyOutput,
             'elapsedTime': activityWithStream.elapsed_time_raw,
-            'averageSpeed':  null, // Toughness Score will not be computed
-            'averageHeartRate':  null, // TODO find ???
-            'maxHeartRate':  null, // TODO find ???
+
+            // Toughness will not be computed intentionnaly with the following attributes "null":
+            'avgPower': null, // Toughness Score will not be computed
+            'averageSpeed': null // Toughness Score will not be computed
         };
 
     },

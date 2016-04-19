@@ -204,14 +204,6 @@ VacuumProcessor.prototype = {
             averageSpeed = averageSpeed / speedFactor; // Always give PKH here
         }
 
-        var averageHeartRate = this.formatActivityDataValue_(
-            actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().next().children().first().children().first().next().has('abbr').text(),
-            false, false, false, false);
-
-        var maxHeartRate = this.formatActivityDataValue_(
-            actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().next().children().first().children().first().next().next().text(),
-            false, false, false, false);
-
         // Create activityData Map
         return {
             'distance': distance,
@@ -221,9 +213,7 @@ VacuumProcessor.prototype = {
             'weightedPower': weightedPower,
             'energyOutput': energyOutput,
             'elapsedTime': elapsedTime,
-            'averageSpeed': averageSpeed,
-            'averageHeartRate': averageHeartRate,
-            'maxHeartRate': maxHeartRate
+            'averageSpeed': averageSpeed
         };
     },
 

@@ -510,8 +510,8 @@ function ComputeAnalysisWorker() {
                     // Update zone distribution percentage
                     this.userSettings.userHrrZones = this.finalizeDistribComputationZones(this.userSettings.userHrrZones);
 
-                    activityStatsMap.averageHeartRate = hrSum / hrrSecondsCount;
-                    activityStatsMap.maxHeartRate = heartRateArraySorted[heartRateArraySorted.length - 1];
+                    var averageHeartRate = hrSum / hrrSecondsCount;
+                    var maxHeartRate = heartRateArraySorted[heartRateArraySorted.length - 1];
 
                     var TRIMPPerHour = TRIMP / hrrSecondsCount * 60 * 60;
                     var percentiles = Helper.weightedPercentiles(heartRateArrayMoving, heartRateArrayMovingDuration, [0.25, 0.5, 0.75]);
@@ -523,10 +523,10 @@ function ComputeAnalysisWorker() {
                         'lowerQuartileHeartRate': percentiles[0],
                         'medianHeartRate': percentiles[1],
                         'upperQuartileHeartRate': percentiles[2],
-                        'averageHeartRate': activityStatsMap.averageHeartRate,
-                        'maxHeartRate': activityStatsMap.maxHeartRate,
-                        'activityHeartRateReserve': Helper.heartRateReserveFromHeartrate(activityStatsMap.averageHeartRate, userMaxHr, userRestHr) * 100,
-                        'activityHeartRateReserveMax': Helper.heartRateReserveFromHeartrate(activityStatsMap.maxHeartRate, userMaxHr, userRestHr) * 100
+                        'averageHeartRate': averageHeartRate,
+                        'maxHeartRate': maxHeartRate,
+                        'activityHeartRateReserve': Helper.heartRateReserveFromHeartrate(averageHeartRate, userMaxHr, userRestHr) * 100,
+                        'activityHeartRateReserveMax': Helper.heartRateReserveFromHeartrate(maxHeartRate, userMaxHr, userRestHr) * 100
                     };
 
                 },
