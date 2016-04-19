@@ -34,6 +34,15 @@ ActivitiesSynchronizer.prototype = {
                     console.log('Stream length match with activities fetched length: (' + streamResults.length + ' == ' + activities.length + ')');
 
                     _.each(streamResults, function (stream, index) {
+
+                        var hasPowerMeter = true;
+
+                        if (_.isEmpty(stream.watts)) {
+                            stream.watts = stream.watts_calc;
+                            hasPowerMeter = false;
+                        }
+                        
+                        activities[index].hasPowerMeter = hasPowerMeter;
                         activities[index].stream = stream;
                     });
 
