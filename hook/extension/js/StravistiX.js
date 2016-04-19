@@ -942,7 +942,9 @@ StravistiX.prototype = {
             var activitiesSynchronizer = new ActivitiesSynchronizer(self.appResources_, self.userSettings_.userHrrZones, self.userSettings_.zones);
 
             activitiesSynchronizer.fetch().then(function success(result) {
-                
+
+                console.log(result);
+
             }, function error(err) {
 
                 console.error(err);

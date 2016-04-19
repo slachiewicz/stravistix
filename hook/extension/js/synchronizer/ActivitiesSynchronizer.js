@@ -8,12 +8,6 @@ function ActivitiesSynchronizer(appResources, userHrrZones, zones) {
 
 ActivitiesSynchronizer.prototype = {
 
-    /**
-     * @return All activities without
-     */
-    fetchActivities: function (untilTimestamp) {
-        return this.vacuumProcessor.fetchActivitiesRecursive(untilTimestamp);
-    },
 
     /**
      * @return All activities with their stream
@@ -25,7 +19,7 @@ ActivitiesSynchronizer.prototype = {
         var deferred = Q.defer();
 
         // Start fetching missing activities
-        self.fetchActivities(untilTimestamp).then(function success(activities) {
+        self.vacuumProcessor.fetchActivitiesRecursive(untilTimestamp).then(function success(activities) {
             var promisesOfActivitiesStreamById = [];
             // For each activity, fetch his stream and compute extended stats
             _.each(activities, function (activity) {
@@ -33,8 +27,22 @@ ActivitiesSynchronizer.prototype = {
                 promisesOfActivitiesStreamById.push(self.vacuumProcessor.fetchActivityStreamById(activity.id));
             });
 
-            Q.all(promisesOfActivitiesStreamById).then(function success(results) {
-                console.log(results);
+            Q.all(promisesOfActivitiesStreamById).then(function success(streamResults) {
+
+                if (streamResults.length !== activities.length) {
+                    var errMessage = 'Stream length mismatch with activities fetched length: ' + streamResults.length + ' != ' + activities.length + ')';
+                    deferred.reject(errMessage);
+                } else {
+
+                    console.log('Stream length match with activities fetched length: (' + streamResults.length + ' == ' + activities.length + ')');
+
+                    _.each(streamResults, function (stream, index) {
+                        activities[index].stream = stream;
+                    });
+
+                    deferred.resolve(activities);
+                }
+
             }, function error(err) {
                 deferred.reject(err);
             });
