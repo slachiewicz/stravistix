@@ -15,22 +15,34 @@ ActivitiesProcessor.prototype = {
 
         var deferred = Q.defer();
 
-        // Testing on first item FIRST ! ;)
-        self.computeActivity(self.activitiesWithStream[0]).then(function success(result) {
 
-            console.warn(result);
+        // Testing only with one
+        // console.error('Testing only with one activitiesWithStream. Remove later...');
+        // self.activitiesWithStream = [self.activitiesWithStream[0]];
 
-        }, function error(err) {
+        _.each(self.activitiesWithStream, function (activityWithStream) {
 
-            console.error(err);
+            self.computeActivity(activityWithStream).then(function success(result) {
 
-            deferred.reject(err);
+                // console.debug(self.activitiesWithStream[0]);
+                console.debug(result);
 
-        }, function progress(percentage) {
+            }, function error(err) {
 
-            console.debug(percentage);
+                console.error(err);
 
+                deferred.reject(err);
+
+            }, function progress(percentage) {
+
+                console.debug(percentage);
+
+            });
         });
+
+
+
+        // END Testing
 
         return deferred.promise;
     },
@@ -106,14 +118,15 @@ ActivitiesProcessor.prototype = {
             },
             params: {
                 athleteWeight: 73, // TODO Replace
-                hasPowerMeter: false, // TODO Replace
+                hasPowerMeter: activityWithStream.hasPowerMeter,
                 activityStatsMap: activityStatsMap,
                 activityStream: activityWithStream.stream,
                 bounds: null
             }
         };
 
-        console.error('Wrong params athleteWeight=73 and hasPowerMeter=false');
+        console.error('Wrong params athleteWeight=73');
+        console.debug(threadMessage);
 
         computeAnalysisThread.postMessage(threadMessage);
 
