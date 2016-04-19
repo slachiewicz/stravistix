@@ -1,8 +1,7 @@
-function ActivitiesProcessor(activitiesWithStream, appResources, userHrrZones, zones) {
+function ActivitiesProcessor(activitiesWithStream, appResources, userSettings) {
     this.activitiesWithStream = activitiesWithStream;
     this.appResources = appResources;
-    this.userHrrZones = userHrrZones;
-    this.zones = zones;
+    this.userSettings = userSettings;
 }
 
 ActivitiesProcessor.prototype = {
@@ -16,23 +15,23 @@ ActivitiesProcessor.prototype = {
 
         var deferred = Q.defer();
 
-        _.each(this.activitiesWithStream, function (activityWithStream, index) {
-            self.computeActivity(activityWithStream);
-        });
+        // Testing on first item FIRST ! ;)
+        self.computeActivity(self.activitiesWithStream[0]).then(function success(result) {
 
-        /*
-        xxxxxxxxxxx.then(function success(result) {
+            console.warn(result);
+
         }, function error(err) {
+
+            console.error(err);
 
             deferred.reject(err);
 
         }, function progress(percentage) {
 
-            deferred.notify({
-                yyyyyyyy: percentage
-            });
+            console.debug(percentage);
+
         });
-*/
+
         return deferred.promise;
     },
 
@@ -58,7 +57,6 @@ ActivitiesProcessor.prototype = {
             'distance': activityWithStream.distance,
             'movingTime': activityWithStream.moving_time_raw,
             'elevation': activityWithStream.elevation_gain,
-            'energyOutput': activityWithStream.energyOutput,
             'elapsedTime': activityWithStream.elapsed_time_raw,
 
             // Toughness will not be computed intentionnaly with the following attributes "null":
@@ -94,17 +92,17 @@ ActivitiesProcessor.prototype = {
 
         // Send user and activity data to the thread
         // He will compute them in the background
-        computeAnalysisThread.postMessage({
+        var threadMessage = {
             activityType: activityWithStream.type,
             isTrainer: activityWithStream.trainer,
             appResources: self.appResources,
             userSettings: {
-                userGender: userGender,
-                userRestHr: userRestHr,
-                userMaxHr: userMaxHr,
-                userFTP: userFTP,
-                zones: self.zones,
-                userHrrZones: self.userHrrZones,
+                userGender: self.userSettings.userGender,
+                userRestHr: self.userSettings.userRestHr,
+                userMaxHr: self.userSettings.userMaxHr,
+                userFTP: self.userSettings.userFTP,
+                zones: self.userSettings.zones,
+                userHrrZones: self.userSettings.userHrrZones,
             },
             params: {
                 athleteWeight: 73, // TODO Replace
@@ -113,19 +111,21 @@ ActivitiesProcessor.prototype = {
                 activityStream: activityWithStream.stream,
                 bounds: null
             }
-        });
+        };
+
+        console.error('Wrong params athleteWeight=73 and hasPowerMeter=false');
+
+        computeAnalysisThread.postMessage(threadMessage);
 
         // Listen messages from thread. Thread will send to us the result of computation
         computeAnalysisThread.onmessage = function (messageFromThread) {
 
-            console.log(messageFromThread.data);
             deferred.resolve(messageFromThread.data);
 
             // Finish and kill thread
             computeAnalysisThread.terminate();
 
         }.bind(this);
-
 
         return deferred.promise;
 
@@ -183,57 +183,3 @@ ActivitiesProcessor.prototype = {
 }
 
 */
-
-// TODO To move out in a processor ?!
-/*
-computeActivity: function (activity) {
-
-            // Create worker blob URL if not exist
-            if (!self.computeAnalysisWorkerBlobURL) {
-
-                // Create a blob from 'ComputeAnalysisWorker' function variable as a string
-                var blob = new Blob(['(', ComputeAnalysisWorker.toString(), ')()'], {
-                    type: 'application/javascript'
-                });
-
-                // Keep track of blob URL to reuse it
-                self.computeAnalysisWorkerBlobURL = URL.createObjectURL(blob);
-            }
-
-            // Lets create that worker/thread!
-            self.computeAnalysisThread = new Worker(self.computeAnalysisWorkerBlobURL);
-
-            // Send user and activity data to the thread
-            // He will compute them in the background
-            self.computeAnalysisThread.postMessage({
-                activityType: activity.type,
-                isTrainer: activity.trainer,
-                appResources: self.appResources,
-                userSettings: {
-                    userGender: userGender,
-                    userRestHr: userRestHr,
-                    userMaxHr: userMaxHr,
-                    userFTP: userFTP,
-                    zones: self.zones,
-                    userHrrZones: self.userHrrZones,
-                },
-                params: {
-                    athleteWeight: 73, // TODO Replace
-                    hasPowerMeter: false, // TODO Replace
-                    activityStatsMap: activityStatsMap,
-                    activityStream: activityStream,
-                    bounds: bounds
-                }
-            });
-
-            // Listen messages from thread. Thread will send to us the result of computation
-            self.computeAnalysisThread.onmessage = function (messageFromThread) {
-
-                callback(messageFromThread.data);
-
-                // Finish and kill thread
-                self.computeAnalysisThread.terminate();
-
-            }.bind(this);
-
-},*/

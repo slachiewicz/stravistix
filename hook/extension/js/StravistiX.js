@@ -944,8 +944,8 @@ StravistiX.prototype = {
             activitiesSynchronizer.fetch().then(function success(activitiesWithStreams) {
 
                 console.log(activitiesWithStreams);
-                
-                var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_.userHrrZones, self.userSettings_.zones);
+
+                var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
 
                 activitiesProcessor.compute();
 
