@@ -939,11 +939,16 @@ StravistiX.prototype = {
 
         window.sync = function () {
 
-            var activitiesSynchronizer = new ActivitiesSynchronizer(self.appResources_, self.userSettings_.userHrrZones, self.userSettings_.zones);
+            var activitiesSynchronizer = new ActivitiesSynchronizer();
 
-            activitiesSynchronizer.fetch().then(function success(result) {
+            activitiesSynchronizer.fetch().then(function success(activitiesWithStreams) {
 
-                console.log(result);
+                console.log(activitiesWithStreams);
+                
+                var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_.userHrrZones, self.userSettings_.zones);
+
+                activitiesProcessor.compute();
+
 
             }, function error(err) {
 

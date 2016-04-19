@@ -65,7 +65,7 @@ ActivityProcessor.prototype = {
 
         // Else no cache... then call VacuumProcessor for getting data, compute them and cache them
         this.vacuumProcessor.getActivityStream(function(activityStatsMap, activityStream, athleteWeight, hasPowerMeter) { // Get stream on page
-
+            
             // Compute data in a background thread to avoid UI locking
             this.computeAnalysisThroughDedicatedThread(userGender, userRestHr, userMaxHr, userFTP, athleteWeight, hasPowerMeter, activityStatsMap, activityStream, bounds, function(resultFromThread) {
 

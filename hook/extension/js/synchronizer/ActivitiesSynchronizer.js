@@ -1,7 +1,4 @@
-function ActivitiesSynchronizer(appResources, userHrrZones, zones) {
-    this.appResources = appResources;
-    this.userHrrZones = userHrrZones;
-    this.zones = zones;
+function ActivitiesSynchronizer() {
     this.vacuumProcessor = new VacuumProcessor();
     this.untilTimestamp = false;
 }
