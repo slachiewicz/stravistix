@@ -9,40 +9,44 @@ ActivitiesProcessor.prototype = {
     /**
      * @return Activities array with computed stats
      */
-    compute: function (untilTimestamp) {
+    compute: function () {
 
         var self = this;
 
         var deferred = Q.defer();
 
-
         // Testing only with one
-        // console.error('Testing only with one activitiesWithStream. Remove later...');
-        // self.activitiesWithStream = [self.activitiesWithStream[0]];
+        var promisesOfActivitiesComputed = [];
 
         _.each(self.activitiesWithStream, function (activityWithStream) {
+            promisesOfActivitiesComputed.push(self.computeActivity(activityWithStream));
+        });
 
-            self.computeActivity(activityWithStream).then(function success(result) {
+        Q.all(promisesOfActivitiesComputed).then(function success(activitiesComputedResults) {
 
-                // console.debug(self.activitiesWithStream[0]);
-                console.debug(result);
+                if (activitiesComputedResults.length !== self.activitiesWithStream.length) {
+                    var errMessage = 'activitiesComputedResults length mismatch with activitiesWithStream length: ' + activitiesComputedResults.length + ' != ' + self.activitiesWithStream.length + ')';
+                    deferred.reject(errMessage);
+                } else {
+                    _.each(activitiesComputedResults, function (computedResult, index) {
+                        self.activitiesWithStream[index].extendedStats = computedResult;
+                        // TODO Remove stream from activityWithStream[index] and/ OR filter with _.pluck wanted fields?!
+                    });
+                }
 
-            }, function error(err) {
+                deferred.resolve(self.activitiesWithStream);
+            },
+            function error(err) {
 
                 console.error(err);
-
                 deferred.reject(err);
 
-            }, function progress(percentage) {
+            },
+            function progress(percentage) {
 
                 console.debug(percentage);
 
             });
-        });
-
-
-
-        // END Testing
 
         return deferred.promise;
     },

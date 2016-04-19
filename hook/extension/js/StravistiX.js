@@ -943,12 +943,13 @@ StravistiX.prototype = {
 
             activitiesSynchronizer.fetch().then(function success(activitiesWithStreams) {
 
-                console.log(activitiesWithStreams);
-
                 var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
 
-                activitiesProcessor.compute();
-
+                activitiesProcessor.compute().then(function success(finalResult) {
+                    console.debug(finalResult);
+                }, function error(err) {
+                    console.error(err);
+                });
 
             }, function error(err) {
 
