@@ -59,7 +59,6 @@ ActivitiesProcessor.prototype = {
             'movingTime': activityWithStream.moving_time_raw,
             'elevation': activityWithStream.elevation_gain,
             'avgPower': null, // Toughness Score will not be computed
-            'weightedPower':  null, // TODO find ???
             'energyOutput': activityWithStream.energyOutput,
             'elapsedTime': activityWithStream.elapsed_time_raw,
             'averageSpeed':  null, // TODO find ???
