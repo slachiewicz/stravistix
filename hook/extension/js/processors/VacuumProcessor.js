@@ -157,6 +157,10 @@ VacuumProcessor.prototype = {
             $('[data-glossary-term*=definition-average-power]').parent().parent().children().first().text(),
             false, false, false, false);
 
+        var weightedPower = this.formatActivityDataValue_(
+            $('[data-glossary-term*=definition-weighted-average-power]').parent().parent().children().first().text(),
+            false, false, false, false);
+
         // Get Energy Output
         var energyOutput = this.formatActivityDataValue_(
             actStatsContainer.find('.inline-stats.section.secondary-stats').children().first().next().children().first().text(),
@@ -181,6 +185,25 @@ VacuumProcessor.prototype = {
             movingTime = elapsedTimeCopy;
         }
 
+        // Get Average speed
+        var averageSpeed = this.formatActivityDataValue_(
+            actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().children().first().children().first().next().text(),
+            false, false, false, false);
+
+        // If no average speed found, try to get pace instead.
+        if (!averageSpeed) {
+            averageSpeed = this.formatActivityDataValue_(
+                $('[data-glossary-term*=definition-moving-time]').parent().parent().first().next().children().first().text(),
+                true, false, false, false);
+
+            averageSpeed = 1 / averageSpeed; // invert to km per seconds
+            averageSpeed = averageSpeed * 60 * 60; // We are in KPH here
+
+            var measurementPreference = currentAthlete.get('measurement_preference');
+            var speedFactor = (measurementPreference == 'meters') ? 1 : 0.62137;
+            averageSpeed = averageSpeed / speedFactor; // Always give PKH here
+        }
+
         var averageHeartRate = this.formatActivityDataValue_(
             actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().next().children().first().children().first().next().has('abbr').text(),
             false, false, false, false);
@@ -195,8 +218,10 @@ VacuumProcessor.prototype = {
             'movingTime': movingTime,
             'elevation': elevation,
             'avgPower': avgPower,
+            'weightedPower': weightedPower,
             'energyOutput': energyOutput,
             'elapsedTime': elapsedTime,
+            'averageSpeed': averageSpeed,
             'averageHeartRate': averageHeartRate,
             'maxHeartRate': maxHeartRate
         };
