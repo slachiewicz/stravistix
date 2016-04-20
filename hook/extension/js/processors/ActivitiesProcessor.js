@@ -88,20 +88,15 @@ ActivitiesProcessor.prototype = {
 
         var deferred = Q.defer();
 
-        // Create worker blob URL if not exist
-        // if (!self.computeAnalysisWorkerBlobURL) {
-
         // Create a blob from 'ComputeAnalysisWorker' function variable as a string
         var blob = new Blob(['(', ComputeAnalysisWorker.toString(), ')()'], {
             type: 'application/javascript'
         });
 
-        //     // Keep track of blob URL to reuse it
-        //     self.computeAnalysisWorkerBlobURL = URL.createObjectURL(blob);
-        // }
-
         // Lets create that worker/thread!
-        var computeAnalysisThread = new Worker(URL.createObjectURL(blob));
+        var computeAnalysisThread = new Worker(URL.createObjectURL(new Blob(['(', ComputeAnalysisWorker.toString(), ')()'], {
+            type: 'application/javascript'
+        })));
 
         // Create activity stats map from given activity
         var activityStatsMap = self.createActivityStatMap(activityWithStream);
@@ -130,7 +125,6 @@ ActivitiesProcessor.prototype = {
         };
 
         console.error('Wrong params athleteWeight=73');
-        console.debug(threadMessage);
 
         computeAnalysisThread.postMessage(threadMessage);
 
@@ -145,9 +139,7 @@ ActivitiesProcessor.prototype = {
         }.bind(this);
 
         return deferred.promise;
-
     }
-
 };
 
 
