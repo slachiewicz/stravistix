@@ -946,7 +946,16 @@ StravistiX.prototype = {
                 var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
 
                 activitiesProcessor.compute().then(function success(finalResult) {
+
                     console.debug(finalResult);
+
+                    _.each(finalResult, function (r) {
+
+                        console.debug('name:', r.name, ' / id:', r.id);
+                        console.debug(r.extendedStats);
+                    });
+
+
                 }, function error(err) {
                     console.error(err);
                 });

@@ -555,7 +555,7 @@ function ComputeAnalysisWorker() {
                     var movingSampleCount = 0;
 
                     var cadenceZoneTyped;
-                    if (this.activityType === 'Ride') {
+                    if (this.activityType === 'Ride' || this.activityType === 'VirtualRide') {
                         cadenceZoneTyped = this.userSettings.zones.cyclingCadence;
                     } else if (this.activityType === 'Run') {
                         cadenceZoneTyped = this.userSettings.zones.runningCadence;
