@@ -1,13 +1,5 @@
 app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', 'ChromeStorageService', 'NotifierService', '$timeout', '$location', function($scope, CommonSettingsService, ChromeStorageService, NotifierService, $timeout, $location) {
 
-    // To move in factory
-    ChromeStorageModule.fetchComputedActivities(function (activities) {
-        console.debug(activities);
-        _.each(activities, function (item) {
-            console.debug(item.name);
-        });
-    });
-
     // Define options structure
     $scope.sections = CommonSettingsService.provideSections();
 
