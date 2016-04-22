@@ -118,15 +118,13 @@ ActivitiesProcessor.prototype = {
                 userHrrZones: self.userSettings.userHrrZones,
             },
             params: {
-                athleteWeight: 73, // TODO Replace
+                athleteWeight: self.userSettings.userWeight,
                 hasPowerMeter: activityWithStream.hasPowerMeter,
                 activityStatsMap: activityStatsMap,
                 activityStream: activityWithStream.stream,
                 bounds: null
             }
         };
-
-        console.error('Wrong params athleteWeight=73');
 
         computeAnalysisThread.postMessage(threadMessage);
 

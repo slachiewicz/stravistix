@@ -1,9 +1,19 @@
 app.controller("HealthSettingsController", ['$scope', 'ChromeStorageService', 'NotifierService', 'AvoidInputKeysService', function($scope, ChromeStorageService, NotifierService, AvoidInputKeysService) {
 
+    $scope.genderList = [{
+        type: 'men'
+    }, {
+        type: 'women'
+    }];
+
     ChromeStorageService.fetchUserSettings(function(userSettingsSynced) {
         $scope.userMaxHr = parseInt(userSettingsSynced.userMaxHr);
         $scope.userRestHr = parseInt(userSettingsSynced.userRestHr);
         $scope.userFTP = parseInt(userSettingsSynced.userFTP);
+        $scope.userWeight = parseInt(userSettingsSynced.userWeight);
+        $scope.gender = _.findWhere($scope.genderList, {
+            type: userSettingsSynced.userGender
+        });
         $scope.zones = userSettingsSynced.userHrrZones;
         $scope.$apply();
     });
@@ -11,6 +21,13 @@ app.controller("HealthSettingsController", ['$scope', 'ChromeStorageService', 'N
     $scope.localStorageMustBeCleared = function() {
         ChromeStorageService.updateUserSetting('localStorageMustBeCleared', true, function() {
             console.log('localStorageMustBeCleared has been updated to ' + true);
+        });
+    };
+
+    $scope.userGenderChanged = function(gender) {
+        ChromeStorageService.updateUserSetting('userGender', gender.type, function() {
+            console.log('userGender has been updated to ' + gender.type);
+            $scope.localStorageMustBeCleared();
         });
     };
 
@@ -65,6 +82,20 @@ app.controller("HealthSettingsController", ['$scope', 'ChromeStorageService', 'N
             }
         }, 500);
     };
+
+    $scope.userWeightChanged = function() {
+
+        setTimeout(function() {
+            if (!_.isUndefined($scope.userWeight)) {
+                ChromeStorageService.updateUserSetting('userWeight', $scope.userWeight, function() {
+                    console.log('userWeight has been updated to ' + $scope.userWeight);
+                    $scope.localStorageMustBeCleared();
+                });
+            }
+        }, 500);
+    };
+
+
 
     $scope.displayUserMaxHrHelper = function() {
         NotifierService('How to find your max Heart rate value', 'If you don\'t know your own max Heart rate then enter the value <strong> 220 - "your age" </strong>. <br /><br /> For example, if you are 30 years old, then your max HR will be <strong> 220 - 30 = 190 </strong>');

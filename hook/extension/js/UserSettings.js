@@ -5,6 +5,7 @@ var userSettings = {
     userMaxHr: 190,
     userRestHr: 65,
     userFTP: null,
+    userWeight: 70,
     userHrrZones: [{
         fromHrr: 30,
         toHrr: 50,
