@@ -6,10 +6,12 @@ function ActivitiesProcessor(activitiesWithStream, appResources, userSettings) {
 
 ActivitiesProcessor.prototype = {
 
+    outputFields: ["id", "name", "type", "activity_type_display_name", "private", "bike_id", "athlete_gear_id", "start_date", "start_date_local_raw", "start_time", "start_day", "distance", "distance_raw", "long_unit", "short_unit", "moving_time", "moving_time_raw", "elapsed_time", "elapsed_time_raw", "trainer", "static_map", "show_elevation", "has_latlng", "commute", "elevation_gain", "elevation_unit", "elevation_gain_raw", "description", "is_new", "is_changing_type", "suffer_score", "calories", "workout_type", "flagged", "hide_power", "hide_heartrate", "hasPowerMeter", "extendedStats"],
+
     /**
      * @return Activities array with computed stats
      */
-    compute: function () {
+    compute: function() {
 
         var self = this;
 
@@ -18,7 +20,7 @@ ActivitiesProcessor.prototype = {
         // Testing only with one
         var promisesOfActivitiesComputed = [];
 
-        _.each(self.activitiesWithStream, function (activityWithStream) {
+        _.each(self.activitiesWithStream, function(activityWithStream) {
             promisesOfActivitiesComputed.push(self.computeActivity(activityWithStream));
         });
 
@@ -28,9 +30,9 @@ ActivitiesProcessor.prototype = {
                     var errMessage = 'activitiesComputedResults length mismatch with activitiesWithStream length: ' + activitiesComputedResults.length + ' != ' + self.activitiesWithStream.length + ')';
                     deferred.reject(errMessage);
                 } else {
-                    _.each(activitiesComputedResults, function (computedResult, index) {
+                    _.each(activitiesComputedResults, function(computedResult, index) {
                         self.activitiesWithStream[index].extendedStats = computedResult;
-                        // TODO Remove stream from activityWithStream[index] and/ OR filter with _.pluck wanted fields?!
+                        self.activitiesWithStream[index] = _.pick(self.activitiesWithStream[index], self.outputFields);
                     });
                 }
 
@@ -51,7 +53,7 @@ ActivitiesProcessor.prototype = {
         return deferred.promise;
     },
 
-    createActivityStatMap: function (activityWithStream) {
+    createActivityStatMap: function(activityWithStream) {
 
         /*
         Sample from activity processor:
@@ -82,7 +84,7 @@ ActivitiesProcessor.prototype = {
 
     },
 
-    computeActivity: function (activityWithStream) {
+    computeActivity: function(activityWithStream) {
 
         var self = this;
 
@@ -129,7 +131,7 @@ ActivitiesProcessor.prototype = {
         computeAnalysisThread.postMessage(threadMessage);
 
         // Listen messages from thread. Thread will send to us the result of computation
-        computeAnalysisThread.onmessage = function (messageFromThread) {
+        computeAnalysisThread.onmessage = function(messageFromThread) {
 
             deferred.resolve(messageFromThread.data);
 
