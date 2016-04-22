@@ -7,7 +7,7 @@ app.factory('ChromeStorageService', function() {
             callback(userSettingsSynced);
         });
     };
-    
+
     chromeStorageService.updateUserSetting = function(key, value, callback) {
         var settingToBeUpdated = {};
         settingToBeUpdated[key] = value;
@@ -15,5 +15,14 @@ app.factory('ChromeStorageService', function() {
             callback();
         });
     };
+
+    chromeStorageService.fetchComputedActivities = function(callback) {
+        chrome.storage.local.get({
+            computedActivities: null
+        }, function(data) {
+            callback(data.computedActivities);
+        });
+    };
+
     return chromeStorageService;
 });

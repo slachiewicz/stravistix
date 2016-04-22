@@ -20,6 +20,11 @@ app.config(['$routeProvider', function($routeProvider) {
         controller: 'XtdZonesSettingsController'
     });
 
+    $routeProvider.when(routeMap.fitnessRoute, {
+        templateUrl: 'views/fitness.html',
+        controller: 'FitnessController'
+    });
+
     $routeProvider.when(routeMap.releaseNotesRoute, {
         templateUrl: 'views/releaseNotes.html'
     });

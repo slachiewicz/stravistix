@@ -945,16 +945,12 @@ StravistiX.prototype = {
 
                 var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
 
-                activitiesProcessor.compute().then(function success(finalResult) {
+                activitiesProcessor.compute().then(function success(computedActivities) {
 
-                    console.debug(finalResult);
-
-                    _.each(finalResult, function (r) {
-
-                        console.debug('name:', r.name, ' / id:', r.id);
-                        console.debug(r.extendedStats);
+                    // Save to chrome storage
+                    Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', computedActivities, function(response) {
+                        console.debug(response);
                     });
-
 
                 }, function error(err) {
                     console.error(err);
@@ -965,32 +961,8 @@ StravistiX.prototype = {
                 console.error(err);
 
             }, function progress(progress) {
-
                 console.log(progress);
-
             });
-
-
-            /*
-                        // Save to chrome storage
-                        Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'fetchedActivities', activities, function(response) {
-                            console.debug(response);
-                        });
-            */
-            /*sync.fetchActivities().then(function success(activities) {
-
-                console.debug(activities);
-
-            }, function error(err) {
-
-                console.error(err);
-
-            }, function progress(percentage) {
-
-                console.log('fetching progress @ ' + percentage);
-
-            });
-*/
 
         };
     },
