@@ -45,6 +45,10 @@ function ComputeAnalysisWorker() {
 
                 compute: function() {
 
+                    if(!this.params.activityStream) {
+                        return null;
+                    }
+
                     // Append altitude_smooth to fetched strava activity stream before compute analysis data
                     this.params.activityStream.altitude_smooth = this.smoothAltitudeStream(this.params.activityStream, this.params.activityStatsMap);
 
