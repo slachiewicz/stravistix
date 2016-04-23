@@ -43,7 +43,7 @@
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;"><strong>CTL</strong></td>
     </tr>
     <!-- <tr style="border: 1px solid black;" ng-repeat="nameTrimp in trimpObjectsArray | orderBy:'-trimp'"> -->
-    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessData">
+    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessData | orderBy:'-timestamp'">
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.date }}</td>
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.activitiesName }}</td>
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;">{{ fitness.CTL }}</td>
