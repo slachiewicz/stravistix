@@ -270,7 +270,8 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             }, {
                 key: "TSB",
                 values: TSBValues,
-                color: '#ed9c12'
+                color: '#ed9c12',
+                area: true
             }],
             yDomain: [yDomainMin * 1.05, yDomainMax * 1.05]
         };
