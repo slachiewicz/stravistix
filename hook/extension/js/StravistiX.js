@@ -66,26 +66,6 @@ StravistiX.prototype = {
         this.handleHideFeed_();
         this.handleDisplayFlyByFeedModifier_();
 
-        window.startSync = function() {
-
-            var self = this;
-            
-            this.handleActivitySync().then(function success(syncedActivities) {
-                console.debug(syncedActivities);
-
-                // Save to chrome storage
-                Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities, function(computedActivitiesOnChromeLocalStorage) {
-                    console.debug(computedActivitiesOnChromeLocalStorage);
-                });
-
-            }, function error(err) {
-                console.error(err);
-            }, function progress(progress) {
-                console.debug(progress);
-            });
-
-        }.bind(this);
-
         // Bike
         this.handleExtendedActivityData_();
         this.handleExtendedSegmentEffortData_();
@@ -111,6 +91,25 @@ StravistiX.prototype = {
         // Must be done at the end
         this.handleTrackTodayIncommingConnection_();
         this.handleGoogleMapsComeBackModifier();
+    },
+
+    startSync: function () {
+
+        var self = this;
+        this.handleActivitiesSync().then(function success(syncedActivities) {
+            console.debug(syncedActivities);
+            // Save to chrome storage
+            Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities, function(computedActivitiesOnChromeLocalStorage) {
+                console.debug(computedActivitiesOnChromeLocalStorage);
+                console.log('Sync done');
+            });
+
+        }, function error(err) {
+            console.error(err);
+        }, function progress(progress) {
+            console.debug(progress);
+        });
+
     },
 
     /**
@@ -952,9 +951,7 @@ StravistiX.prototype = {
         }
     },
 
-
-
-    handleActivitySync: function() {
+    handleActivitiesSync: function() {
 
         var self = this;
 
