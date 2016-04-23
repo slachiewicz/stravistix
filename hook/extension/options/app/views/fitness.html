@@ -1,1 +1,16 @@
-{{computedActivities | json}}
+<div>Activity with HR data: {{namesTrimpsArray.length}}</div>
+<!-- <div>{{computedActivities | json}}</div> -->
+<br/>
+<table style="border: 1px solid black;">
+    <tr style="border: 1px solid black;">
+        <td style="border: 1px solid black;padding: 3px;"><strong>Date</strong></td>
+        <td style="border: 1px solid black;padding: 3px;"><strong>Name</strong></td>
+        <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;"><strong>TRIMP</strong></td>
+    </tr>
+    <!-- <tr style="border: 1px solid black;" ng-repeat="nameTrimp in namesTrimpsArray | orderBy:'-trimp'"> -->
+    <tr style="border: 1px solid black;" ng-repeat="nameTrimp in namesTrimpsArray">
+        <td style="border: 1px solid black;padding: 3px;">{{ nameTrimp.date }}</td>
+        <td style="border: 1px solid black;padding: 3px;">{{ nameTrimp.name }}</td>
+        <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;">{{ nameTrimp.trimp }}</td>
+    </tr>
+</table>
