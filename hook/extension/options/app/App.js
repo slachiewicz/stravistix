@@ -1,7 +1,7 @@
 /**
  * Declaring Angular App
  */
-var app = angular.module("App", ['ngRoute', 'ui.bootstrap', 'ui.checkbox', 'nvd3ChartDirectives']);
+var app = angular.module("App", ['ngRoute', 'ui.bootstrap', 'ui.checkbox', 'nvd3']);
 
 app.config(['$routeProvider', function($routeProvider) {
 

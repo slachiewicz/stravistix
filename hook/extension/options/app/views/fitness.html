@@ -22,7 +22,7 @@
    <svg></svg>
 </nvd3-line-with-focus-chart> -->
 
-<nvd3-line-chart
+<!-- <nvd3-line-chart
        data="exampleData"
        id="exampleId"
        height="600"
@@ -34,7 +34,9 @@
        margin="{left:50,top:50,bottom:50,right:50}"
        >
    <svg></svg>
-</nvd3-line-chart>
+</nvd3-line-chart> -->
+
+<nvd3 options="fitnessChartOptions" data="fitnessChartData" class="with-3d-shadow with-transitions"></nvd3>
 
 <table style="border: 1px solid black;">
     <tr style="border: 1px solid black;">
@@ -43,7 +45,7 @@
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;"><strong>CTL</strong></td>
     </tr>
     <!-- <tr style="border: 1px solid black;" ng-repeat="nameTrimp in trimpObjectsArray | orderBy:'-trimp'"> -->
-    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessData | orderBy:'-timestamp'">
+    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessTableData | orderBy:'-timestamp'">
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.date }}</td>
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.activitiesName }}</td>
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;">{{ fitness.CTL }}</td>

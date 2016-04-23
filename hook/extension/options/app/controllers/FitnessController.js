@@ -36,10 +36,10 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             // Inject day off..
             var dayLong = 24 * 3600 * 1000;
             var firstActivityDate = new Date((_.first(trimpObjectsArray)).date);
-            var lastActivityDate = new Date();
+            var today = new Date();
 
-            var timeDiff = Math.abs(lastActivityDate.getTime() - firstActivityDate.getTime());
-            var diffDays = Math.ceil(timeDiff / dayLong);
+            var timeDiffBetweenFirstActivityAndToday = Math.abs(today.getTime() - firstActivityDate.getTime());
+            var diffDays = Math.ceil(timeDiffBetweenFirstActivityAndToday / dayLong);
 
             var trimpObjectsWithDaysOffArray = [];
 
@@ -100,26 +100,122 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     CTL: CTL.toFixed(3)
                 });
             });
-
             return ctlResults;
         };
 
-        $scope.fitnessData = $scope.computeFitness($scope.trimpObjectsArray);
 
+        $scope.generateFitnessChartData = function(fitnessTableData) {
+            var values = [];
+            _.each(fitnessTableData, function(fitData) {
+                // values.push([fitData.timestamp, fitData.CTL]);
+                values.push({
+                    x: fitData.timestamp,
+                    y: fitData.CTL
+                });
+            });
 
-        var values = [];
-        _.each($scope.fitnessData, function(fitData) {
-            values.push([fitData.timestamp, fitData.CTL]);
-        });
+            return [{
+                key: "CTL",
+                values: values
+            }];
+        };
 
+        $scope.fitnessTableData = $scope.computeFitness($scope.trimpObjectsArray);
 
-        $scope.exampleData = [{
-            "key": "CTL",
-            "bar": true,
-            values: values
-        }];
+        $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessTableData);
+
+        $scope.fitnessChartOptions = {
+            chart: {
+                type: 'lineChart',
+                height: 450,
+                margin: {
+                    top: 20,
+                    right: 20,
+                    bottom: 40,
+                    left: 55
+                },
+                x: function(d) {
+                    return d.x;
+                },
+                y: function(d) {
+                    return d.y;
+                },
+                useInteractiveGuideline: true,
+                dispatch: {
+                    stateChange: function(e) {
+                        console.log("stateChange");
+                    },
+                    changeState: function(e) {
+                        console.log("changeState");
+                    },
+                    tooltipShow: function(e) {
+                        console.log("tooltipShow");
+                    },
+                    tooltipHide: function(e) {
+                        console.log("tooltipHide");
+                    }
+                },
+                xAxis: {
+                    axisLabel: 'Date',
+                    tickFormat: function(d) {
+                        return (new Date(d)).toLocaleDateString();
+                    },
+                },
+                yAxis: {
+                    axisLabel: 'CTL',
+                    tickFormat: function(d) {
+                        return d3.format('.02f')(d);
+                    },
+                    axisLabelDistance: -10
+                },
+                callback: function(chart) {
+                    console.log("!!! lineChart callback !!!");
+                }
+            },
+            title: {
+                enable: true,
+                text: 'Fitness, Fatigue and Form'
+            }
+        };
 
         $scope.$apply();
+        
+        /*$scope.data = sinAndCos();
+
+        function sinAndCos() {
+
+            //Line chart data should be sent as an array of series objects.
+            var values = [];
+
+            _.each($scope.fitnessData, function(fitData) {
+                // values.push([fitData.timestamp, fitData.CTL]);
+                values.push({
+                    x: fitData.timestamp,
+                    y: fitData.CTL
+                });
+            });
+
+            return [{
+                    key: "CTL",
+                    values: values
+                }
+                , {
+                                values: cos,
+                                key: 'Cosine Wave',
+                                color: '#2ca02c'
+                            }, {
+                                values: sin2,
+                                key: 'Another sine wave',
+                                color: '#7777ff',
+                            }
+            ];
+        }
+
+
+*/
+
+
+
     });
 
     // $scope.xAxisTicksFunction = function() {
@@ -134,12 +230,12 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
     //         return d3.time.format('%Y/%m/%d')(new Date(d));
     //     };
     // };
-
-    $scope.xAxisTickFormatFunction = function() {
-        return function(d) {
-            // return d3.time.format('%x')(new Date(d)); //uncomment for date format
-            return (new Date(d)).toLocaleDateString(); //uncomment for date format
-        };
-    };
+    /*
+        $scope.xAxisTickFormatFunction = function() {
+            return function(d) {
+                // return d3.time.format('%x')(new Date(d)); //uncomment for date format
+                return (new Date(d)).toLocaleDateString(); //uncomment for date format
+            };
+        };*/
 
 }]);
