@@ -74,7 +74,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
                 trimpObjectsWithDaysOffArray.push(trimpObjectForWhatEverDay);
             }
-
             // ... End injecting day off..
 
             // Now compute
@@ -82,10 +81,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             var ATL = 0;
             var TSB = 0;
 
-            // CTL = CTL(d-1) + [TSS - CTL(d-1)] * [1 - exp^(-1 / 42)]
-            // ATL = ATL(d-1) + [TSS - ATL(d-1)] * [1 - exp^(-1 / 7)]
-            // TSB = CTL-ATL
-            var ctlResults = [];
+            var results = [];
 
             _.each(trimpObjectsWithDaysOffArray, function(trimpObject, index, trimpObjectsArray) {
 
@@ -95,7 +91,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
                 var formattedDate = trimpObject.date.toLocaleDateString();
 
-                ctlResults.push({
+                results.push({
                     date: formattedDate,
                     timestamp: trimpObject.timestamp,
                     activitiesName: trimpObject.activitiesName,
@@ -104,89 +100,25 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     TSB: TSB.toFixed(3),
                 });
             });
-            return ctlResults;
-        };
-
-
-        $scope.generateFitnessChartData = function(fitnessTableData) {
-            var CTLValues = [];
-            var ATLValues = [];
-            var TSBValues = [];
-
-            _.each(fitnessTableData, function(fitData) {
-
-                CTLValues.push({
-                    x: fitData.timestamp,
-                    y: fitData.CTL
-                });
-
-                ATLValues.push({
-                    x: fitData.timestamp,
-                    y: fitData.ATL
-                });
-
-                TSBValues.push({
-                    x: fitData.timestamp,
-                    y: fitData.TSB
-                });
-
-            });
-
-            var yDomainMax = d3.max([
-                d3.max(CTLValues, function(d) {
-                    return parseInt(d.y);
-                }),
-                d3.max(ATLValues, function(d) {
-                    return parseInt(d.y);
-                }),
-                d3.max(TSBValues, function(d) {
-                    return parseInt(d.y);
-                })
-            ], function(d) {
-                return d;
-            });
-
-            var yDomainMin = d3.min([
-                d3.min(CTLValues, function(d) {
-                    return parseInt(d.y);
-                }),
-                d3.min(ATLValues, function(d) {
-                    return parseInt(d.y);
-                }),
-                d3.min(TSBValues, function(d) {
-                    return parseInt(d.y);
-                })
-            ], function(d) {
-                return d;
-            });
-            // console.log(yDomainMax);
-            // console.log(yDomainMin);
-            return {
-                curves: [{
-                    key: "ATL",
-                    values: ATLValues,
-                    color: '#ff53b0'
-                }, {
-                    key: "CTL",
-                    values: CTLValues,
-                    color: '#007fe7'
-                }, {
-                    key: "TSB",
-                    values: TSBValues,
-                    color: '#ed9c12'
-                }],
-                yDomain: [yDomainMin, yDomainMax]
-            };
+            return results;
         };
 
         $scope.fitnessTableData = $scope.computeFitness($scope.trimpObjectsArray);
 
         $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessTableData);
 
+        $scope.generateGraph();
+
+        $scope.$apply();
+    });
+
+    $scope.generateGraph = function() {
+
         $scope.fitnessChartOptions = {
             chart: {
                 type: 'lineWithFocusChart',
                 height: 800,
+                // height2: 500,
                 // clipEdge: true,
                 // rescaleY: true,
                 // clipVoronoi: false,
@@ -198,6 +130,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     left: 50
                 },
                 yDomain: $scope.fitnessChartData.yDomain,
+                // y2Domain: $scope.fitnessChartData.yDomain,
                 x: function(d) {
                     return d.x;
                 },
@@ -220,29 +153,45 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     }
                 },
                 xAxis: {
-                    axisLabel: 'Date',
+                    // axisLabel: 'Date',
+                    ticks: 12,
                     tickFormat: function(d) {
                         return (new Date(d)).toLocaleDateString();
                     },
+                    staggerLabels: true
                 },
                 yAxis: {
                     ticks: 10,
-                    axisLabel: 'CTL',
+                    // axisLabel: 'CTL',
                     tickFormat: function(d) {
                         return d3.format('.02f')(d);
                     },
-                    axisLabelDistance: -10
+                    axisLabelDistance: -10,
                 },
                 y2Axis: {
                     tickFormat: function(d) {
                         return d3.format('.02f')(d);
-                    }
+                    },
+                    // scale: 0.5,
+                    // outerTickSize:100,
+                    // range: [-500, 500],
                 },
                 x2Axis: {
+                    ticks: 10,
                     tickFormat: function(d) {
-                        return (new Date(d)).toLocaleDateString();
+                        return null; //(new Date(d)).toLocaleDateString();
                     },
-                    axisLabelDistance: -10
+                    // tickSize:[100, 100],
+                    tickPadding: 15,
+                    // padding: {
+                    //     top: 20,
+                    //     right: 50,
+                    //     bottom: 80,
+                    //     left: 50
+                    // },
+                    // staggerLabels: true,
+                    // axisLabelDistance: -10,
+                    // height: 150
                 },
                 callback: function(chart) {
                     console.log("!!! lineChart callback !!!");
@@ -254,101 +203,78 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             }
         };
 
-        $scope.$apply();
+    };
 
-        /*
+    $scope.generateFitnessChartData = function(fitnessTableData) {
 
-        "yAxis": {
-      "axisLabel": "Y Axis",
-      "axisLabelDistance": 0,
-      "dispatch": {},
-      "staggerLabels": false,
-      "rotateLabels": 0,
-      "rotateYLabel": true,
-      "showMaxMin": true,
-      "height": 60,
-      "ticks": null,
-      "width": 75,
-      "margin": {
-        "top": 0,
-        "right": 0,
-        "bottom": 0,
-        "left": 0
-      },
-      "duration": 250,
-      "orient": "left",
-      "tickValues": null,
-      "tickSubdivide": 0,
-      "tickSize": 6,
-      "tickPadding": 3,
-      "domain": [
-        0,
-        1
-      ],
-      "range": [
-        0,
-        1
-      ]
-    },
+        var CTLValues = [];
+        var ATLValues = [];
+        var TSBValues = [];
 
-    */
+        _.each(fitnessTableData, function(fitData) {
 
-        /*$scope.data = sinAndCos();
-
-        function sinAndCos() {
-
-            //Line chart data should be sent as an array of series objects.
-            var values = [];
-
-            _.each($scope.fitnessData, function(fitData) {
-                // values.push([fitData.timestamp, fitData.CTL]);
-                values.push({
-                    x: fitData.timestamp,
-                    y: fitData.CTL
-                });
+            CTLValues.push({
+                x: fitData.timestamp,
+                y: fitData.CTL
             });
 
-            return [{
-                    key: "CTL",
-                    values: values
-                }
-                , {
-                                values: cos,
-                                key: 'Cosine Wave',
-                                color: '#2ca02c'
-                            }, {
-                                values: sin2,
-                                key: 'Another sine wave',
-                                color: '#7777ff',
-                            }
-            ];
-        }
+            ATLValues.push({
+                x: fitData.timestamp,
+                y: fitData.ATL
+            });
 
+            TSBValues.push({
+                x: fitData.timestamp,
+                y: fitData.TSB
+            });
 
-*/
+        });
 
+        var yDomainMax = d3.max([
+            d3.max(CTLValues, function(d) {
+                return parseInt(d.y);
+            }),
+            d3.max(ATLValues, function(d) {
+                return parseInt(d.y);
+            }),
+            d3.max(TSBValues, function(d) {
+                return parseInt(d.y);
+            })
+        ], function(d) {
+            return d;
+        });
 
+        var yDomainMin = d3.min([
+            d3.min(CTLValues, function(d) {
+                return parseInt(d.y);
+            }),
+            d3.min(ATLValues, function(d) {
+                return parseInt(d.y);
+            }),
+            d3.min(TSBValues, function(d) {
+                return parseInt(d.y);
+            })
+        ], function(d) {
+            return d;
+        });
 
-    });
+        return {
+            curves: [{
+                key: "ATL",
+                values: ATLValues,
+                color: '#ff53b0'
+            }, {
+                key: "CTL",
+                values: CTLValues,
+                color: '#007fe7'
+            }, {
+                key: "TSB",
+                values: TSBValues,
+                color: '#ed9c12'
+            }],
+            yDomain: [yDomainMin * 1.05, yDomainMax * 1.05]
+        };
+    };
 
-    // $scope.xAxisTicksFunction = function() {
-    //     console.log(d3.svg.axis().ticks(d3.time.minutes, 5));
-    //     return function(d) {
-    //         return d3.svg.axis().ticks(d3.time.minutes, 5);
-    //     };
-    // };
-
-    // $scope.xAxisTickFormatFunction = function() {
-    //     return function(d) {
-    //         return d3.time.format('%Y/%m/%d')(new Date(d));
-    //     };
-    // };
-    /*
-        $scope.xAxisTickFormatFunction = function() {
-            return function(d) {
-                // return d3.time.format('%x')(new Date(d)); //uncomment for date format
-                return (new Date(d)).toLocaleDateString(); //uncomment for date format
-            };
-        };*/
 
 }]);
