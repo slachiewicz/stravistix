@@ -45,7 +45,7 @@ function ComputeAnalysisWorker() {
 
                 compute: function() {
 
-                    if(!this.params.activityStream) {
+                    if (!this.params.activityStream) {
                         return null;
                     }
 
@@ -895,7 +895,7 @@ function ComputeAnalysisWorker() {
                  */
                 smoothAltitude: function(activityStream, stravaElevation) {
 
-                    if (!activityStream.altitude) {
+                    if (!activityStream.altitude || !activityStream.distance) {
                         return null;
                     }
 
@@ -938,9 +938,9 @@ function ComputeAnalysisWorker() {
                     // http://phrogz.net/js/framerate-independent-low-pass-filter.html
                     // value += (currentValue - value) / (smoothing / timeSinceLastSample);
                     // it is adapted for stability - if (smoothing / timeSinceLastSample) is less then 1, set it to 1 -> no smoothing for that sample
+                    var result = [];
                     if (data && distance) {
                         var smooth_factor = 0;
-                        var result = [];
                         result[0] = data[0];
                         for (i = 1, max = data.length; i < max; i++) {
                             if (smoothing === 0) {
@@ -970,6 +970,7 @@ function ComputeAnalysisWorker() {
 
         // Result to main thread
         postMessage(result);
+        self.close();
     };
 
     this.importRequiredLibraries = function(libsFromExtensionPath, chromeExtensionId) {

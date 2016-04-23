@@ -30,7 +30,6 @@ ActivitiesSynchronizer.prototype = {
                 promisesOfActivitiesStreamById.push(self.vacuumProcessor.fetchActivityStreamById(activity.id));
             });
 
-            //allSettled
             Q.allSettled(promisesOfActivitiesStreamById).then(function success(streamResults) {
 
                 if (streamResults.length !== activities.length) {
@@ -64,12 +63,9 @@ ActivitiesSynchronizer.prototype = {
                     // console.log(activities);
                     // console.log(activities.length);
 
-                    // Finishing...
-                    // Force progress @ 100% because 'rejected' promises don't call progress callback
-                    fetchedActivitiesProgress = 100;
-
+                    // Finishing... force progress @ 100% because 'rejected' promises don't call progress callback
                     deferred.notify({
-                        fetchedActivitiesStreamCount: fetchedActivitiesProgress
+                        fetchedActivitiesStreamPercentage: 100
                     });
 
                     deferred.resolve(activities);

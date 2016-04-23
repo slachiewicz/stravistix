@@ -17,8 +17,9 @@ ActivitiesProcessor.prototype = {
 
         var deferred = Q.defer();
 
-        // Testing only with one
         var promisesOfActivitiesComputed = [];
+
+        var computedActivitiesPercentageCount = 0;
 
         _.each(self.activitiesWithStream, function(activityWithStream) {
             promisesOfActivitiesComputed.push(self.computeActivity(activityWithStream));
@@ -36,6 +37,11 @@ ActivitiesProcessor.prototype = {
                     });
                 }
 
+                // Finishing... force progress @ 100% for compute progress callback
+                deferred.notify({
+                    computedActivitiesPercentage: 100
+                });
+
                 deferred.resolve(self.activitiesWithStream);
             },
             function error(err) {
@@ -44,9 +50,19 @@ ActivitiesProcessor.prototype = {
                 deferred.reject(err);
 
             },
-            function progress(percentage) {
+            function progress(notification) {
 
-                console.debug(percentage);
+                computedActivitiesPercentage = computedActivitiesPercentageCount / self.activitiesWithStream.length * 100;
+
+                console.warn('ALL promisesOfActivitiesComputed ' + computedActivitiesPercentage);
+
+                deferred.notify({
+                    computedActivitiesPercentage: computedActivitiesPercentage,
+                    index: notification.index,
+                    activityId: notification.value,
+                });
+
+                computedActivitiesPercentageCount++;
 
             });
 
@@ -131,6 +147,12 @@ ActivitiesProcessor.prototype = {
         // Listen messages from thread. Thread will send to us the result of computation
         computeAnalysisThread.onmessage = function(messageFromThread) {
 
+            // console.debug('done ' + activityWithStream.id);
+
+            // Notify upper compute method when an activity has been computed for progress percentage
+            deferred.notify(activityWithStream.id);
+
+            // Then resolve...
             deferred.resolve(messageFromThread.data);
 
             // Finish and kill thread
@@ -138,10 +160,24 @@ ActivitiesProcessor.prototype = {
 
         }.bind(this);
 
+        computeAnalysisThread.onerror = function(err) {
+
+            var errorMessage = {
+                errObject: err,
+                activityId: activityWithStream.id,
+            };
+
+            // Push error uppper
+            console.error(errorMessage);
+            deferred.reject(errorMessage);
+
+            // Finish and kill thread
+            computeAnalysisThread.terminate();
+        };
+
         return deferred.promise;
     }
 };
-
 
 /*
 {
