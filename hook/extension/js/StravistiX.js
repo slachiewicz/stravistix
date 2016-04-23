@@ -946,7 +946,7 @@ StravistiX.prototype = {
                 var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
 
                 activitiesProcessor.compute().then(function success(computedActivities) {
-
+                    console.debug(computedActivities);
                     // Save to chrome storage
                     Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', computedActivities, function(response) {
                         console.debug(response);

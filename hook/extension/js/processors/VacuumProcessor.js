@@ -133,7 +133,7 @@ VacuumProcessor.prototype = {
     /**
      * @returns Common activity stats given by Strava throught right panel
      */
-    getActivityCommonStats: function () {
+    getActivityCommonStats: function() {
 
         var actStatsContainer = $(".activity-summary-container");
 
@@ -273,7 +273,7 @@ VacuumProcessor.prototype = {
 
         var url = "/activities/" + this.getActivityId() + "/streams?stream_types[]=watts_calc&stream_types[]=watts&stream_types[]=velocity_smooth&stream_types[]=time&stream_types[]=distance&stream_types[]=cadence&stream_types[]=heartrate&stream_types[]=grade_smooth&stream_types[]=altitude&stream_types[]=latlng";
 
-        $.ajax(url).done(function (jsonResponse) {
+        $.ajax(url).done(function(jsonResponse) {
 
             var hasPowerMeter = true;
 
@@ -325,10 +325,10 @@ VacuumProcessor.prototype = {
                 type: 'GET',
                 crossDomain: true, // enable this
                 dataType: 'jsonp',
-                success: function (xhrResponseText) {
+                success: function(xhrResponseText) {
                     segmentsUnify.cycling = xhrResponseText;
                 },
-                error: function (err) {
+                error: function(err) {
                     console.error(err);
                 }
             }),
@@ -344,15 +344,15 @@ VacuumProcessor.prototype = {
                 type: 'GET',
                 crossDomain: true, // enable this
                 dataType: 'jsonp',
-                success: function (xhrResponseText) {
+                success: function(xhrResponseText) {
                     segmentsUnify.running = xhrResponseText;
                 },
-                error: function (err) {
+                error: function(err) {
                     console.error(err);
                 }
             })
 
-        ).then(function () {
+        ).then(function() {
             callback(segmentsUnify);
         });
 
@@ -366,10 +366,10 @@ VacuumProcessor.prototype = {
         $.ajax({
             url: '/stream/segments/' + segmentId,
             type: 'GET',
-            success: function (xhrResponseText) {
+            success: function(xhrResponseText) {
                 callback(xhrResponseText);
             },
-            error: function (err) {
+            error: function(err) {
                 console.error(err);
             }
         });
@@ -379,7 +379,7 @@ VacuumProcessor.prototype = {
     /**
      * @returns Array of bikes/odo
      */
-    getBikeOdoOfAthlete: function (athleteId, callback) {
+    getBikeOdoOfAthlete: function(athleteId, callback) {
 
         if (_.isUndefined(window.pageView)) {
             callback(null);
@@ -393,10 +393,10 @@ VacuumProcessor.prototype = {
 
         var url = location.protocol + "//www.strava.com/athletes/" + athleteId;
 
-        $.ajax(url).always(function (data) {
+        $.ajax(url).always(function(data) {
 
             var bikeOdoArray = {};
-            _.each($(data.responseText).find('div.gear>table>tbody>tr'), function (element) {
+            _.each($(data.responseText).find('div.gear>table>tbody>tr'), function(element) {
                 var bikeName = $(element).find('td').first().text().trim();
                 var bikeOdo = $(element).find('td').last().text().trim();
                 bikeOdoArray[btoa(unescape(encodeURIComponent(bikeName)))] = bikeOdo;
@@ -416,7 +416,7 @@ VacuumProcessor.prototype = {
         return (activityName) ? activityName : null;
     },
 
-    fetchActivitiesRecursive: function (untilTimestamp, page, deferred, activitiesList) {
+    fetchActivitiesRecursive: function(untilTimestamp, page, deferred, activitiesList) {
 
         var self = this;
 
@@ -443,7 +443,7 @@ VacuumProcessor.prototype = {
             } else { // No errors...
 
                 // overridde data total
-                data.total = 20;
+                data.total = 80;
 
                 if (activitiesList.length >= data.total) { // No more activities to fetch, resolving promise here
                     console.log('Resolving with ' + activitiesList.length + ' activities found');
@@ -459,18 +459,23 @@ VacuumProcessor.prototype = {
 
         }, function error(data, textStatus, errorThrown) {
 
-            deferred.reject({
+            var err = {
+                method: 'VacuumProcessor.fetchActivitiesRecursive',
+                activitiesUrl: activitiesUrl,
                 data: data,
                 textStatus: textStatus,
-                errorThrown: errorThrown
-            });
+                errorThrown: errorThrown,
+            };
+
+            console.error(err);
+            deferred.reject(err);
 
         });
 
         return deferred.promise;
     },
 
-    fetchActivityStreamById: function (activityId) {
+    fetchActivityStreamById: function(activityId) {
 
         var self = this;
 
@@ -481,13 +486,23 @@ VacuumProcessor.prototype = {
         var promiseActivityStream = $.ajax(activityStreamUrl);
 
         promiseActivityStream.then(function success(data, textStatus, jqXHR) {
+
+            deferred.notify(activityId);
+
+            // Append activityId resolved data
+            data.activityId = activityId;
             deferred.resolve(data);
+
         }, function error(data, textStatus, errorThrown) {
+
             deferred.reject({
+                method: 'VacuumProcessor.fetchActivityStreamById',
+                activityId: activityId,
                 data: data,
                 textStatus: textStatus,
-                errorThrown: errorThrown
+                errorThrown: errorThrown,
             });
+
         });
 
         return deferred.promise;
