@@ -47,10 +47,10 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
                 var currentDayTimestamp = firstActivityDate.getTime() + dayLong * i;
 
+                // Seek if current day with have 1 or serveral trimp. then add...
                 var trimpsObjectFoundOnThatDay = _.where(trimpObjectsArray, {
                     timestamp: currentDayTimestamp
                 });
-
 
                 var trimpObjectForWhatEverDay = {
                     date: new Date(currentDayTimestamp),
@@ -73,28 +73,25 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                 }
 
                 trimpObjectsWithDaysOffArray.push(trimpObjectForWhatEverDay);
-                // Seek if current day with have 1 or serveral trimp. then add...
             }
 
-
-            // CTL = CTL(d-1) + [TSS - CTL(d-1)] * [1 - exp^(-1 / 42)]
-            // ATL = ATL(d-1) + [TSS - ATL(d-1)] * [1 - exp^(-1 / 7)]
-            // TSB = CTL-ATL
+            // ... End injecting day off..
 
             // Now compute
             var CTL = 0;
             var ATL = 0;
             var TSB = 0;
 
+            // CTL = CTL(d-1) + [TSS - CTL(d-1)] * [1 - exp^(-1 / 42)]
+            // ATL = ATL(d-1) + [TSS - ATL(d-1)] * [1 - exp^(-1 / 7)]
+            // TSB = CTL-ATL
             var ctlResults = [];
-
-            // $scope.csvResult = 'Date, CTL\n';
 
             _.each(trimpObjectsWithDaysOffArray, function(trimpObject, index, trimpObjectsArray) {
 
                 CTL = CTL + (trimpObject.trimp - CTL) * (1 - Math.exp(-1 / 42));
 
-                var formattedDate = trimpObject.date.getDate() + '/' + (trimpObject.date.getMonth() + 1) + '/' + trimpObject.date.getFullYear();
+                var formattedDate = trimpObject.date.toLocaleDateString();
 
                 ctlResults.push({
                     date: formattedDate,
@@ -102,8 +99,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     activitiesName: trimpObject.activitiesName,
                     CTL: CTL.toFixed(3)
                 });
-
-                // $scope.csvResult += formattedDate + ',' + CTL.toFixed(2) + '\n';
             });
 
             return ctlResults;
@@ -142,7 +137,8 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     $scope.xAxisTickFormatFunction = function() {
         return function(d) {
-            return d3.time.format('%x')(new Date(d)); //uncomment for date format
+            // return d3.time.format('%x')(new Date(d)); //uncomment for date format
+            return (new Date(d)).toLocaleDateString(); //uncomment for date format
         };
     };
 
