@@ -54,7 +54,7 @@ ActivitiesProcessor.prototype = {
 
                 computedActivitiesPercentage = computedActivitiesPercentageCount / self.activitiesWithStream.length * 100;
 
-                console.warn('ALL promisesOfActivitiesComputed ' + computedActivitiesPercentage);
+                // console.warn('ALL promisesOfActivitiesComputed ' + computedActivitiesPercentage);
 
                 deferred.notify({
                     computedActivitiesPercentage: computedActivitiesPercentage,
