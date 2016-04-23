@@ -110,19 +110,19 @@ ActivitiesProcessor.prototype = {
             isTrainer: activityWithStream.trainer,
             appResources: self.appResources,
             userSettings: {
-                userGender: self.userSettings.userGender,
-                userRestHr: self.userSettings.userRestHr,
-                userMaxHr: self.userSettings.userMaxHr,
-                userFTP: self.userSettings.userFTP,
-                zones: self.userSettings.zones,
-                userHrrZones: self.userSettings.userHrrZones,
+                userGender: self.userSettings.userGender, // Comming from option page
+                userRestHr: self.userSettings.userRestHr, // Comming from option page
+                userMaxHr: self.userSettings.userMaxHr, // Comming from option page
+                userFTP: self.userSettings.userFTP, // Comming from option page
+                zones: self.userSettings.zones, // Comming from option page
+                userHrrZones: self.userSettings.userHrrZones, // Comming from option page
             },
             params: {
-                athleteWeight: self.userSettings.userWeight,
+                athleteWeight: self.userSettings.userWeight, // Comming from option page
                 hasPowerMeter: activityWithStream.hasPowerMeter,
                 activityStatsMap: activityStatsMap,
                 activityStream: activityWithStream.stream,
-                bounds: null
+                bounds: null // No segments efforts computed then null...
             }
         };
 

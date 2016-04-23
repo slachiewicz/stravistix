@@ -44,9 +44,7 @@ ActivitiesSynchronizer.prototype = {
 
                         if (data.state === 'rejected') {
                             // No stream found for this activity
-                            console.warn('Stream not found for activity ' + data.reason.activityId, data);
-
-                            // totalActivitiesWithStreamCount--;
+                            console.warn('Stream not found for activity <' + data.reason.activityId + '>, index <' + index + '>', data);
 
                         } else if (data.state === 'fulfilled') {
 
@@ -91,7 +89,7 @@ ActivitiesSynchronizer.prototype = {
                 fetchedActivitiesProgress = fetchedActivitiesStreamCount / activities.length * 100;
 
                 deferred.notify({
-                    fetchedActivitiesStreamCount: fetchedActivitiesProgress,
+                    fetchedActivitiesStreamPercentage: fetchedActivitiesProgress,
                     index: notification.index,
                     activityId: notification.value,
                 });
