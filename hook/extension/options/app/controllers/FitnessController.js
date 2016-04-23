@@ -187,12 +187,14 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             chart: {
                 type: 'lineWithFocusChart',
                 height: 800,
-                clipEdge: true,
-                rescaleY: true,
+                // clipEdge: true,
+                // rescaleY: true,
+                // clipVoronoi: false,
+                // "duration": 500,
                 margin: {
                     top: 20,
                     right: 50,
-                    bottom: 40,
+                    bottom: 80,
                     left: 50
                 },
                 yDomain: $scope.fitnessChartData.yDomain,
@@ -228,6 +230,17 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     axisLabel: 'CTL',
                     tickFormat: function(d) {
                         return d3.format('.02f')(d);
+                    },
+                    axisLabelDistance: -10
+                },
+                y2Axis: {
+                    tickFormat: function(d) {
+                        return d3.format('.02f')(d);
+                    }
+                },
+                x2Axis: {
+                    tickFormat: function(d) {
+                        return (new Date(d)).toLocaleDateString();
                     },
                     axisLabelDistance: -10
                 },
