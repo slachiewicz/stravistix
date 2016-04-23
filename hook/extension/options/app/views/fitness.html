@@ -1,8 +1,41 @@
 <div>Activity with HR data: {{trimpObjectsArray.length}}</div>
 <!-- <div>{{computedActivities | json}}</div> -->
-<nvd3 options="options" data="data"></nvd3>
-<br/><br/><br/>
-<textarea ng-model="csvResult" rows="8" cols="40"></textarea>
+<!-- <nvd3-line-chart
+       data="exampleData"
+       showXAxis="true"
+       showYAxis="true"
+       tooltips="true"
+       interactive="true">
+   </nvd3-line-chart> -->
+
+<!-- <nvd3-line-with-focus-chart
+    data="exampleData"
+    id="exampleId"
+    interactive="true"
+    tooltips="true"
+    height="800"
+    height2="100"
+    margin="{left:80,top:50,bottom:50,right:50}"
+    yAxisTickFormat="yAxisTickFormatFunction()"
+    xAxisTickFormat="xAxisTickFormatFunction()"
+    x2AxisTickFormat="xAxisTickFormatFunction()">
+   <svg></svg>
+</nvd3-line-with-focus-chart> -->
+
+<nvd3-line-chart
+       data="exampleData"
+       id="exampleId"
+       height="600"
+       showXAxis="true"
+       showYAxis="true"
+       tooltips="true"
+       interactive="true"
+       xAxisTickFormat="xAxisTickFormatFunction()"
+       margin="{left:50,top:50,bottom:50,right:50}"
+       >
+   <svg></svg>
+</nvd3-line-chart>
+
 <table style="border: 1px solid black;">
     <tr style="border: 1px solid black;">
         <td style="border: 1px solid black;padding: 3px;"><strong>date</strong></td>

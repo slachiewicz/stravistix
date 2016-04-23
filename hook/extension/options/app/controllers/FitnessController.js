@@ -40,11 +40,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
             var timeDiff = Math.abs(lastActivityDate.getTime() - firstActivityDate.getTime());
             var diffDays = Math.ceil(timeDiff / dayLong);
-            /*
-                        console.log(firstActivityDate);
-                        console.log(lastActivityDate);
-                        console.log(timeDiff);
-                        console.log(diffDays);*/
 
             var trimpObjectsWithDaysOffArray = [];
 
@@ -93,7 +88,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
             var ctlResults = [];
 
-            $scope.csvResult = 'Date, CTL\n';
+            // $scope.csvResult = 'Date, CTL\n';
 
             _.each(trimpObjectsWithDaysOffArray, function(trimpObject, index, trimpObjectsArray) {
 
@@ -105,106 +100,50 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                     date: formattedDate,
                     timestamp: trimpObject.timestamp,
                     activitiesName: trimpObject.activitiesName,
-                    CTL: CTL.toFixed(2)
+                    CTL: CTL.toFixed(3)
                 });
 
-                $scope.csvResult += formattedDate + ',' + CTL.toFixed(2) + '\n';
+                // $scope.csvResult += formattedDate + ',' + CTL.toFixed(2) + '\n';
             });
 
             return ctlResults;
         };
 
         $scope.fitnessData = $scope.computeFitness($scope.trimpObjectsArray);
-        /*
-                // Test draw graph... NVD3
-                $scope.options = {
-                    chart: {
-                        type: 'lineWithFocusChart',
-                        height: 450,
-                        margin: {
-                            top: 20,
-                            right: 20,
-                            bottom: 60,
-                            left: 40
-                        },
-                        duration: 50,
-                        xAxis: {
-                            axisLabel: 'TIME',
-                            tickFormat: function(d) {
-                                return d3.format(',f')(d);
-                            }
-                        },
-                        x2Axis: {
-                            tickFormat: function(d) {
-                                return d3.format(',f')(d);
-                            }
-                        },
-                        yAxis: {
-                            axisLabel: 'CTL',
-                            tickFormat: function(d) {
-                                return d3.format(',.2f')(d);
-                            },
-                            rotateYLabel: false
-                        },
-                        y2Axis: {
-                            tickFormat: function(d) {
-                                return d3.format(',.2f')(d);
-                            }
-                        }
 
-                    }
-                };
 
-                $scope.data = generateData();
+        var values = [];
+        _.each($scope.fitnessData, function(fitData) {
+            values.push([fitData.timestamp, fitData.CTL]);
+        });
 
-                function generateData() {
-                    return stream_layers(3, 10 + Math.random() * 200, .1).map(function(data, i) {
-                        return {
-                            key: 'Stream' + i,
-                            values: data
-                        };
-                    });
-                }
 
-                function stream_layers(n, m, o) {
-                    if (arguments.length < 3) o = 0;
-
-                    function bump(a) {
-                        var x = 1 / (.1 + Math.random()),
-                            y = 2 * Math.random() - .5,
-                            z = 10 / (.1 + Math.random());
-                        for (var i = 0; i < m; i++) {
-                            var w = (i / m - y) * z;
-                            a[i] += x * Math.exp(-w * w);
-                        }
-                    }
-                    return d3.range(n).map(function() {
-                        var a = [],
-                            i;
-                        for (i = 0; i < m; i++) a[i] = o + o * Math.random();
-                        for (i = 0; i < 5; i++) bump(a);
-                        return a.map(stream_index);
-                    });
-                }
-
-                function stream_waves(n, m) {
-                    return d3.range(n).map(function(i) {
-                        return d3.range(m).map(function(j) {
-                            var x = 20 * j / m - i / 3;
-                            return 2 * x * Math.exp(-.5 * x);
-                        }).map(stream_index);
-                    });
-                }
-
-                function stream_index(d, i) {
-                    return {
-                        x: i,
-                        y: Math.max(0, d)
-                    };
-                }*/
+        $scope.exampleData = [{
+            "key": "CTL",
+            "bar": true,
+            values: values
+        }];
 
         $scope.$apply();
     });
 
+    // $scope.xAxisTicksFunction = function() {
+    //     console.log(d3.svg.axis().ticks(d3.time.minutes, 5));
+    //     return function(d) {
+    //         return d3.svg.axis().ticks(d3.time.minutes, 5);
+    //     };
+    // };
+
+    // $scope.xAxisTickFormatFunction = function() {
+    //     return function(d) {
+    //         return d3.time.format('%Y/%m/%d')(new Date(d));
+    //     };
+    // };
+
+    $scope.xAxisTickFormatFunction = function() {
+        return function(d) {
+            return d3.time.format('%x')(new Date(d)); //uncomment for date format
+        };
+    };
 
 }]);
