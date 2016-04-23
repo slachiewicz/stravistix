@@ -27,7 +27,7 @@
     "fancybox": "3.0.0",
     "fiber": "1.0.4",
     "mobin-angular-nvd3-directives": "0.0.8",
-    "nvd3": "1.8.1",
+    "nvd3": "1.1.15",
     "q": "^1.4.1",
     "underscore": "1.8.3"
   },
