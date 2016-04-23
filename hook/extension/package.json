@@ -20,13 +20,10 @@
     "angular": "1.5.5",
     "angular-bootstrap": "0.12.2",
     "angular-route": "1.5.5",
-    "angularjs-nvd3-directives": "0.0.8",
     "bootstrap": "3.3.6",
     "chart.js": "1.0.*",
-    "d3": "^3.5.16",
     "fancybox": "3.0.0",
     "fiber": "1.0.4",
-    "nvd3": "^1.8.2",
     "q": "^1.4.1",
     "underscore": "1.8.3"
   },
