@@ -1,6 +1,26 @@
 <div>Activity with HR data: {{trimpObjectsArray.length}}</div>
 <!-- <div>{{computedActivities | json}}</div> -->
-<!-- <nvd3-line-chart data="exampleData" showXAxis="true" showYAxis="true" tooltips="true" interactive="true"></nvd3-line-chart> -->
+<!-- <nvd3-line-chart
+       data="exampleData"
+       showXAxis="true"
+       showYAxis="true"
+       tooltips="true"
+       interactive="true">
+   </nvd3-line-chart> -->
+   <nvd3-line-chart
+               data="exampleData"
+               id="exampleId"
+               height="600"
+               showXAxis="true"
+               showYAxis="true"
+               tooltips="true"
+               interactive="true"
+               xAxisTickValues="[1378387500, 1378388100, 1378389900]"
+               xAxisTickFormat="xAxisTickFormatFunction()"
+               margin="{left:50,top:50,bottom:50,right:50}"
+               >
+           <svg></svg>
+       </nvd3-line-chart>
 <br/>
 <br/>
 <br/>
