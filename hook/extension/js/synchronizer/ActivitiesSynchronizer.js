@@ -14,14 +14,15 @@ ActivitiesSynchronizer.prototype = {
         // Start fetching missing activities
         self.fetchActivitiesRecursive(lastSyncUserDateTime).then(function success(activities) {
 
+            console.log('Activities fetched: ' + activities.length);
+
             var fetchedActivitiesStreamCount = 0;
             var fetchedActivitiesProgress = 0;
-
             var promisesOfActivitiesStreamById = [];
+            
             // For each activity, fetch his stream and compute extended stats
             _.each(activities, function(activity) {
                 // Getting promise of stream for each activity...
-                // console.log(activity.name + ' ****************  ' + new Date(activity.start_time));
                 promisesOfActivitiesStreamById.push(self.fetchActivityStreamById(activity.id));
             });
 
@@ -117,11 +118,12 @@ ActivitiesSynchronizer.prototype = {
         promiseActivitiesRequest.then(function success(data, textStatus, jqXHR) {
 
             if (textStatus !== 'success') {
+
                 deferred.reject('Unable to get models' + textStatus);
+
             } else { // No errors...
 
                 // overridde data total
-                // data.total = 20;
                 if (_.isEmpty(data.models)) { // No more activities to fetch, resolving promise here
                     console.log('Resolving with ' + activitiesList.length + ' activities found');
                     deferred.resolve(activitiesList);
@@ -139,10 +141,11 @@ ActivitiesSynchronizer.prototype = {
                         activitiesList = _.flatten(_.union(activitiesCompliantWithLastSyncDateTime, activitiesList));
 
                         if (data.models.length > activitiesCompliantWithLastSyncDateTime.length) {
-                            deferred.notify(activitiesList.length + ' ???????? ');
+                            deferred.notify(100); // 100% Complete
                             deferred.resolve(activitiesList);
                         } else {
                             // Continue to fetch
+                            deferred.notify(activitiesList.length /  data.total * 100);
                             self.fetchActivitiesRecursive(lastSyncUserDateTime, page + 1, deferred, activitiesList);
                         }
 
@@ -186,9 +189,7 @@ ActivitiesSynchronizer.prototype = {
         promiseActivityStream.then(function success(data, textStatus, jqXHR) {
 
             deferred.notify(activityId);
-
-            // Append activityId resolved data
-            data.activityId = activityId;
+            data.activityId = activityId; // Append activityId resolved data
             deferred.resolve(data);
 
         }, function error(data, textStatus, errorThrown) {

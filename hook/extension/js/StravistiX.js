@@ -939,6 +939,8 @@ StravistiX.prototype = {
 
             console.log(syncedActivities.length + ' new activities synced. Now saving them to extension local storage.');
 
+            // TODO Get activities already on storage and append !
+
             // Save to chrome storage
             return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities);
 
@@ -959,7 +961,7 @@ StravistiX.prototype = {
 
         }).then(function saveLastSyncDateTimeSuccess(saved) {
 
-            console.log('Last sync date time saved: ' + saved.data.lastSyncDateTime, new Date(saved.data.lastSyncDateTime));
+            console.log('Last sync date time saved: ', new Date(saved.data.lastSyncDateTime));
 
         });
 
@@ -980,7 +982,7 @@ StravistiX.prototype = {
             // console.log('Last Sync Date Time: ' + savedLastSyncDateTime.data);
             // console.log('Last Sync Date Time Saved: ', savedLastSyncDateTime.data);
             if(savedLastSyncDateTime.data) {
-                console.log('last sync date time saved: ' + savedLastSyncDateTime.data, new Date(savedLastSyncDateTime.data));
+                console.log('Last sync date time found: ', new Date(savedLastSyncDateTime.data));
             } else {
                 console.log('No last sync date time found, starting full sync');
             }
