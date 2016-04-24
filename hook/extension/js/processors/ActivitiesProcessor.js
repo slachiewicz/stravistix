@@ -42,6 +42,11 @@ ActivitiesProcessor.prototype = {
                     computedActivitiesPercentage: 100
                 });
 
+                // Sort computedActivities by start date ascending before resolve
+                self.activitiesWithStream = _.sortBy(self.activitiesWithStream, function(item) {
+                    return (new Date(item.start_time)).getTime();
+                });
+
                 deferred.resolve(self.activitiesWithStream);
             },
             function error(err) {
@@ -53,8 +58,6 @@ ActivitiesProcessor.prototype = {
             function progress(notification) {
 
                 computedActivitiesPercentage = computedActivitiesPercentageCount / self.activitiesWithStream.length * 100;
-
-                // console.warn('ALL promisesOfActivitiesComputed ' + computedActivitiesPercentage);
 
                 deferred.notify({
                     computedActivitiesPercentage: computedActivitiesPercentage,
@@ -70,34 +73,15 @@ ActivitiesProcessor.prototype = {
     },
 
     createActivityStatMap: function(activityWithStream) {
-
-        /*
-        Sample from activity processor:
-        {
-            "distance": 122.5,
-            "movingTime": 15454,
-            "elevation": 505,
-            "avgPower": 150,
-            "weightedPower": null,
-            "energyOutput": 2317,
-            "elapsedTime": 17781,
-            "averageSpeed": 28.5,
-            "averageHeartRate": 155,
-            "maxHeartRate": 172
-        }
-        */
-
         return {
             'distance': activityWithStream.distance,
             'movingTime': activityWithStream.moving_time_raw,
             'elevation': activityWithStream.elevation_gain,
             'elapsedTime': activityWithStream.elapsed_time_raw,
-
             // Toughness will not be computed intentionnaly with the following attributes "null":
             'avgPower': null, // Toughness Score will not be computed
             'averageSpeed': null // Toughness Score will not be computed
         };
-
     },
 
     computeActivity: function(activityWithStream) {
@@ -147,8 +131,6 @@ ActivitiesProcessor.prototype = {
         // Listen messages from thread. Thread will send to us the result of computation
         computeAnalysisThread.onmessage = function(messageFromThread) {
 
-            // console.debug('done ' + activityWithStream.id);
-
             // Notify upper compute method when an activity has been computed for progress percentage
             deferred.notify(activityWithStream.id);
 
@@ -178,53 +160,3 @@ ActivitiesProcessor.prototype = {
         return deferred.promise;
     }
 };
-
-/*
-{
-    "id": 549238663,
-    "name": "120k with froozen feet & rain ! Strong race with a doe !",
-    "emoji_name": "120k with froozen feet & rain ! Strong race with a doe !",
-    "type": "Ride",
-    "display_type": "Workout",
-    "activity_type_display_name": "Ride",
-    "private": false,
-    "bike_id": 2042105,
-    "athlete_gear_id": null,
-    "start_date": "Mon, 18/04/2016",
-    "start_date_local_raw": 1460980977,
-    "start_time": "2016-04-18T10:02:57+0000",
-    "start_day": "Mon",
-    "distance": "122.5",
-    "distance_raw": 122555,
-    "long_unit": "kilometers",
-    "short_unit": "km",
-    "moving_time": "4:17:34",
-    "moving_time_raw": 15454,
-    "elapsed_time": "4:56:21",
-    "elapsed_time_raw": 17781,
-    "trainer": false,
-    "static_map": true,
-    "show_elevation": true,
-    "has_latlng": true,
-    "commute": false,
-    "elevation_gain": "505",
-    "elevation_unit": "m",
-    "elevation_gain_raw": 505,
-    "description": "",
-    "activity_url": "https://www.strava.com/activities/549238663",
-    "activity_url_for_twitter": "https://www.strava.com/activities/549238663?utm_content=2470979&utm_medium=referral&utm_source=twitter",
-    "twitter_msg": "went for a 122.5 kilometer road ride.",
-    "is_new": false,
-    "is_changing_type": false,
-    "suffer_score": null,
-    "calories": 2583.5442401399996,
-    "feed_data": {
-        "entries": []
-    },
-    "workout_type": 12,
-    "flagged": false,
-    "hide_power": false,
-    "hide_heartrate": false
-}
-
-*/

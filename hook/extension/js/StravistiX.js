@@ -93,25 +93,6 @@ StravistiX.prototype = {
         this.handleGoogleMapsComeBackModifier();
     },
 
-    startSync: function () {
-
-        var self = this;
-        this.handleActivitiesSync().then(function success(syncedActivities) {
-            console.debug(syncedActivities);
-            // Save to chrome storage
-            Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities, function(computedActivitiesOnChromeLocalStorage) {
-                console.debug(computedActivitiesOnChromeLocalStorage);
-                console.log('Sync done');
-            });
-
-        }, function error(err) {
-            console.error(err);
-        }, function progress(progress) {
-            console.debug(progress);
-        });
-
-    },
-
     /**
      *
      */
@@ -951,6 +932,27 @@ StravistiX.prototype = {
         }
     },
 
+    startSync: function() {
+
+        var self = this;
+        this.handleActivitiesSync().then(function success(syncedActivities) {
+
+            console.log(syncedActivities.length + ' new activities synced. Now saving them to extension local storage.');
+
+            // Save to chrome storage
+            Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities, function(savedData) {
+                // console.debug(savedData);
+                console.log(savedData.data.computedActivities.length + ' activities were saved to extension local storage', savedData.data.computedActivities);
+            });
+
+        }, function error(err) {
+            console.error(err);
+        }, function progress(progress) {
+            console.debug(progress);
+        });
+
+    },
+
     handleActivitiesSync: function() {
 
         var self = this;
@@ -959,23 +961,38 @@ StravistiX.prototype = {
 
         var activitiesSynchronizer = new ActivitiesSynchronizer();
 
-        activitiesSynchronizer.fetch().then(function success(activitiesWithStreams) {
+        // var dayLong = 24 * 3600 * 1000;
+        // var lastSyncDateTime = new Date((new Date()).getTime() - dayLong * 1);
+        // TODO Get lastSyncDateTime in chrome localStorage
+        var lastSyncDateTime = new Date('11/18/2015 18:00');
+
+        console.log('lastSyncDateTime', lastSyncDateTime);
+
+        activitiesSynchronizer.fetchWithStream(lastSyncDateTime).then(function success(activitiesWithStreams) {
 
             var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
+            return activitiesProcessor.compute();
 
-            activitiesProcessor.compute().then(function success(computedActivities) {
-
-                deferred.resolve(computedActivities);
-
-            }, function error(err) {
-                deferred.reject(err);
-            }, function progress(progress) {
-                deferred.notify(progress);
-            });
         }, function error(err) {
+
             deferred.reject(err);
+
         }, function progress(progress) {
-            deferred.notify(progress);
+
+            if (progress) deferred.notify(progress);
+
+        }).then(function success(computedActivities) {
+            
+            deferred.resolve(computedActivities);
+
+        }, function error(err) {
+
+            deferred.reject(err);
+
+        }, function progress(progress) {
+
+            if (progress) deferred.notify(progress);
+
         });
 
         return deferred.promise;

@@ -12,6 +12,9 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     ChromeStorageService.fetchComputedActivities(function(computedActivities) {
 
+        console.log(computedActivities.length);
+        console.log(computedActivities);
+
         $scope.computedActivities = computedActivities;
 
         $scope.trimpObjectsArray = [];
@@ -30,8 +33,8 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         $scope.computeFitness = function(trimpObjectsArray) {
 
             // Creating clone of trimp object and reverse for chronologic
-            trimpObjectsArray = _.clone(trimpObjectsArray);
-            trimpObjectsArray.reverse();
+            // trimpObjectsArray = _.clone(trimpObjectsArray);
+            // trimpObjectsArray.reverse();
 
             // Inject day off..
             var dayLong = 24 * 3600 * 1000;

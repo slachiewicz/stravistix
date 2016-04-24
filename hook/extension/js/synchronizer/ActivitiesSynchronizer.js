@@ -1,33 +1,28 @@
-function ActivitiesSynchronizer() {
-    this.vacuumProcessor = new VacuumProcessor();
-    this.untilTimestamp = false;
-}
+function ActivitiesSynchronizer() {}
 
 ActivitiesSynchronizer.prototype = {
-
 
     /**
      * @return All activities with their stream
      */
-    fetch: function(untilTimestamp) {
+    fetchWithStream: function(lastSyncUserDateTime) {
 
         var self = this;
 
         var deferred = Q.defer();
 
         // Start fetching missing activities
-        self.vacuumProcessor.fetchActivitiesRecursive(untilTimestamp).then(function success(activities) {
+        self.fetchActivitiesRecursive(lastSyncUserDateTime).then(function success(activities) {
 
             var fetchedActivitiesStreamCount = 0;
             var fetchedActivitiesProgress = 0;
-
-            // var totalActivitiesWithStreamCount = activities.length; // For progress percentage notification... Assuming all activities have stream at first
 
             var promisesOfActivitiesStreamById = [];
             // For each activity, fetch his stream and compute extended stats
             _.each(activities, function(activity) {
                 // Getting promise of stream for each activity...
-                promisesOfActivitiesStreamById.push(self.vacuumProcessor.fetchActivityStreamById(activity.id));
+                // console.log(activity.name + ' ****************  ' + new Date(activity.start_time));
+                promisesOfActivitiesStreamById.push(self.fetchActivityStreamById(activity.id));
             });
 
             Q.allSettled(promisesOfActivitiesStreamById).then(function success(streamResults) {
@@ -60,9 +55,6 @@ ActivitiesSynchronizer.prototype = {
 
                     });
 
-                    // console.log(activities);
-                    // console.log(activities.length);
-
                     // Finishing... force progress @ 100% because 'rejected' promises don't call progress callback
                     deferred.notify({
                         fetchedActivitiesStreamPercentage: 100
@@ -75,11 +67,6 @@ ActivitiesSynchronizer.prototype = {
 
                 // We don't enter here with allSettled...
 
-                /*
-                activities = activities
-                console.warn('I should remove ' + err.activityId + ' from activities array');
-                deferred.reject(err);
-                */
             }, function progress(notification) {
 
                 fetchedActivitiesProgress = fetchedActivitiesStreamCount / activities.length * 100;
@@ -100,10 +87,123 @@ ActivitiesSynchronizer.prototype = {
         }, function progress(percentage) {
 
             deferred.notify({
-                fetchActivities: percentage
+                fetchActivitiesPercentage: percentage
             });
         });
 
         return deferred.promise;
     },
+
+    fetchActivitiesRecursive: function(lastSyncUserDateTime, page, deferred, activitiesList) {
+
+        var self = this;
+
+        if (!page) {
+            page = 1; // Usually start from first page when no page given
+        }
+
+        if (!deferred) {
+            deferred = Q.defer();
+        }
+
+        if (!activitiesList) {
+            activitiesList = [];
+        }
+
+        var activitiesUrl = '/athlete/training_activities?new_activity_only=false&per_page=200&page=' + page;
+
+        var promiseActivitiesRequest = $.ajax(activitiesUrl);
+
+        promiseActivitiesRequest.then(function success(data, textStatus, jqXHR) {
+
+            if (textStatus !== 'success') {
+                deferred.reject('Unable to get models' + textStatus);
+            } else { // No errors...
+
+                // overridde data total
+                // data.total = 20;
+                if (_.isEmpty(data.models)) { // No more activities to fetch, resolving promise here
+                    console.log('Resolving with ' + activitiesList.length + ' activities found');
+                    deferred.resolve(activitiesList);
+                } else {
+
+                    if (lastSyncUserDateTime) {
+
+                        // Filter activities with start date upper than lastSyncUserDateTime
+                        var activitiesCompliantWithLastSyncDateTime = _.filter(data.models, function(model) {
+                            var activityEndTime = new Date(model.start_time).getTime() + model.elapsed_time_raw * 1000;
+                            return (activityEndTime >= lastSyncUserDateTime.getTime());
+                        });
+
+                        // Append activities
+                        activitiesList = _.flatten(_.union(activitiesCompliantWithLastSyncDateTime, activitiesList));
+
+                        if (data.models.length > activitiesCompliantWithLastSyncDateTime.length) {
+                            deferred.notify(activitiesList.length + ' ???????? ');
+                            deferred.resolve(activitiesList);
+                        } else {
+                            // Continue to fetch
+                            self.fetchActivitiesRecursive(lastSyncUserDateTime, page + 1, deferred, activitiesList);
+                        }
+
+                    } else {
+                        // Append activities
+                        activitiesList = _.flatten(_.union(activitiesList, data.models));
+                        deferred.notify(activitiesList.length / data.total * 100);
+                        self.fetchActivitiesRecursive(lastSyncUserDateTime, page + 1, deferred, activitiesList);
+                    }
+                }
+            }
+
+        }, function error(data, textStatus, errorThrown) {
+
+            var err = {
+                method: 'VacuumProcessor.fetchActivitiesRecursive',
+                activitiesUrl: activitiesUrl,
+                data: data,
+                textStatus: textStatus,
+                errorThrown: errorThrown,
+            };
+
+            console.error(err);
+            deferred.reject(err);
+
+        });
+
+        return deferred.promise;
+    },
+
+    fetchActivityStreamById: function(activityId) {
+
+        var self = this;
+
+        var deferred = Q.defer();
+
+        var activityStreamUrl = "/activities/" + activityId + "/streams?stream_types[]=watts_calc&stream_types[]=watts&stream_types[]=velocity_smooth&stream_types[]=time&stream_types[]=distance&stream_types[]=cadence&stream_types[]=heartrate&stream_types[]=grade_smooth&stream_types[]=altitude&stream_types[]=latlng";
+
+        var promiseActivityStream = $.ajax(activityStreamUrl);
+
+        promiseActivityStream.then(function success(data, textStatus, jqXHR) {
+
+            deferred.notify(activityId);
+
+            // Append activityId resolved data
+            data.activityId = activityId;
+            deferred.resolve(data);
+
+        }, function error(data, textStatus, errorThrown) {
+
+            deferred.reject({
+                method: 'VacuumProcessor.fetchActivityStreamById',
+                activityId: activityId,
+                data: data,
+                textStatus: textStatus,
+                errorThrown: errorThrown,
+            });
+
+        });
+
+        return deferred.promise;
+    }
+
 };
