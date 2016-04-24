@@ -935,20 +935,32 @@ StravistiX.prototype = {
     startSync: function() {
 
         var self = this;
-        this.handleActivitiesSync().then(function success(syncedActivities) {
+        this.handleActivitiesSync().then(function syncSuccess(syncedActivities) {
 
             console.log(syncedActivities.length + ' new activities synced. Now saving them to extension local storage.');
 
             // Save to chrome storage
-            Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities, function(savedData) {
-                // console.debug(savedData);
-                console.log(savedData.data.computedActivities.length + ' activities were saved to extension local storage', savedData.data.computedActivities);
-            });
+            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities);
 
-        }, function error(err) {
+        }, function syncError(err) {
+
             console.error(err);
-        }, function progress(progress) {
+
+        }, function syncProgress(progress) {
+
             console.debug(progress);
+
+        }).then(function saveChromeLocalStorageSuccess(savedData) {
+
+            // Helper.setToStorage promise resolved here
+            console.log(savedData.data.computedActivities.length + ' activities were saved to extension local storage', savedData.data.computedActivities);
+
+            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime', (new Date()).getTime());
+
+        }).then(function saveLastSyncDateTimeSuccess(saved) {
+
+            console.log('Last sync date time saved: ' + saved.data.lastSyncDateTime, new Date(saved.data.lastSyncDateTime));
+
         });
 
     },
@@ -959,37 +971,45 @@ StravistiX.prototype = {
 
         var deferred = Q.defer();
 
-        var activitiesSynchronizer = new ActivitiesSynchronizer();
+        Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime').then(function getLastSyncDateTimeSuccess(savedLastSyncDateTime) {
 
-        // var dayLong = 24 * 3600 * 1000;
-        // var lastSyncDateTime = new Date((new Date()).getTime() - dayLong * 1);
-        // TODO Get lastSyncDateTime in chrome localStorage
-        var lastSyncDateTime = new Date('11/18/2015 18:00');
+            // var dayLong = 24 * 3600 * 1000;
+            // var lastSyncDateTime = new Date((new Date()).getTime() - dayLong * 1);
+            // TODO Get lastSyncDateTime in chrome localStorage
+            //var lastSyncDateTime = new Date('11/18/2015 18:00');
+            // console.log('Last Sync Date Time: ' + savedLastSyncDateTime.data);
+            // console.log('Last Sync Date Time Saved: ', savedLastSyncDateTime.data);
+            if(savedLastSyncDateTime.data) {
+                console.log('last sync date time saved: ' + savedLastSyncDateTime.data, new Date(savedLastSyncDateTime.data));
+            } else {
+                console.log('No last sync date time found, starting full sync');
+            }
 
-        console.log('lastSyncDateTime', lastSyncDateTime);
+            var activitiesSynchronizer = new ActivitiesSynchronizer();
+            return activitiesSynchronizer.fetchWithStream(new Date(savedLastSyncDateTime.data));
 
-        activitiesSynchronizer.fetchWithStream(lastSyncDateTime).then(function success(activitiesWithStreams) {
+        }).then(function fetchWithStreamSuccess(activitiesWithStreams) {
 
             var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
             return activitiesProcessor.compute();
 
-        }, function error(err) {
+        }, function fetchWithStreamError(err) {
 
             deferred.reject(err);
 
-        }, function progress(progress) {
+        }, function fetchWithStreamProgress(progress) {
 
             if (progress) deferred.notify(progress);
 
-        }).then(function success(computedActivities) {
-            
+        }).then(function computeSuccess(computedActivities) {
+
             deferred.resolve(computedActivities);
 
-        }, function error(err) {
+        }, function computeError(err) {
 
             deferred.reject(err);
 
-        }, function progress(progress) {
+        }, function computeProgress(progress) {
 
             if (progress) deferred.notify(progress);
 
