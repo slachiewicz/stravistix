@@ -263,13 +263,13 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         return {
             curves: [{
-                key: "ATL",
-                values: ATLValues,
-                color: '#ff53b0'
-            }, {
                 key: "CTL",
                 values: CTLValues,
                 color: '#007fe7'
+            }, {
+                key: "ATL",
+                values: ATLValues,
+                color: '#ff53b0'
             }, {
                 key: "TSB",
                 values: TSBValues,
