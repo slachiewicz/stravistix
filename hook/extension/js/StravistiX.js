@@ -975,13 +975,7 @@ StravistiX.prototype = {
 
         Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime').then(function getLastSyncDateTimeSuccess(savedLastSyncDateTime) {
 
-            // var dayLong = 24 * 3600 * 1000;
-            // var lastSyncDateTime = new Date((new Date()).getTime() - dayLong * 1);
-            // TODO Get lastSyncDateTime in chrome localStorage
-            //var lastSyncDateTime = new Date('11/18/2015 18:00');
-            // console.log('Last Sync Date Time: ' + savedLastSyncDateTime.data);
-            // console.log('Last Sync Date Time Saved: ', savedLastSyncDateTime.data);
-            if(savedLastSyncDateTime.data) {
+            if (savedLastSyncDateTime.data) {
                 console.log('Last sync date time found: ', new Date(savedLastSyncDateTime.data));
             } else {
                 console.log('No last sync date time found, starting full sync');
@@ -992,8 +986,8 @@ StravistiX.prototype = {
 
         }).then(function fetchWithStreamSuccess(activitiesWithStreams) {
 
-            var activitiesProcessor = new ActivitiesProcessor(activitiesWithStreams, self.appResources_, self.userSettings_);
-            return activitiesProcessor.compute();
+            var activitiesProcessor = new ActivitiesProcessor(self.appResources_, self.userSettings_);
+            return activitiesProcessor.compute(activitiesWithStreams);
 
         }, function fetchWithStreamError(err) {
 

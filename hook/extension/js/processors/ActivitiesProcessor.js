@@ -1,5 +1,4 @@
-function ActivitiesProcessor(activitiesWithStream, appResources, userSettings) {
-    this.activitiesWithStream = activitiesWithStream;
+function ActivitiesProcessor(appResources, userSettings) {
     this.appResources = appResources;
     this.userSettings = userSettings;
 }
@@ -11,62 +10,66 @@ ActivitiesProcessor.prototype = {
     /**
      * @return Activities array with computed stats
      */
-    compute: function() {
+    compute: function(activitiesWithStream) {
 
         var self = this;
-
         var deferred = Q.defer();
-
         var promisesOfActivitiesComputed = [];
-
         var computedActivitiesPercentageCount = 0;
+        var activitiesComputedResults = [];
 
-        _.each(self.activitiesWithStream, function(activityWithStream) {
-            promisesOfActivitiesComputed.push(self.computeActivity(activityWithStream));
-        });
+        var queue = activitiesWithStream.reduce(function(promise, activityWithStream, index) {
 
-        Q.all(promisesOfActivitiesComputed).then(function success(activitiesComputedResults) {
+            return promise.then(function() {
 
-                if (activitiesComputedResults.length !== self.activitiesWithStream.length) {
-                    var errMessage = 'activitiesComputedResults length mismatch with activitiesWithStream length: ' + activitiesComputedResults.length + ' != ' + self.activitiesWithStream.length + ')';
+                return self.computeActivity(activityWithStream).then(function(activityComputedResult) {
+
+                    activitiesComputedResults.push(activityComputedResult);
+
+                    deferred.notify({
+                        computedActivitiesPercentage: computedActivitiesPercentageCount / activitiesWithStream.length * 100,
+                        index: index,
+                        activityId: activityWithStream.id,
+                    });
+
+                    computedActivitiesPercentageCount++;
+
+                });
+
+            });
+
+        }, Q.resolve());
+
+        // Queue Finished
+        queue.then(function() {
+
+                if (activitiesComputedResults.length !== activitiesWithStream.length) {
+                    var errMessage = 'activitiesComputedResults length mismatch with activitiesWithStream length: ' + activitiesComputedResults.length + ' != ' + activitiesWithStream.length + ')';
                     deferred.reject(errMessage);
                 } else {
+
                     _.each(activitiesComputedResults, function(computedResult, index) {
-                        self.activitiesWithStream[index].extendedStats = computedResult;
-                        self.activitiesWithStream[index] = _.pick(self.activitiesWithStream[index], self.outputFields);
+                        activitiesWithStream[index].extendedStats = computedResult;
+                        activitiesWithStream[index] = _.pick(activitiesWithStream[index], self.outputFields);
                     });
+
+                    // Sort computedActivities by start date ascending before resolve
+                    activitiesWithStream = _.sortBy(activitiesWithStream, function(item) {
+                        return (new Date(item.start_time)).getTime();
+                    });
+
+                    // Finishing... force progress @ 100% for compute progress callback
+                    deferred.notify({
+                        computedActivitiesPercentage: 100
+                    });
+
+                    deferred.resolve(activitiesWithStream);
                 }
 
-                // Finishing... force progress @ 100% for compute progress callback
-                deferred.notify({
-                    computedActivitiesPercentage: 100
-                });
-
-                // Sort computedActivities by start date ascending before resolve
-                self.activitiesWithStream = _.sortBy(self.activitiesWithStream, function(item) {
-                    return (new Date(item.start_time)).getTime();
-                });
-
-                deferred.resolve(self.activitiesWithStream);
-            },
-            function error(err) {
-
-                console.error(err);
-                deferred.reject(err);
-
-            },
-            function progress(notification) {
-
-                computedActivitiesPercentage = computedActivitiesPercentageCount / self.activitiesWithStream.length * 100;
-
-                deferred.notify({
-                    computedActivitiesPercentage: computedActivitiesPercentage,
-                    index: notification.index,
-                    activityId: notification.value,
-                });
-
-                computedActivitiesPercentageCount++;
-
+            })
+            .catch(function(error) {
+                console.error(error);
+                deferred.reject(error);
             });
 
         return deferred.promise;
