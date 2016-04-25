@@ -90,7 +90,7 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
         });
     };
 
-    $scope.displayOptionHelper = function(ev, optionKeyParam) {
+    $scope.displayOptionHelper = function($event, optionKeyParam) {
 
         var option = null;
 
@@ -115,7 +115,7 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
                 .htmlContent(option.optionHtml)
                 .ariaLabel(option.optionTitle)
                 .ok('Got it!')
-                .targetEvent(ev)
+                .targetEvent($event)
             );
         }
     };

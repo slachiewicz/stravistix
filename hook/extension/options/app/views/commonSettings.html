@@ -17,19 +17,12 @@
                     <md-icon ng-click="displayOptionHelper($event, option.optionKey)">info_outline</md-icon>
                     <p flex="45">{{option.optionTitle}}</p>
                     <p>
-                        <span ng-repeat="label in option.optionLabels">
-                        <span ng-switch on="label">
-                        <span ng-switch-when="Cycling">
-                            <md-button class="md-primary">{{label}}</md-button>
-                        </span>
-                        <span ng-switch-when="Running">
-                            <md-button class="md-primary md-hue-1">{{label}}</md-button>
-                        </span>
-                        <span ng-switch-default>
-                            <md-button class="md-primary md-hue-2">{{label}}</md-button>
-                        </span>
-                        </span>
-                        </span>
+                        <div ng-repeat="label in option.optionLabels">
+                            <div ng-switch on="label">
+                                <md-icon ng-switch-when="Cycling">directions_bike</md-icon>
+                                <md-icon ng-switch-when="Running">directions_walk</md-icon>
+                            </div>
+                        </div>
                     </p>
                     <div ng-switch on="option.optionType" flex="10">
                         <md-select ng-switch-when="list" ng-model="option.active" ng-change="toggleSelectOption(option)" class="md-block" aria-label="{{ option.optionTitle }}">
