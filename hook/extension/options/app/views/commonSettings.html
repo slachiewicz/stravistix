@@ -1,56 +1,49 @@
 <div id="settingsContainer">
 
-    <md-input-container flex-gt-sm class="md-block md-title">
+    <md-input-container flex-gt-sm class="md-block md-body-1">
         <md-icon>search</md-icon>
         <input ng-model="searchText" type="text" placeholder="Search for an option">
     </md-input-container>
 
-    <md-card ng-repeat="section in sections">
-        <md-card-title>
+    <!-- <md-card ng-repeat="section in sections"> -->
+    <!-- <md-card-title>
             <md-card-title-text>
-                <span class="md-headline">{{ section.sectionTitle }}</span>
             </md-card-title-text>
-        </md-card-title>
-        <md-card-content>
-            <md-list ng-cloak>
-                <md-list-item class="md-subhead" ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="option in section.sectionContent | filter:searchText" ng-hide="option.hidden">
-                    <md-icon ng-click="displayOptionHelper($event, option.optionKey)">info_outline</md-icon>
-                    <p flex="45">{{option.optionTitle}}</p>
-                    <p>
-                        <span ng-repeat="label in option.optionLabels">
-                        <span ng-switch on="label">
-                        <span ng-switch-when="Cycling">
-                            <md-button class="md-primary">{{label}}</md-button>
-                        </span>
-                        <span ng-switch-when="Running">
-                            <md-button class="md-primary md-hue-1">{{label}}</md-button>
-                        </span>
-                        <span ng-switch-default>
-                            <md-button class="md-primary md-hue-2">{{label}}</md-button>
-                        </span>
-                        </span>
-                        </span>
-                    </p>
-                    <div ng-switch on="option.optionType" flex="10">
-                        <md-select ng-switch-when="list" ng-model="option.active" ng-change="toggleSelectOption(option)" class="md-block" aria-label="{{ option.optionTitle }}">
-                            <md-option ng-value="listItem" ng-repeat="listItem in option.optionList">{{ listItem.name }}</md-option>
-                        </md-select>
-
-                        <md-input-container ng-switch-when="integer" class="md-block">
-                            <input type="number" step="any" name="rate" ng-model="option.value" ng-change="toggleIntegerOption(option)" aria-label="{{ option.optionTitle }}" />
-                            <md-tooltip md-direction="top">
-                                {{option.optionHtml}}
-                            </md-tooltip>
-                        </md-input-container>
-
-                        <span ng-switch-when="checkbox" class="md-secondary">
-                            <md-switch ng-model="option.active"></md-switch>
-                        </span>
+        </md-card-title> -->
+    <!-- <md-card-content> -->
+    <md-list ng-repeat="section in sections" class="md-body-1" ng-cloak>
+        <md-subheader class="md-no-sticky">{{ section.sectionTitle }}</md-subheader>
+        <md-list-item ng-click="displayOptionHelper($event, option.optionKey)" ng-repeat="option in section.sectionContent | filter:searchText" ng-hide="option.hidden">
+            <!-- <md-icon>favorite</md-icon> -->
+            <p flex="75">{{option.optionTitle}}</p>
+            <p>
+                <div ng-repeat="label in option.optionLabels">
+                    <div ng-switch on="label">
+                        <md-icon ng-switch-when="Cycling">directions_bike</md-icon>
+                        <md-icon ng-switch-when="Running">directions_walk</md-icon>
                     </div>
-                </md-list-item>
-            </md-list>
-        </md-card-content>
-    </md-card>
+                </div>
+            </p>
+            <div ng-switch on="option.optionType" flex="10">
+                <md-select ng-switch-when="list" ng-model="option.active" ng-change="toggleSelectOption(option)" class="md-block" aria-label="{{ option.optionTitle }}">
+                    <md-option ng-value="listItem" ng-repeat="listItem in option.optionList">{{ listItem.name }}</md-option>
+                </md-select>
+
+                <md-input-container ng-switch-when="integer" class="md-block">
+                    <input type="number" step="any" name="rate" ng-model="option.value" ng-change="toggleIntegerOption(option)" aria-label="{{ option.optionTitle }}" />
+                    <md-tooltip md-direction="top">
+                        {{option.optionHtml}}
+                    </md-tooltip>
+                </md-input-container>
+                <span ng-switch-when="checkbox">
+                    <md-switch ng-model="option.active" class="md-secondary" ng-change="toggleCheckOption(option)"></md-switch>
+                </span>
+            </div>
+        </md-list-item>
+        <md-divider></md-divider>
+    </md-list>
+    <!-- </md-card-content> -->
+    <!-- </md-card> -->
 
     <!-- <input ng-model="searchText" placeholder="Search for an option" class="form-control input-lg"> -->
     <div ng-hide="true" ng-repeat="section in sections">
