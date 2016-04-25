@@ -14,5 +14,8 @@
     "url": "https://github.com/thomaschampagne/stravistix"
   },
   "author": "Thomas Champagne",
-  "readme": "None"
+  "readme": "None",
+  "devDependencies": {
+    "angular-material-icons": "^0.7.0"
+  }
 }

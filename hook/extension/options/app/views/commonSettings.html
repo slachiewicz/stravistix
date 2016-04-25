@@ -1,6 +1,59 @@
 <div id="settingsContainer">
-<input ng-model="searchText" placeholder="Search for an option" class="form-control input-lg">
-    <div data-ng-repeat="section in sections">
+
+    <md-input-container flex-gt-sm class="md-block md-headline">
+        <md-icon>search</md-icon>
+        <input ng-model="searchText" type="text" placeholder="Search for an option">
+    </md-input-container>
+
+    <md-card ng-repeat="section in sections">
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">{{ section.sectionTitle }}</span>
+            </md-card-title-text>
+        </md-card-title>
+        <md-card-content>
+            <md-list ng-cloak>
+                <md-list-item class="md-subhead" ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="option in section.sectionContent | filter:searchText" ng-hide="option.hidden">
+                    <md-icon ng-click="displayOptionHelper(option.optionKey)">info_outline</md-icon>
+                    <p flex="45">{{option.optionTitle}}</p>
+                    <p>
+                        <span ng-repeat="label in option.optionLabels">
+                        <span ng-switch on="label">
+                        <span ng-switch-when="Cycling">
+                            <md-button class="md-primary">{{label}}</md-button>
+                        </span>
+                        <span ng-switch-when="Running">
+                            <md-button class="md-primary md-hue-1">{{label}}</md-button>
+                        </span>
+                        <span ng-switch-default>
+                            <md-button class="md-primary md-hue-2">{{label}}</md-button>
+                        </span>
+                        </span>
+                        </span>
+                    </p>
+                    <div ng-switch on="option.optionType" flex="10">
+                        <md-select ng-switch-when="list" ng-model="option.active" ng-change="toggleSelectOption(option)" class="md-block" aria-label="{{ option.optionTitle }}">
+                            <md-option ng-value="listItem" ng-repeat="listItem in option.optionList">{{ listItem.name }}</md-option>
+                        </md-select>
+
+                        <md-input-container ng-switch-when="integer" class="md-block">
+                            <input type="number" step="any" name="rate" ng-model="option.value" ng-change="toggleIntegerOption(option)" aria-label="{{ option.optionTitle }}" />
+                            <md-tooltip md-direction="top">
+                                {{option.optionHtml}}
+                            </md-tooltip>
+                        </md-input-container>
+
+                        <span ng-switch-when="checkbox" class="md-secondary">
+                            <md-switch ng-model="option.active"></md-switch>
+                        </span>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </md-card-content>
+    </md-card>
+
+    <!-- <input ng-model="searchText" placeholder="Search for an option" class="form-control input-lg"> -->
+    <div ng-hide="true" ng-repeat="section in sections">
         <h3 data-ng-hide="false"><span class="label label-default">{{ section.sectionTitle }}</span></h3>
         <table class="table table-hover">
             <thead>
@@ -20,14 +73,14 @@
                             <span data-ng-switch on="label">
                                 <span data-ng-switch-when="Cycling">
                                     <span class="label label-default" style="background-color: #FC4C02;">{{label}}</span>
-                                </span>
-                                <span data-ng-switch-when="Running">
+                        </span>
+                        <span data-ng-switch-when="Running">
                                     <span class="label label-default"style="background-color: #2DAA35;">{{label}}</span>
-                                </span>
-                                <span data-ng-switch-default>
+                        </span>
+                        <span data-ng-switch-default>
                                     <span class="label label-default" >{{label}}</span>
-                                </span>
-                            </span>
+                        </span>
+                        </span>
                         </span>
                     </td>
                     <td class="text-right">

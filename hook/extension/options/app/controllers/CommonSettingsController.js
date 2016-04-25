@@ -1,4 +1,4 @@
-app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', 'ChromeStorageService', 'NotifierService', '$timeout', '$location', function($scope, CommonSettingsService, ChromeStorageService, NotifierService, $timeout, $location) {
+app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', 'ChromeStorageService', '$timeout', '$location', function($scope, CommonSettingsService, ChromeStorageService, $timeout, $location) {
 
     // Define options structure
     $scope.sections = CommonSettingsService.provideSections();
@@ -34,6 +34,10 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
 
         $scope.$apply();
     });
+
+    $scope.showHelp = function ($event) {
+        console.log($event);
+    };
 
     $scope.toggleCheckOption = function(option) {
 

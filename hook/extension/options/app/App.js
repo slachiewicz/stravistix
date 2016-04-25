@@ -1,7 +1,11 @@
 /**
  * Declaring Angular App
  */
-var app = angular.module("App", ['ngRoute', 'ui.bootstrap', 'ui.checkbox']);
+var app = angular.module("App", ['ngRoute', 'ngMaterial']);
+
+app.config(function($mdThemingProvider) {
+    $mdThemingProvider.theme('default').primaryPalette('deep-orange');
+});
 
 app.config(['$routeProvider', function($routeProvider) {
 
