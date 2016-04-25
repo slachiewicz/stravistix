@@ -37,15 +37,15 @@
             <md-content role="navigation">
                 <md-list ng-repeat="section in data.sidenav.sections">
                     <md-list-item ng-click="section.expand = !section.expand">
-                        <p class="md-subheader md-primary">{{section.name}}</p>
+                        <p class="md-subheader md-primary ">{{section.name}}</p>
                         <span flex></span>
-                        <md-icon class="md-primary md-icon-button">{{section.expand ? 'arrow_drop_up' : 'arrow_drop_down'}}</md-icon>
+                        <md-icon class="md-primary md-icon-button">{{section.expand ? 'expand_less' : 'expand_more'}}</md-icon>
                     </md-list-item>
                     <md-list-item ng-show="!section.expand" ng-repeat="action in section.actions" ng-click="forward(action.link)">
                         <md-icon>{{action.icon}}</md-icon>
-                        <p class="md-body-2">{{action.name}}</p>
+                        <p>{{action.name}}</p>
                         <span flex></span>
-                        <md-icon>chevron_right</md-icon>
+                        <!-- <md-icon>chevron_right</md-icon> -->
                     </md-list-item>
             </md-content>
         </md-sidenav>

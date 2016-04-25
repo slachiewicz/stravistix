@@ -80,12 +80,12 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                 name: 'Settings',
                 expand: false,
                 actions: [{
-                    name: 'Health settings',
-                    icon: 'settings',
+                    name: 'Health',
+                    icon: 'favorite',
                     link: 'Action 1'
                 }, {
-                    name: 'Zone settings',
-                    icon: 'settings',
+                    name: 'Zone',
+                    icon: 'format_line_spacing',
                     link: 'Action 2'
                 }, {
                     name: 'Release note',
