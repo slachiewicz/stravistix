@@ -1,6 +1,6 @@
 <div id="settingsContainer">
 
-    <md-input-container flex-gt-sm class="md-block md-headline">
+    <md-input-container flex-gt-sm class="md-block md-title">
         <md-icon>search</md-icon>
         <input ng-model="searchText" type="text" placeholder="Search for an option">
     </md-input-container>
@@ -14,7 +14,7 @@
         <md-card-content>
             <md-list ng-cloak>
                 <md-list-item class="md-subhead" ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="option in section.sectionContent | filter:searchText" ng-hide="option.hidden">
-                    <md-icon ng-click="displayOptionHelper(option.optionKey)">info_outline</md-icon>
+                    <md-icon ng-click="displayOptionHelper($event, option.optionKey)">info_outline</md-icon>
                     <p flex="45">{{option.optionTitle}}</p>
                     <p>
                         <span ng-repeat="label in option.optionLabels">

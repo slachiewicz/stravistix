@@ -30,6 +30,7 @@
     "angular-material-icons": "^0.7.0",
     "angular-messages": "^1.5.5",
     "angular-route": "1.5.5",
+    "angular-sanitize": "^1.5.5",
     "chart.js": "1.0.*",
     "fancybox": "3.0.0",
     "fiber": "1.0.4",

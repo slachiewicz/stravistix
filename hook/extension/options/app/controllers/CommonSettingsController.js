@@ -1,4 +1,4 @@
-app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', 'ChromeStorageService', '$timeout', '$location', function($scope, CommonSettingsService, ChromeStorageService, $timeout, $location) {
+app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', 'ChromeStorageService', '$timeout', '$location', '$mdDialog', function($scope, CommonSettingsService, ChromeStorageService, $timeout, $location, $mdDialog) {
 
     // Define options structure
     $scope.sections = CommonSettingsService.provideSections();
@@ -34,10 +34,6 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
 
         $scope.$apply();
     });
-
-    $scope.showHelp = function ($event) {
-        console.log($event);
-    };
 
     $scope.toggleCheckOption = function(option) {
 
@@ -94,7 +90,7 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
         });
     };
 
-    $scope.displayOptionHelper = function(optionKeyParam) {
+    $scope.displayOptionHelper = function(ev, optionKeyParam) {
 
         var option = null;
 
@@ -111,7 +107,16 @@ app.controller("CommonSettingsController", ['$scope', 'CommonSettingsService', '
         });
 
         if (option) {
-            NotifierService(option.optionTitle, option.optionHtml);
+            $mdDialog.show(
+                $mdDialog.alert()
+                .parent(angular.element(document.body))
+                .clickOutsideToClose(true)
+                .title(option.optionTitle)
+                .htmlContent(option.optionHtml)
+                .ariaLabel(option.optionTitle)
+                .ok('Got it!')
+                .targetEvent(ev)
+            );
         }
     };
 
