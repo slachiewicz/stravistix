@@ -19,7 +19,7 @@ ActivitiesSynchronizer.prototype = {
             var fetchedActivitiesStreamCount = 0;
             var fetchedActivitiesProgress = 0;
             var promisesOfActivitiesStreamById = [];
-            
+
             // For each activity, fetch his stream and compute extended stats
             _.each(activities, function(activity) {
                 // Getting promise of stream for each activity...
@@ -161,7 +161,7 @@ ActivitiesSynchronizer.prototype = {
         }, function error(data, textStatus, errorThrown) {
 
             var err = {
-                method: 'VacuumProcessor.fetchActivitiesRecursive',
+                method: 'ActivitiesSynchronizer.fetchActivitiesRecursive',
                 activitiesUrl: activitiesUrl,
                 data: data,
                 textStatus: textStatus,
@@ -195,7 +195,7 @@ ActivitiesSynchronizer.prototype = {
         }, function error(data, textStatus, errorThrown) {
 
             deferred.reject({
-                method: 'VacuumProcessor.fetchActivityStreamById',
+                method: 'ActivitiesSynchronizer.fetchActivityStreamById',
                 activityId: activityId,
                 data: data,
                 textStatus: textStatus,
