@@ -68,29 +68,62 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                 name: 'Insights',
                 expand: false,
                 actions: [{
-                    name: 'Fitness',
+                    name: 'Fitness Trend',
                     icon: 'fitness_center',
                     link: 'Action 3'
                 }, {
-                    name: 'Grid',
+                    name: 'Activity Grid',
                     icon: 'grid_on',
                     link: 'Action 3'
                 }]
             }, {
-                name: 'Settings',
+                name: 'Health settings',
                 expand: false,
+                icon: 'accessibility',
                 actions: [{
                     name: 'Health',
+                    icon: 'accessibility',
+                    link: 'Action 3'
+                }]
+            }, {
+                name: 'Zones settings md-icon:poll ou equalizer',
+                expand: false,
+                actions: [{
+                    name: 'HR Reserve',
                     icon: 'favorite',
-                    link: 'Action 1'
+                    link: routeMap.healthSettingsRoute
                 }, {
-                    name: 'Zone',
-                    icon: 'format_line_spacing',
+                    name: 'Cycling Speed',
+                    icon: 'directions_bike',
                     link: 'Action 2'
                 }, {
-                    name: 'Release note',
-                    icon: 'note',
-                    link: routeMap.releaseNotesRoute
+                    name: 'Runing Pace',
+                    icon: 'directions_walk',
+                    link: 'Action 2'
+                }, {
+                    name: 'Cycling Power',
+                    icon: 'flash_on',
+                    link: 'Action 2'
+                },{
+                    name: 'Cycling Cadence',
+                    icon: 'autorenew',
+                    link: 'Action 2'
+                }, {
+                    name: 'Running Cadence',
+                    icon: 'transfer_within_a_station',
+                    link: 'Action 2'
+                }, {
+                    name: 'Grade',
+                    icon: 'trending_up',
+                    link: 'Action 2'
+                }, {
+                    name: 'Elevation',
+                    icon: 'terrain',
+                    link: 'Action 2'
+                }, {
+                    name: 'Ascent speed',
+                    icon: 'call_made',
+                    link: 'Action 2'
                 }]
             }]
         },
