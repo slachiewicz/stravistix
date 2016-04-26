@@ -5,12 +5,13 @@
         <input ng-model="searchText" type="text" placeholder="Search for an option">
     </md-input-container>
 
-    <md-card ng-repeat="section in sections">
+    <md-card ng-repeat="section in sections" ng-cloak>
         <md-card-content>
-            <p class="md-title">{{ section.sectionTitle }}</p>
-            <p ng-cloak >
+            <!-- <p class=" md-title md-primary">{{ section.sectionTitle }}</p> -->
+            <p class="md-subheader md-primary">{{section.sectionTitle}}</p>
+            <p ng-cloak>
                 <div layout="row" ng-click="navigateTo(setting.extraScreen, $event)" ng-repeat="option in section.sectionContent | filter:searchText" ng-hide="option.hidden" ng-cloak>
-                    <p flex="40" >{{option.optionTitle}}</p>
+                    <p flex="40">{{option.optionTitle}}</p>
                     <p flex="30">
                         <span ng-repeat="label in option.optionLabels">
                             <span ng-switch on="label">
@@ -20,7 +21,7 @@
                         </span>
                     </p>
                     <!-- <md-button flex="20" layout="row" layout-align="start center"><md-icon  ng-click="displayOptionHelper($event, option.optionKey)">info_outline</md-icon></md-button> -->
-                    <div flex="20" layout="row" layout-align="start center"  ng-click="displayOptionHelper($event, option.optionKey)">
+                    <div flex="20" layout="row" layout-align="start center" ng-click="displayOptionHelper($event, option.optionKey)">
                         <md-button class="md-mini md-primary" aria-label="Use Android">
                             hint
                         </md-button>
