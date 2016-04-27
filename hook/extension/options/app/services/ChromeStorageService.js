@@ -1,6 +1,6 @@
 app.factory('ChromeStorageService', function() {
 
-    chromeStorageService = {};
+    var chromeStorageService = {};
 
     chromeStorageService.fetchUserSettings = function(callback) {
         chrome.storage.sync.get(userSettings, function(userSettingsSynced) {
