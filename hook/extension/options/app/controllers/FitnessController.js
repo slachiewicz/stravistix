@@ -1,7 +1,5 @@
 app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'NotifierService', '$timeout', '$location', function($scope, ChromeStorageService, NotifierService, $timeout, $location) {
 
-    $scope.computedActivities = {};
-
     $scope.getDayAtMidnight = function(date) {
         date.setHours(Math.abs(date.getTimezoneOffset() / 60));
         date.setMinutes(0);
@@ -10,18 +8,15 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         return date;
     };
 
-    ChromeStorageService.fetchComputedActivities(function(computedActivities) {
-
-        console.log(computedActivities.length);
-        console.log(computedActivities);
-
-        $scope.computedActivities = computedActivities;
-
-        $scope.trimpObjectsArray = [];
+    /**
+     * @return
+     */
+    $scope.filterActivitiesWithHRData = function(computedActivities) {
+        var activitiesWithHRData = [];
         _.each(computedActivities, function(activity) {
             if (activity.extendedStats && activity.extendedStats.heartRateData) {
                 var date = $scope.getDayAtMidnight(new Date(activity.start_time));
-                $scope.trimpObjectsArray.push({
+                activitiesWithHRData.push({
                     date: date,
                     timestamp: date.getTime(),
                     activityName: activity.name,
@@ -29,85 +24,107 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                 });
             }
         });
+        return activitiesWithHRData;
+    };
 
-        $scope.computeFitness = function(trimpObjectsArray) {
+    /**
+     * @return
+     */
+    $scope.computeCtlAtlTsb = function(everyDaysTrimpArray) {
+        // Now compute
+        var ctl = 0;
+        var atl = 0;
+        var tsb = 0;
 
-            // Creating clone of trimp object and reverse for chronologic
-            // trimpObjectsArray = _.clone(trimpObjectsArray);
-            // trimpObjectsArray.reverse();
+        var results = [];
 
-            // Inject day off..
-            var dayLong = 24 * 3600 * 1000;
-            var firstActivityDate = new Date((_.first(trimpObjectsArray)).date);
-            var today = new Date();
+        _.each(everyDaysTrimpArray, function(trimpObject, index, activitiesWithHRData) {
 
-            var timeDiffBetweenFirstActivityAndToday = Math.abs(today.getTime() - firstActivityDate.getTime());
-            var diffDays = Math.ceil(timeDiffBetweenFirstActivityAndToday / dayLong);
+            ctl = ctl + (trimpObject.trimp - ctl) * (1 - Math.exp(-1 / 42));
+            atl = atl + (trimpObject.trimp - atl) * (1 - Math.exp(-1 / 7));
+            tsb = ctl - atl;
 
-            var trimpObjectsWithDaysOffArray = [];
+            results.push({
+                date: trimpObject.date.toLocaleDateString(),
+                timestamp: trimpObject.timestamp,
+                activitiesName: trimpObject.activitiesName,
+                ctl: ctl.toFixed(3),
+                atl: atl.toFixed(3),
+                tsb: tsb.toFixed(3),
+            });
 
-            for (var i = 0; i < diffDays; i++) {
+        });
 
-                var currentDayTimestamp = firstActivityDate.getTime() + dayLong * i;
+        return results;
+    };
 
-                // Seek if current day with have 1 or serveral trimp. then add...
-                var trimpsObjectFoundOnThatDay = _.where(trimpObjectsArray, {
-                    timestamp: currentDayTimestamp
-                });
+    /**
+     * @return
+     */
+    $scope.filterActivitiesAlongUserChoices = function(activitiesWithHRData, fromDate, toDate) {
 
-                var trimpObjectForWhatEverDay = {
-                    date: new Date(currentDayTimestamp),
-                    timestamp: currentDayTimestamp,
-                    activitiesName: [],
-                    trimp: 0
-                };
+        var DAY_LONG_MILLIS = 24 * 3600 * 1000;
 
-                if (trimpsObjectFoundOnThatDay.length) {
+        if (!fromDate) {
+            fromDate = new Date((_.first(activitiesWithHRData)).date);
+        }
 
-                    // Some trimp have beed found for that day
-                    if (trimpsObjectFoundOnThatDay.length > 1) {
-                        console.warn('More than 1 activity on ' + trimpsObjectFoundOnThatDay.date + ', handle this on names displayed...');
-                    }
+        if (!toDate) {
+            toDate = new Date(); // today
+        }
 
-                    for (var j = 0; j < trimpsObjectFoundOnThatDay.length; j++) {
-                        trimpObjectForWhatEverDay.trimp += trimpsObjectFoundOnThatDay[j].trimp;
-                        trimpObjectForWhatEverDay.activitiesName.push(trimpsObjectFoundOnThatDay[j].activityName);
-                    }
+        // Inject day off..
+        var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / DAY_LONG_MILLIS);
+
+        var everyDaysTrimpArray = [];
+
+        for (var i = 0; i < daysDiff; i++) {
+
+            var timestampOfCurrentDay = fromDate.getTime() + DAY_LONG_MILLIS * i;
+
+            // Seek if current day with have 1 or serveral trimp. then add...
+            var trimpsObjectFoundOnThatDay = _.where(activitiesWithHRData, {
+                timestamp: timestampOfCurrentDay
+            });
+
+            var everyDayTrimpData = {
+                date: new Date(timestampOfCurrentDay),
+                timestamp: timestampOfCurrentDay,
+                activitiesName: [],
+                trimp: 0
+            };
+
+            if (trimpsObjectFoundOnThatDay.length) {
+
+                // Some trimp have beed found for that day
+                if (trimpsObjectFoundOnThatDay.length > 1) {
+                    console.warn('More than 1 activity on ' + trimpsObjectFoundOnThatDay.date + ', handle this on names displayed...');
                 }
 
-                trimpObjectsWithDaysOffArray.push(trimpObjectForWhatEverDay);
+                for (var j = 0; j < trimpsObjectFoundOnThatDay.length; j++) {
+                    everyDayTrimpData.trimp += parseFloat(trimpsObjectFoundOnThatDay[j].trimp);
+                    everyDayTrimpData.activitiesName.push(trimpsObjectFoundOnThatDay[j].activityName);
+                }
             }
-            // ... End injecting day off..
 
-            // Now compute
-            var CTL = 0;
-            var ATL = 0;
-            var TSB = 0;
+            everyDaysTrimpArray.push(everyDayTrimpData);
+        }
 
-            var results = [];
+        // console.warn(everyDaysTrimpArray);
 
-            _.each(trimpObjectsWithDaysOffArray, function(trimpObject, index, trimpObjectsArray) {
+        return everyDaysTrimpArray;
+        // ... End injecting day off..
+        //$scope.computeCtlAtlTsb(trimpObjectForWhatEverDay);
+    };
 
-                CTL = CTL + (trimpObject.trimp - CTL) * (1 - Math.exp(-1 / 42));
-                ATL = ATL + (trimpObject.trimp - ATL) * (1 - Math.exp(-1 / 7));
-                TSB = CTL - ATL;
+    ChromeStorageService.fetchComputedActivities(function(computedActivities) {
 
-                var formattedDate = trimpObject.date.toLocaleDateString();
+        // Filter only activities with HeartRateData to compute trimp
+        $scope.activitiesWithHRData = $scope.filterActivitiesWithHRData(computedActivities);
+        $scope.activitiesAlongUserChoices = $scope.filterActivitiesAlongUserChoices($scope.activitiesWithHRData, null, null);
 
-                results.push({
-                    date: formattedDate,
-                    timestamp: trimpObject.timestamp,
-                    activitiesName: trimpObject.activitiesName,
-                    CTL: CTL.toFixed(3),
-                    ATL: ATL.toFixed(3),
-                    TSB: TSB.toFixed(3),
-                });
-            });
-            return results;
-        };
-
-        $scope.fitnessTableData = $scope.computeFitness($scope.trimpObjectsArray);
-
+        // Generate table & graph data
+        $scope.fitnessTableData = $scope.computeCtlAtlTsb($scope.activitiesAlongUserChoices);
         $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessTableData);
 
         $scope.generateGraph();
@@ -165,7 +182,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                 },
                 yAxis: {
                     ticks: 10,
-                    // axisLabel: 'CTL',
+                    // axisLabel: 'ctl',
                     tickFormat: function(d) {
                         return d3.format('.02f')(d);
                     },
@@ -210,37 +227,37 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     $scope.generateFitnessChartData = function(fitnessTableData) {
 
-        var CTLValues = [];
-        var ATLValues = [];
-        var TSBValues = [];
+        var ctlValues = [];
+        var atlValues = [];
+        var tsbValues = [];
 
         _.each(fitnessTableData, function(fitData) {
 
-            CTLValues.push({
+            ctlValues.push({
                 x: fitData.timestamp,
-                y: fitData.CTL
+                y: fitData.ctl
             });
 
-            ATLValues.push({
+            atlValues.push({
                 x: fitData.timestamp,
-                y: fitData.ATL
+                y: fitData.atl
             });
 
-            TSBValues.push({
+            tsbValues.push({
                 x: fitData.timestamp,
-                y: fitData.TSB
+                y: fitData.tsb
             });
 
         });
 
         var yDomainMax = d3.max([
-            d3.max(CTLValues, function(d) {
+            d3.max(ctlValues, function(d) {
                 return parseInt(d.y);
             }),
-            d3.max(ATLValues, function(d) {
+            d3.max(atlValues, function(d) {
                 return parseInt(d.y);
             }),
-            d3.max(TSBValues, function(d) {
+            d3.max(tsbValues, function(d) {
                 return parseInt(d.y);
             })
         ], function(d) {
@@ -248,13 +265,13 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         });
 
         var yDomainMin = d3.min([
-            d3.min(CTLValues, function(d) {
+            d3.min(ctlValues, function(d) {
                 return parseInt(d.y);
             }),
-            d3.min(ATLValues, function(d) {
+            d3.min(atlValues, function(d) {
                 return parseInt(d.y);
             }),
-            d3.min(TSBValues, function(d) {
+            d3.min(tsbValues, function(d) {
                 return parseInt(d.y);
             })
         ], function(d) {
@@ -263,16 +280,16 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         return {
             curves: [{
-                key: "CTL",
-                values: CTLValues,
+                key: "ctl",
+                values: ctlValues,
                 color: '#007fe7'
             }, {
-                key: "ATL",
-                values: ATLValues,
+                key: "atl",
+                values: atlValues,
                 color: '#ff53b0'
             }, {
-                key: "TSB",
-                values: TSBValues,
+                key: "tsb",
+                values: tsbValues,
                 color: '#ed9c12',
                 area: true
             }],
