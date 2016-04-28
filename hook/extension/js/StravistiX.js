@@ -24,6 +24,7 @@ function StravistiX(userSettings, appResources) {
  */
 StravistiX.getFromStorageMethod = 'getFromStorage';
 StravistiX.setToStorageMethod = 'setToStorage';
+StravistiX.removeFromStorageMethod = 'removeFromStorage';
 StravistiX.defaultIntervalTimeMillis = 750;
 
 /**
@@ -935,22 +936,30 @@ StravistiX.prototype = {
     startSync: function() {
 
         var self = this;
-        this.handleActivitiesSync().then(function syncSuccess(syncedActivities) {
 
-            console.log(syncedActivities.length + ' new activities synced. Now saving them to extension local storage.');
+        this.newSyncedComputedActivities = null;
 
-            // TODO Get activities already on storage and append !
+        this.handleActivitiesSync().then(function syncSuccess(newSyncedComputedActivities) {
 
-            // Save to chrome storage
-            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', syncedActivities);
+            self.newSyncedComputedActivities = newSyncedComputedActivities;
+            console.log(self.newSyncedComputedActivities.length + ' new activities synced. Now saving them to extension local storage.');
+            Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities');
 
         }, function syncError(err) {
-
             console.error(err);
-
         }, function syncProgress(progress) {
-
             console.debug(progress);
+
+        }).then(function successGetFromStorage(computedActivitiesStored) {
+
+            if (_.isEmpty(computedActivitiesStored) || _.isEmpty(computedActivitiesStored.data)) {
+                computedActivitiesStored = {};
+                computedActivitiesStored.data = [];
+            }
+
+            var mergedActivities = _.union(self.newSyncedComputedActivities, computedActivitiesStored.data);
+            // Save to chrome storage
+            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', mergedActivities);
 
         }).then(function saveChromeLocalStorageSuccess(savedData) {
 
@@ -962,9 +971,17 @@ StravistiX.prototype = {
         }).then(function saveLastSyncDateTimeSuccess(saved) {
 
             console.log('Last sync date time saved: ', new Date(saved.data.lastSyncDateTime));
-
         });
 
+    },
+
+    clearSyncCache: function() {
+        Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'removeFromStorage', function () {
+            console.log('removeFromStorage removed from local storage');
+        });
+        Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime', function () {
+            console.log('lastSyncDateTime removed from local storage');
+        });
     },
 
     handleActivitiesSync: function() {
