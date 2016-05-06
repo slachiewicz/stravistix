@@ -6,7 +6,13 @@
         <nvd3 options="fitnessChartOptions" config="{deepWatchDataDepth: 0}" data="fitnessChartData.curves" class="with-3d-shadow with-transitions"></nvd3>
     </div>
     <div style="text-align: center;">
-        select period upper with mouse
+        <i>select period upper with mouse</i>
+    </div>
+    <div>
+        <div>You will loose {{restLooseGainData.lostCtl.percentageTrigger}}% of your CTL/Fitness  in <strong>~{{restLooseGainData.lostCtl.dayCount}} days (on {{restLooseGainData.lostCtl.date.toLocaleDateString()}})</strong></div>
+        <div>You will loose {{restLooseGainData.lostAtl.percentageTrigger}}% of your ATL/Fatigue in <strong>~{{restLooseGainData.lostAtl.dayCount}} days (on {{restLooseGainData.lostAtl.date.toLocaleDateString()}})</strong></div>
+        <div>You will get in form (positive TSB) in <strong>~{{restLooseGainData.gainForm.dayCount}} days (on {{restLooseGainData.gainForm.date.toLocaleDateString()}})</strong></div>
+        <div>When in form, you will lost this form (negative TSB) after<strong>~{{restLooseGainData.lostForm.dayCount}} days (on {{restLooseGainData.lostForm.date.toLocaleDateString()}})</strong></div>
     </div>
 </div>
 

@@ -86,10 +86,16 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         });
 
+        return results;
+    };
+
+    /**
+     * @return
+     */
+    $scope.computeRestLooseGain = function(results) {
+
         // Find the date and loos
         var lastResult = _.clone(_.last(results));
-
-        console.log(lastResult);
 
         var dayCountLostCtl = 1;
         var dayCountLostAtl = 1;
@@ -123,21 +129,34 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             } else { // Positive
                 dayCountLostForm++;
             }
-
         }
 
-        console.log('You will loose ' + (100 - ctlLooseTriggerPercentage) + '% of your CTL/Fitness  in ~' + dayCountLostCtl + ' days');
-        console.log('You will lost ' + (100 - atlLooseTriggerPercentage) + '% of your ATL/Fatigue in ~' + dayCountLostAtl + ' days');
-        console.log('You will get in form (positive TSB) in ~' + dayCountInForm + ' days');
-        console.log('When in form, you will lost this form (negative TSB) after ~' + dayCountLostForm + ' days');
-
-        return results;
+        return {
+            lostCtl: {
+                percentageTrigger: 100 - ctlLooseTriggerPercentage,
+                dayCount: dayCountLostCtl,
+                date: new Date((new Date().getTime() + dayCountLostCtl * DAY_LONG_MILLIS))
+            },
+            lostAtl: {
+                percentageTrigger: 100 - atlLooseTriggerPercentage,
+                dayCount: dayCountLostAtl,
+                date: new Date((new Date().getTime() + dayCountLostAtl * DAY_LONG_MILLIS))
+            },
+            gainForm: {
+                dayCount: dayCountInForm,
+                date: new Date((new Date().getTime() + dayCountInForm * DAY_LONG_MILLIS))
+            },
+            lostForm: {
+                dayCount: dayCountLostForm,
+                date: new Date((new Date().getTime() + dayCountLostForm * DAY_LONG_MILLIS))
+            },
+        };
     };
 
     /**
      * @return
      */
-    $scope.filterActivitiesAlongUserChoices = function(activitiesWithHRData) {
+    $scope.prepareTrimpObjectsWithDaysOff = function(activitiesWithHRData) {
 
         var fromDate = new Date((_.first(activitiesWithHRData)).date);
 
@@ -181,7 +200,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         }
 
         return everyDaysTrimpArray;
-        // ... End injecting day off..
     };
 
     ChromeStorageService.fetchComputedActivities(function(computedActivities) {
@@ -189,10 +207,15 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         // Filter only activities with HeartRateData to compute trimp
         $scope.activitiesWithHRData = $scope.filterActivitiesWithHRData(computedActivities);
 
-        $scope.activitiesAlongUserChoices = $scope.filterActivitiesAlongUserChoices($scope.activitiesWithHRData);
+        $scope.trimpObjectsWithDaysOff = $scope.prepareTrimpObjectsWithDaysOff($scope.activitiesWithHRData);
 
         // Generate table & graph data
-        $scope.fitnessData = $scope.computeCtlAtlTsb($scope.activitiesAlongUserChoices);
+        $scope.fitnessData = $scope.computeCtlAtlTsb($scope.trimpObjectsWithDaysOff);
+
+        // Compute rest Loose Gain Data
+        $scope.restLooseGainData = $scope.computeRestLooseGain($scope.fitnessData);
+
+        console.log($scope.restLooseGainData);
 
         $scope.updateFitnessChartGraph();
 
