@@ -215,8 +215,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         // Compute rest Loose Gain Data
         $scope.restLooseGainData = $scope.computeRestLooseGain($scope.fitnessData);
 
-        console.log($scope.restLooseGainData);
-
         $scope.updateFitnessChartGraph();
 
         $scope.$apply();
@@ -226,6 +224,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     $scope.updateFitnessChartGraph = function() {
         $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessData);
+
         $scope.generateGraph();
     };
 
@@ -234,7 +233,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
         $scope.fitnessChartOptions = {
             chart: {
                 type: 'lineWithFocusChart',
-                height: 800,
+                height: 750,
                 // height2: 500,
                 // clipEdge: true,
                 // rescaleY: true,
@@ -254,7 +253,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                 y: function(d) {
                     return d.y;
                 },
-                useInteractiveGuideline: true,
+
                 dispatch: {
                     stateChange: function(e) {
                         console.log("stateChange");
@@ -269,6 +268,57 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                         console.log("tooltipHide");
                     }
                 },
+                // pointRange: [-1,-0.5,0.5,1],
+                // padData: true,
+                // useInteractiveGuideline: true,
+                pointActive: function(d) {
+                    var activitiesFound = (_.findWhere($scope.fitnessData, {
+                        timestamp: d.x
+                    })).activitiesName.length;
+                    return activitiesFound;
+                },
+                // showValues: true,
+                // duration: 500,
+                /*tooltip: {
+                    enabled: true,
+                    contentGenerator: function(d) {
+                        console.log(d);
+                        return 'branch name: ' + d.data.branch;
+                    }
+                },*/
+                /*
+                useInteractiveGuideline: true,
+                interactiveGuideline: {
+                    tooltip: {
+                        enabled: true,
+                        contentGenerator: function(d) {
+                            console.log(d);
+                            return '<h3>HELLO WORLD</h3>';
+                        }
+                    },
+                },*/
+
+                // interactive: true,
+                    /*
+                tooltip: {
+                    enabled: true,
+                    contentGenerator: function(d) {
+                        return '<h3>HELLO WORLD</h3>';
+                    }
+                },*/
+                /*
+                interactive: true,
+                tooltips: true,
+                contentGenerator : function(key, x, y, e, graph) { //return html content
+                    console.warn(key);
+                    return '<h3>' + key + '</h3>' +
+                        '<p>' + y + ' on ' + x + '</p>';
+                },*/
+                /*
+                pointSize: function(d) {
+                    return 10;
+                },*/
+
                 xAxis: {
                     // axisLabel: 'Date',
                     ticks: 12,
