@@ -256,8 +256,13 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     $scope.generateFitnessChartData = function(fitnessData) {
 
-        // Compute from date
-        var fromTimestamp = new Date().getTime() - $scope.periodSelected.days * DAY_LONG_MILLIS;
+        // Compute from timstamp
+        var fromTimestamp;
+        if ($scope.periodSelected.days === 0) {
+            fromTimestamp = (_.first(fitnessData)).timestamp;
+        } else {
+            fromTimestamp = new Date().getTime() - $scope.periodSelected.days * DAY_LONG_MILLIS;
+        }
 
         var ctlValues = [];
         var atlValues = [];
@@ -265,7 +270,6 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         _.each(fitnessData, function(fitData) {
 
-            //
             if (fitData.timestamp >= fromTimestamp) {
 
                 ctlValues.push({
