@@ -89,7 +89,7 @@ Helper.weightedPercentiles = function(values, weights, percentiles) {
 // Use abstract equality == for "is number" test
 Helper.isEven = function(n) {
     return n == parseFloat(n) ? !(n % 2) : void 0;
-}
+};
 
 
 Helper.heartrateFromHeartRateReserve = function(hrr, maxHr, restHr) {
@@ -130,6 +130,27 @@ Helper.getFromStorage = function(extensionId, storageType, key, callback) {
     // Sending message to background page
     chrome.runtime.sendMessage(extensionId, {
             method: StravistiX.getFromStorageMethod,
+            params: {
+                storage: storageType,
+                'key': key
+            }
+        },
+        function(response) {
+            if (callback) callback(response);
+            deferred.resolve(response);
+        }
+    );
+
+    return deferred.promise;
+};
+
+Helper.removeFromStorage = function(extensionId, storageType, key, callback) {
+
+    var deferred = Q.defer();
+
+    // Sending message to background page
+    chrome.runtime.sendMessage(extensionId, {
+            method: StravistiX.removeFromStorageMethod,
             params: {
                 storage: storageType,
                 'key': key

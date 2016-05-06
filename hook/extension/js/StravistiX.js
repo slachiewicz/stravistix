@@ -943,7 +943,8 @@ StravistiX.prototype = {
 
             self.newSyncedComputedActivities = newSyncedComputedActivities;
             console.log(self.newSyncedComputedActivities.length + ' new activities synced. Now saving them to extension local storage.');
-            Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities');
+
+            return Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities');
 
         }, function syncError(err) {
             console.error(err);
@@ -957,7 +958,18 @@ StravistiX.prototype = {
                 computedActivitiesStored.data = [];
             }
 
-            var mergedActivities = _.union(self.newSyncedComputedActivities, computedActivitiesStored.data);
+            var mergedActivities = _.flatten(_.union(self.newSyncedComputedActivities, computedActivitiesStored.data));
+
+            console.log(self.newSyncedComputedActivities);
+            console.log(computedActivitiesStored.data);
+
+            // Sort mergedActivities ascending before save
+            mergedActivities = _.sortBy(mergedActivities, function(item) {
+                return (new Date(item.start_time)).getTime();
+            });
+
+            console.log('merged: ', mergedActivities);
+
             // Save to chrome storage
             return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', mergedActivities);
 
@@ -976,12 +988,17 @@ StravistiX.prototype = {
     },
 
     clearSyncCache: function() {
-        Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'removeFromStorage', function () {
-            console.log('removeFromStorage removed from local storage');
-        });
-        Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime', function () {
+        
+        var self = this;
+
+        var promise = Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities').then(function() {
+            console.log('computedActivities removed from local storage');
+            return Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime');
+        }).then(function() {
             console.log('lastSyncDateTime removed from local storage');
         });
+
+        return promise;
     },
 
     handleActivitiesSync: function() {

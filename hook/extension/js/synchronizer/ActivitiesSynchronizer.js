@@ -138,7 +138,7 @@ ActivitiesSynchronizer.prototype = {
                         });
 
                         // Append activities
-                        activitiesList = _.flatten(_.union(activitiesCompliantWithLastSyncDateTime, activitiesList));
+                        activitiesList = _.flatten(_.union(activitiesList, activitiesCompliantWithLastSyncDateTime));
 
                         if (data.models.length > activitiesCompliantWithLastSyncDateTime.length) {
                             deferred.notify(100); // 100% Complete

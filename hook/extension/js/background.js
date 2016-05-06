@@ -28,6 +28,17 @@ chrome.runtime.onMessageExternal.addListener(
 
                 break;
 
+            case StravistiX.removeFromStorageMethod:
+
+                storageManager.storageType = request.params.storage;
+                storageManager.removeFromStorage(request.params.key, function(returnAllData) {
+                    sendResponse({
+                        data: returnAllData
+                    });
+                });
+
+                break;
+
             default:
                 return false;
                 // break;
