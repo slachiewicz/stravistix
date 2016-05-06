@@ -94,14 +94,9 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
      */
     $scope.filterActivitiesAlongUserChoices = function(activitiesWithHRData) {
 
-
-        // if (!fromDate) {
         var fromDate = new Date((_.first(activitiesWithHRData)).date);
-        // }
 
-        // if (!toDate) {
         var toDate = new Date(); // today
-        // }
 
         // Inject day off..
         var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / DAY_LONG_MILLIS);
@@ -253,7 +248,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             },
             title: {
                 enable: true,
-                text: 'Fitness, Fatigue and Form'
+                text: 'Chronic Training Load (Fitness), Acute Training Load (Fatigue) & Training Stress Balance (Form)'
             }
         };
 
@@ -321,15 +316,15 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         return {
             curves: [{
-                key: "ctl",
+                key: "Chronic Training Load",
                 values: ctlValues,
                 color: '#007fe7'
             }, {
-                key: "atl",
+                key: "Acute Training Load",
                 values: atlValues,
                 color: '#ff53b0'
             }, {
-                key: "tsb",
+                key: "Training Stress Balance",
                 values: tsbValues,
                 color: '#ed9c12',
                 area: true
