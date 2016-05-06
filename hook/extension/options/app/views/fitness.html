@@ -1,8 +1,9 @@
 <div>Activity with HR data: {{trimpObjectsArray.length}}</div>
 
 <div>
+    <select ng-options="period as period.label for period in periodsToWatch" ng-model="periodSelected" ng-change="periodChanged(period)"></select>
     <div>
-        <nvd3 options="fitnessChartOptions" config="config" data="fitnessChartData.curves" api="api" class="with-3d-shadow with-transitions"></nvd3>
+        <nvd3 options="fitnessChartOptions" config="{deepWatchDataDepth: 0}" data="fitnessChartData.curves" class="with-3d-shadow with-transitions"></nvd3>
     </div>
     <div style="text-align: center;">
         select period upper with mouse
@@ -19,7 +20,7 @@
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;"><strong>CTL</strong></td>
     </tr>
     <!-- <tr style="border: 1px solid black;" ng-repeat="nameTrimp in trimpObjectsArray | orderBy:'-trimp'"> -->
-    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessTableData | orderBy:'-timestamp'">
+    <tr style="border: 1px solid black;" ng-repeat="fitness in fitnessData | orderBy:'-timestamp'">
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.date }}</td>
         <td style="border: 1px solid black;padding: 3px;">{{ fitness.activitiesName }}</td>
         <td style="border: 1px solid black;padding: 1px 3px 0px 20px; text-align: right;">{{ fitness.ctl }}</td>

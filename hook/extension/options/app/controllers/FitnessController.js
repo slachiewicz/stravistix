@@ -1,5 +1,36 @@
 app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'NotifierService', '$timeout', '$location', function($scope, ChromeStorageService, NotifierService, $timeout, $location) {
 
+    var DAY_LONG_MILLIS = 24 * 3600 * 1000;
+
+    $scope.periodsToWatch = [{
+        days: 7,
+        label: 'Last 7 days'
+    }, {
+        days: 30,
+        label: 'Last 30 days'
+    }, {
+        days: 90,
+        label: 'Last 90 days'
+    }, {
+        days: 180,
+        label: 'Last 180 days'
+    }, {
+        days: 365,
+        label: 'Last 365 days'
+    }, {
+        days: 0,
+        label: 'All time'
+    }];
+
+    $scope.periodSelected = $scope.periodsToWatch[2];
+
+    $scope.periodChanged = function(period) {
+        $scope.updateFitnessChartGraph();
+    };
+
+    /**
+     * @return
+     */
     $scope.getDayAtMidnight = function(date) {
         date.setHours(Math.abs(date.getTimezoneOffset() / 60));
         date.setMinutes(0);
@@ -61,17 +92,16 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
     /**
      * @return
      */
-    $scope.filterActivitiesAlongUserChoices = function(activitiesWithHRData, fromDate, toDate) {
+    $scope.filterActivitiesAlongUserChoices = function(activitiesWithHRData) {
 
-        var DAY_LONG_MILLIS = 24 * 3600 * 1000;
 
-        if (!fromDate) {
-            fromDate = new Date((_.first(activitiesWithHRData)).date);
-        }
+        // if (!fromDate) {
+        var fromDate = new Date((_.first(activitiesWithHRData)).date);
+        // }
 
-        if (!toDate) {
-            toDate = new Date(); // today
-        }
+        // if (!toDate) {
+        var toDate = new Date(); // today
+        // }
 
         // Inject day off..
         var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / DAY_LONG_MILLIS);
@@ -110,27 +140,31 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
             everyDaysTrimpArray.push(everyDayTrimpData);
         }
 
-        // console.warn(everyDaysTrimpArray);
-
         return everyDaysTrimpArray;
         // ... End injecting day off..
-        //$scope.computeCtlAtlTsb(trimpObjectForWhatEverDay);
     };
 
     ChromeStorageService.fetchComputedActivities(function(computedActivities) {
 
         // Filter only activities with HeartRateData to compute trimp
         $scope.activitiesWithHRData = $scope.filterActivitiesWithHRData(computedActivities);
-        $scope.activitiesAlongUserChoices = $scope.filterActivitiesAlongUserChoices($scope.activitiesWithHRData, null, null);
+
+        $scope.activitiesAlongUserChoices = $scope.filterActivitiesAlongUserChoices($scope.activitiesWithHRData);
 
         // Generate table & graph data
-        $scope.fitnessTableData = $scope.computeCtlAtlTsb($scope.activitiesAlongUserChoices);
-        $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessTableData);
+        $scope.fitnessData = $scope.computeCtlAtlTsb($scope.activitiesAlongUserChoices);
 
-        $scope.generateGraph();
+        $scope.updateFitnessChartGraph();
 
         $scope.$apply();
+
     });
+
+
+    $scope.updateFitnessChartGraph = function() {
+        $scope.fitnessChartData = $scope.generateFitnessChartData($scope.fitnessData);
+        $scope.generateGraph();
+    };
 
     $scope.generateGraph = function() {
 
@@ -225,28 +259,35 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
     };
 
-    $scope.generateFitnessChartData = function(fitnessTableData) {
+    $scope.generateFitnessChartData = function(fitnessData) {
+
+        // Compute from date
+        var fromTimestamp = new Date().getTime() - $scope.periodSelected.days * DAY_LONG_MILLIS;
 
         var ctlValues = [];
         var atlValues = [];
         var tsbValues = [];
 
-        _.each(fitnessTableData, function(fitData) {
+        _.each(fitnessData, function(fitData) {
 
-            ctlValues.push({
-                x: fitData.timestamp,
-                y: fitData.ctl
-            });
+            //
+            if (fitData.timestamp >= fromTimestamp) {
 
-            atlValues.push({
-                x: fitData.timestamp,
-                y: fitData.atl
-            });
+                ctlValues.push({
+                    x: fitData.timestamp,
+                    y: fitData.ctl
+                });
 
-            tsbValues.push({
-                x: fitData.timestamp,
-                y: fitData.tsb
-            });
+                atlValues.push({
+                    x: fitData.timestamp,
+                    y: fitData.atl
+                });
+
+                tsbValues.push({
+                    x: fitData.timestamp,
+                    y: fitData.tsb
+                });
+            }
 
         });
 
