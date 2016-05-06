@@ -86,6 +86,51 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
 
         });
 
+        // Find the date and loos
+        var lastResult = _.clone(_.last(results));
+
+        console.log(lastResult);
+
+        var dayCountLostCtl = 1;
+        var dayCountLostAtl = 1;
+        var dayCountInForm = 0;
+        var dayCountLostForm = 0;
+
+        lastResult.ctl = parseInt(lastResult.ctl);
+        lastResult.atl = parseInt(lastResult.atl);
+
+        var ctlLooseTriggerPercentage = 5;
+        var ctlLooseTrigger = ctlLooseTriggerPercentage / 100 * lastResult.ctl;
+
+        var atlLooseTriggerPercentage = 5;
+        var atlLooseTrigger = atlLooseTriggerPercentage / 100 * lastResult.atl;
+
+        while (lastResult.ctl > ctlLooseTrigger) {
+
+            lastResult.ctl = lastResult.ctl + (0 - lastResult.ctl) * (1 - Math.exp(-1 / 42));
+            lastResult.atl = lastResult.atl + (0 - lastResult.atl) * (1 - Math.exp(-1 / 7));
+            lastResult.tsb = lastResult.ctl - lastResult.atl;
+
+            if (lastResult.ctl > ctlLooseTrigger) {
+                dayCountLostCtl++;
+            }
+            if (lastResult.atl > atlLooseTrigger) {
+                dayCountLostAtl++;
+            }
+
+            if (lastResult.tsb <= 0) {
+                dayCountInForm++;
+            } else { // Positive
+                dayCountLostForm++;
+            }
+
+        }
+
+        console.log('You will loose ' + (100 - ctlLooseTriggerPercentage) + '% of your CTL/Fitness  in ~' + dayCountLostCtl + ' days');
+        console.log('You will lost ' + (100 - atlLooseTriggerPercentage) + '% of your ATL/Fatigue in ~' + dayCountLostAtl + ' days');
+        console.log('You will get in form (positive TSB) in ~' + dayCountInForm + ' days');
+        console.log('When in form, you will lost this form (negative TSB) after ~' + dayCountLostForm + ' days');
+
         return results;
     };
 
