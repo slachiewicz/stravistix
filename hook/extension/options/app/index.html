@@ -45,7 +45,7 @@
                         <span flex></span>
                         <md-icon class="md-primary md-icon-button">{{section.expand ? 'expand_less' : 'expand_more'}}</md-icon>
                     </md-list-item>
-                    <md-list-item ng-show="!section.expand" ng-repeat="action in section.actions" ng-click="forward(action.link)">
+                    <md-list-item ng-show="!section.expand" ng-repeat="action in section.actions" ng-click="forward(action)">
                         <md-icon>{{action.icon}}</md-icon>
                         <p>{{action.name}}</p>
                         <span flex></span>

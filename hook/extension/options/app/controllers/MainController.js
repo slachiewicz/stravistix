@@ -7,8 +7,9 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
         $mdSidenav(menu).toggle();
     };
 
-    $scope.forward = function(route) {
-        $location.path(route);
+    $scope.forward = function(action) {
+        $scope.data.title = action.name;
+        $location.path(action.link);
     };
 
     $scope.toast = function(message) {
