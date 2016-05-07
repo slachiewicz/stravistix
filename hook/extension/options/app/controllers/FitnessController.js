@@ -2,6 +2,12 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', '$timeout
 
     var DAY_LONG_MILLIS = 24 * 3600 * 1000;
 
+    $scope.query = {
+        order: 'name',
+        limit: 5,
+        page: 1
+    };
+
     $scope.periodsToWatch = [{
         days: 7,
         label: 'Last 7 days'
