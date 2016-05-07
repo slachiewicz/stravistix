@@ -3,29 +3,122 @@
 
 <head>
     <title>StravistiX settings</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="css/app.css">
-    <link rel="stylesheet" href="../../node_modules/bootstrap/dist/css/bootstrap.min.css">
+	<meta charset="utf-8">
+    <link rel="stylesheet" href="../../node_modules/angular-material/angular-material.css">
+    <link rel="stylesheet" href="../../node_modules/angular-material-icons/angular-material-icons.css">
     <link rel="stylesheet" href="../../node_modules/nvd3/build/nv.d3.min.css">
-    <script src="../../node_modules/angular/angular.min.js"></script>
-    <script src="../../node_modules/angular-route/angular-route.min.js"></script>
-    <script src="../../node_modules/angular-bootstrap/ui-bootstrap.min.js"></script>
-    <script src="../../node_modules/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
-    <script src="../../node_modules/underscore/underscore-min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../../node_modules/angular/angular.js"></script>
+    <script src="../../node_modules/angular-route/angular-route.js"></script>
+    <script src="../../node_modules/angular-sanitize/angular-sanitize.js"></script>
+    <script src="../../node_modules/angular-animate/angular-animate.js"></script>
+    <script src="../../node_modules/angular-aria/angular-aria.js"></script>
+    <script src="../../node_modules/angular-messages/angular-messages.js"></script>
+    <script src="../../node_modules/angular-material/angular-material.js"></script>
+    <script src="../../node_modules/angular-material-icons/angular-material-icons.js"></script>
     <script src="../../node_modules/d3/d3.js"></script>
     <script src="../../node_modules/nvd3/build/nv.d3.min.js"></script>
     <script src="../../node_modules/angular-nvd3/dist/angular-nvd3.min.js"></script>
+    <script src="../../node_modules/underscore/underscore-min.js"></script>
 </head>
-
-<body data-ng-app="App" data-ng-controller="MainController">
-    <header data-ng-include="'views/headerNav.html'" /></header>
-    <div class="container">
-        <div ng-view>
-            <!-- Placeholder for views -->
-        </div>
+<body class="md-body-1">
+    <div ng-app="App" ng-controller="MainController" layout="row" layout-fill ng-cloak>
+        <md-sidenav class="md-sidenav-left md-whiteframe-z2" role="sidenav" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
+            <md-toolbar class="md-tall md-hue-2" layout-align="end end">
+                <div class="md-toolbar-tools" layout layout-padding>
+                    <md-icon>{{data.user.icon}}</md-icon>
+                    <div layout="column" layout-padding>
+                        <span class="md-body-2">{{data.user.name}}</span>
+                        <span class="md-caption">{{data.user.email}}</span>
+                    </div>
+                    <span flex></span>
+                    <md-button class="md-icon-button" aria-label="User Settings" ng-click="toast('Logout')">
+                        <md-icon>more_vert</md-icon>
+                    </md-button>
+                </div>
+            </md-toolbar>
+            <!-- Menus on left -->
+            <md-content role="navigation">
+                <md-list ng-repeat="section in data.sidenav.sections">
+                    <md-list-item ng-click="section.expand = !section.expand">
+                        <p class="md-subheader md-primary">{{section.name}}</p>
+                        <span flex></span>
+                        <md-icon class="md-primary md-icon-button">{{section.expand ? 'expand_less' : 'expand_more'}}</md-icon>
+                    </md-list-item>
+                    <md-list-item ng-show="!section.expand" ng-repeat="action in section.actions" ng-click="forward(action.link)">
+                        <md-icon>{{action.icon}}</md-icon>
+                        <p>{{action.name}}</p>
+                        <span flex></span>
+                        <!-- <md-icon>chevron_right</md-icon> -->
+                    </md-list-item>
+            </md-content>
+        </md-sidenav>
+        <section layout="column" role="main" flex>
+            <md-toolbar role="toolbar">
+                <div class="md-toolbar-tools">
+                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" hide-gt-md aria-label="Menu">
+                        <md-icon>menu</md-icon>
+                    </md-button>
+                    <h4 class="md-title">{{data.title}}</h4>
+                    <span flex></span>
+                    <md-button class="md-icon-button" ng-repeat="button in data.toolbar.buttons" aria-label={{button.name}} ng-click="toast(button.link)">
+                        <md-icon>{{button.icon}}</md-icon>
+                    </md-button>
+                    <md-menu md-position-mode="target-right target" ng-repeat="menu in data.toolbar.menus">
+                        <md-button class="md-icon-button" aria-label="{{menu.name}}" ng-click="$mdOpenMenu($event)">
+                            <md-icon>{{menu.icon}}</md-icon>
+                        </md-button>
+                        <md-menu-content width={{menu.width}}>
+                            <md-subheader>{{menu.name}}</md-subheader>
+                            <md-menu-item ng-repeat="action in menu.actions">
+                                <md-button layout-fill md-ink-ripple ng-click="toast(action.message)">
+                                    <md-icon md-class="{{action.error ? 'md-warn' : 'md-primary'}}" md-menu-align-target>{{action.completed ? 'done' : 'hourglass_empty'}}</md-icon>
+                                    {{action.name}}
+                                </md-button>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
+                </div>
+            </md-toolbar>
+            <section id="content" role="content" layout="column" layout-padding md-scroll-y>
+                <div ng-view>
+                    <!-- Placeholder for views -->
+                </div>
+                <!-- <md-content class="md-whiteframe-z2" ng-cloak>
+                    <md-list ng-repeat="list in data.content.lists">
+                        <div class="md-actions" layout layout-align="end center">
+                            <md-subheader class="md-no-sticky md-primary">{{list.name}}</md-subheader>
+                            <span flex></span>
+                            <md-menu md-position-mode="target-right target">
+                                <md-button class="md-icon-button" aria-label="{{list.menu.name}}" ng-click="$mdOpenMenu($event)">
+                                    <md-icon class="md-primary">settings</md-icon>
+                                </md-button>
+                                <md-menu-content width={{list.menu.width}}>
+                                    <md-subheader>{{list.menu.name}}</md-subheader>
+                                    <md-menu-item ng-repeat="action in list.menu.actions">
+                                        <md-button layout-fill md-ink-ripple ng-click="toastList(action.message)">
+                                            <md-icon md-class="{{action.error ? 'md-warn' : 'md-primary'}}" md-menu-align-target>{{action.completed ? 'done' : 'hourglass_empty'}}</md-icon>
+                                            {{action.name}}
+                                        </md-button>
+                                    </md-menu-item>
+                                </md-menu-content>
+                            </md-menu>
+                        </div>
+                        <md-divider></md-divider>
+                        <md-list-item class="md-2-line" ng-repeat="item in list.items">
+                            <md-checkbox ng-click="toggle(item, selected)"></md-checkbox>
+                            <md-content class="md-list-item-text" layout="column">
+                                <h3 class="md-body-2">{{item.name}}</h3>
+                                <p class="md-caption">{{item.description}}</p>
+                            </md-content>
+                            <span flex></span>
+                            <md-icon aria-label="Show Item" ng-click="toast(item.link)">chevron_right</md-icon>
+                        </md-list-item>
+                    </md-list>
+                </md-content> -->
+            </section>
+        </section>
     </div>
-
-    <footer data-ng-include="'views/footer.html'" />
 
     <!-- Specifics StravistiX includes -->
     <script src="../../js/UserSettings.js"></script>
@@ -39,18 +132,24 @@
     <script src="controllers/MainController.js"></script>
     <script src="controllers/CommonSettingsController.js"></script>
     <script src="controllers/HealthSettingsController.js"></script>
-    <script src="controllers/FitnessController.js"></script>
+
+    <!-- <script src="controllers/FitnessController.js"></script>
     <script src="controllers/XtdZonesSettingsController.js"></script>
-    <script src="controllers/DonateController.js"></script>
+    <script src="controllers/DonateController.js"></script> -->
+
+    <!--<script src="controllers/XtdZonesSettingsController.js"></script>
+    <script src="controllers/DonateController.js"></script> -->
+
 
     <!-- Angular services -->
-    <script src="services/NotifierService.js"></script>
+    <!-- <script src="services/NotifierService.js"></script> -->
+
     <script src="services/AvoidInputKeysService.js"></script>
     <script src="services/CommonSettingsService.js"></script>
     <script src="services/ChromeStorageService.js"></script>
 
     <!-- Angular directives -->
-    <script src="directives/uiCheckbox.js"></script>
+    <!-- <script src="directives/uiCheckbox.js"></script>-->
     <script src="directives/hrZones/HealthCustomZones.js"></script>
     <script src="directives/hrZones/HrZone.js"></script>
     <script src="directives/xtdZones/xtdZones.js"></script>
@@ -58,7 +157,7 @@
 
     <!-- Angular filters -->
     <script src="filters/HrrToBpmFilter.js"></script>
-    <script src="filters/XtdDataFilter.js"></script>
+    <!--<script src="filters/XtdDataFilter.js"></script> -->
 </body>
 
 </html>
