@@ -24,7 +24,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', '$timeout
 
     $scope.periodSelected = $scope.periodsToWatch[2];
 
-    $scope.periodChanged = function(period) {
+    $scope.periodChanged = function() {
         $scope.updateFitnessChartGraph();
     };
 
