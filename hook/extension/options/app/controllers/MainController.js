@@ -70,7 +70,7 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                 actions: [{
                     name: 'Fitness Trend',
                     icon: 'fitness_center',
-                    link: 'Action 3'
+                    link: routeMap.fitnessRoute
                 }, {
                     name: 'Activity Grid',
                     icon: 'grid_on',

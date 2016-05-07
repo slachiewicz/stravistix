@@ -1,4 +1,4 @@
-app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'NotifierService', '$timeout', '$location', function($scope, ChromeStorageService, NotifierService, $timeout, $location) {
+app.controller("FitnessController", ['$scope', 'ChromeStorageService', '$timeout', '$location', function($scope, ChromeStorageService, $timeout, $location) {
 
     var DAY_LONG_MILLIS = 24 * 3600 * 1000;
 
@@ -299,7 +299,7 @@ app.controller("FitnessController", ['$scope', 'ChromeStorageService', 'Notifier
                 },*/
 
                 // interactive: true,
-                    /*
+                /*
                 tooltip: {
                     enabled: true,
                     contentGenerator: function(d) {
