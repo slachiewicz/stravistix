@@ -1,7 +1,7 @@
 /**
  * Declaring Angular App
  */
-var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize', 'nvd3']);
+var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize', 'nvd3', 'md.data.table']);
 
 app.config(function($mdThemingProvider) {
     $mdThemingProvider.theme('default').primaryPalette('deep-orange');
