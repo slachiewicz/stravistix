@@ -173,9 +173,9 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
                 date: trimpObject.date.toLocaleDateString(),
                 timestamp: trimpObject.timestamp,
                 activitiesName: trimpObject.activitiesName,
-                ctl: ctl.toFixed(3),
-                atl: atl.toFixed(3),
-                tsb: tsb.toFixed(3),
+                ctl: parseFloat(ctl.toFixed(3)),
+                atl: parseFloat(atl.toFixed(3)),
+                tsb: parseFloat(tsb.toFixed(3)),
             });
         });
 
