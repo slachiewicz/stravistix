@@ -15,7 +15,7 @@
             <div class="md-toolbar-tools md-block">
                 <md-icon>search</md-icon>
                 <form flex name="filter.form" class="ng-valid ng-valid-parse">
-                    <input type="text" ng-model="query.filter" ng-model-options="filter.options" placeholder="Search for activities" class="ng-valid ng-valid-parse ng-touched ng-pristine" aria-invalid="false"  style="width: 100%; margin: 0; border: none;">
+                    <input type="text" ng-model="query.filter" ng-model-options="filter.options" placeholder="Search for activities" class="ng-valid ng-valid-parse ng-touched ng-pristine" aria-invalid="false" style="width: 100%; margin: 0; border: none;">
                 </form>
                 <button class="md-icon-button md-button" ng-click="removeFilter()" aria-label="close">
                     <md-icon>close</md-icon>
@@ -43,7 +43,9 @@
                         <td md-cell>{{fitnessObj.activitiesName}}</td>
                         <td md-cell>{{fitnessObj.ctl}}</td>
                         <td md-cell>{{fitnessObj.atl}}</td>
-                        <td md-cell>{{fitnessObj.tsb}}</td>
+                        <td md-cell>
+                            <md-subheader ng-class="(fitnessObj.tsb >= 0) ? '' : 'md-warn'">{{fitnessObj.tsb}}</md-subheader>
+                        </td>
                         <td md-cell>
                             <a href="#">
                                 <md-icon>insert_link</md-icon>
