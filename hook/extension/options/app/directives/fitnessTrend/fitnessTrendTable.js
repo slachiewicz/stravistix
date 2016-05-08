@@ -16,15 +16,24 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
 
                 if (newFitnessObj.activitiesName.length) {
 
-                    var finalName = '';
+                    var finalActivityName = '';
                     _.each(newFitnessObj.activitiesName, function(name, index) {
-                        finalName += name;
                         if (index !== 0) {
-                            finalName += ' ; ';
+                            finalActivityName += ' <strong>+</strong> ';
                         }
+                        finalActivityName += name;
                     });
 
-                    newFitnessObj.activitiesName = finalName;
+                    var finalTypeName = '';
+                    _.each(newFitnessObj.type, function(type, index) {
+                        if (index > 0) {
+                            finalTypeName += ' <strong>+</strong> ';
+                        }
+                        finalTypeName += type;
+                    });
+
+                    newFitnessObj.activitiesName = finalActivityName;
+                    newFitnessObj.type = finalTypeName;
                     fitnessDataForTable.push(newFitnessObj);
                 }
             });
@@ -84,10 +93,6 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
         $scope.removeFilter = function() {
             $scope.filter.show = false;
             $scope.query.filter = '';
-
-            if ($scope.filter.form.$dirty) {
-                $scope.filter.form.$setPristine();
-            }
         };
 
         /**

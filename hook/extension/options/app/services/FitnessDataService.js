@@ -28,14 +28,14 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
 
         // if (!fitnessDataService.computedActivities) {
 
-            console.log('Fetch computedActivities from chromeStorageService');
+        console.log('Fetch computedActivities from chromeStorageService');
 
-            chromeStorageService.fetchComputedActivities().then(function successGetFromStorage(computedActivities) {
-                fitnessDataService.computedActivities = computedActivities;
-                deferred.resolve(computedActivities);
-            }, function errorGetFromStorage(err) {
-                deferred.reject(err);
-            });
+        chromeStorageService.fetchComputedActivities().then(function successGetFromStorage(computedActivities) {
+            fitnessDataService.computedActivities = computedActivities;
+            deferred.resolve(computedActivities);
+        }, function errorGetFromStorage(err) {
+            deferred.reject(err);
+        });
 
         // } else {
         //     console.log('Fetch computedActivities from FitnessDataService local var');
@@ -54,29 +54,30 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
 
         // if (!fitnessDataService.computedActivitiesWithHR) {
 
-            console.log('Fetch computedActivitiesWithHR from fitnessDataService.getCleanedComputedActivitiesWithHeartrateData');
+        console.log('Fetch computedActivitiesWithHR from fitnessDataService.getCleanedComputedActivitiesWithHeartrateData');
 
-            fitnessDataService.getComputedActivities().then(function successGet(computedActivities) {
+        fitnessDataService.getComputedActivities().then(function successGet(computedActivities) {
 
-                var cleanedActivitiesWithHRData = [];
-                _.each(computedActivities, function(activity) {
-                    if (activity.extendedStats && activity.extendedStats.heartRateData) {
-                        var date = fitnessDataService.getDayAtMidnight(new Date(activity.start_time));
-                        cleanedActivitiesWithHRData.push({
-                            date: date,
-                            timestamp: date.getTime(),
-                            activityName: activity.name,
-                            trimp: parseInt(activity.extendedStats.heartRateData.TRIMP.toFixed(0))
-                        });
-                    }
-                });
-
-                fitnessDataService.computedActivitiesWithHR = cleanedActivitiesWithHRData;
-                deferred.resolve(fitnessDataService.computedActivitiesWithHR);
-
-            }, function errorGet(err) {
-                deferred.reject(err);
+            var cleanedActivitiesWithHRData = [];
+            _.each(computedActivities, function(activity) {
+                if (activity.extendedStats && activity.extendedStats.heartRateData) {
+                    var date = fitnessDataService.getDayAtMidnight(new Date(activity.start_time));
+                    cleanedActivitiesWithHRData.push({
+                        date: date,
+                        type: activity.activity_type_display_name,
+                        timestamp: date.getTime(),
+                        activityName: activity.name,
+                        trimp: parseInt(activity.extendedStats.heartRateData.TRIMP.toFixed(0))
+                    });
+                }
             });
+
+            fitnessDataService.computedActivitiesWithHR = cleanedActivitiesWithHRData;
+            deferred.resolve(fitnessDataService.computedActivitiesWithHR);
+
+        }, function errorGet(err) {
+            deferred.reject(err);
+        });
 
         // } else {
         //     console.log('Fetch computedActivitiesWithHR from FitnessDataService local var');
@@ -96,57 +97,55 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
 
         // if (!fitnessDataService.fitnessObjectsWithDaysOff) {
 
-            console.log('Fetch fitnessObjectsWithDaysOff from fitnessDataService.getFitnessObjectsWithDaysOff');
+        console.log('Fetch fitnessObjectsWithDaysOff from fitnessDataService.getFitnessObjectsWithDaysOff');
 
-            fitnessDataService.getCleanedComputedActivitiesWithHeartrateData().then(function successGet(cleanedActivitiesWithHRData) {
+        fitnessDataService.getCleanedComputedActivitiesWithHeartrateData().then(function successGet(cleanedActivitiesWithHRData) {
 
-                var fromDate = new Date((_.first(cleanedActivitiesWithHRData)).date);
+            var fromDate = new Date((_.first(cleanedActivitiesWithHRData)).date);
 
-                var toDate = new Date(); // Today
+            var toDate = new Date(); // Today
 
-                // Inject day off..
-                var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / fitnessDataService.const.DAY_LONG_MILLIS);
+            // Inject day off..
+            var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / fitnessDataService.const.DAY_LONG_MILLIS);
 
-                var everyDayFitnessObjects = [];
+            var everyDayFitnessObjects = [];
 
-                for (var i = 0; i < daysDiff; i++) {
+            for (var i = 0; i < daysDiff; i++) {
 
-                    var timestampOfCurrentDay = fromDate.getTime() + fitnessDataService.const.DAY_LONG_MILLIS * i;
+                var timestampOfCurrentDay = fromDate.getTime() + fitnessDataService.const.DAY_LONG_MILLIS * i;
 
-                    // Seek if current day with have 1 or serveral trimp. then add...
-                    var fitnessObjectFoundOnCurrentDay = _.where(cleanedActivitiesWithHRData, {
-                        timestamp: timestampOfCurrentDay
-                    });
+                // Seek if current day with have 1 or serveral trimp. then add...
+                var fitnessObjectFoundOnCurrentDay = _.where(cleanedActivitiesWithHRData, {
+                    timestamp: timestampOfCurrentDay
+                });
 
-                    var fitnessObjectOnCurrentDay = {
-                        date: new Date(timestampOfCurrentDay),
-                        timestamp: timestampOfCurrentDay,
-                        activitiesName: [],
-                        trimp: 0
-                    };
+                var fitnessObjectOnCurrentDay = {
+                    date: new Date(timestampOfCurrentDay),
+                    timestamp: timestampOfCurrentDay,
+                    type: [],
+                    activitiesName: [],
+                    trimp: 0
+                };
 
-                    if (fitnessObjectFoundOnCurrentDay.length) {
-
-                        // Some trimp have beed found for that day
-                        // if (fitnessObjectFoundOnCurrentDay.length > 1) {
-                        //     console.warn('More than 1 activity on ' + fitnessObjectFoundOnCurrentDay.date + ', handle this on names displayed...');
-                        // }
-
-                        for (var j = 0; j < fitnessObjectFoundOnCurrentDay.length; j++) {
-                            fitnessObjectOnCurrentDay.trimp += parseFloat(fitnessObjectFoundOnCurrentDay[j].trimp);
-                            fitnessObjectOnCurrentDay.activitiesName.push(fitnessObjectFoundOnCurrentDay[j].activityName);
-                        }
+                if (fitnessObjectFoundOnCurrentDay.length) {
+                  
+                    // Some trimp have beed found for that day
+                    for (var j = 0; j < fitnessObjectFoundOnCurrentDay.length; j++) {
+                        fitnessObjectOnCurrentDay.trimp += parseFloat(fitnessObjectFoundOnCurrentDay[j].trimp);
+                        fitnessObjectOnCurrentDay.activitiesName.push(fitnessObjectFoundOnCurrentDay[j].activityName);
+                        fitnessObjectOnCurrentDay.type.push(fitnessObjectFoundOnCurrentDay[j].type);
                     }
-
-                    everyDayFitnessObjects.push(fitnessObjectOnCurrentDay);
                 }
 
-                fitnessDataService.fitnessObjectsWithDaysOff = everyDayFitnessObjects;
-                deferred.resolve(fitnessDataService.fitnessObjectsWithDaysOff);
+                everyDayFitnessObjects.push(fitnessObjectOnCurrentDay);
+            }
 
-            }, function errorGet(err) {
-                deferred.reject(err);
-            });
+            fitnessDataService.fitnessObjectsWithDaysOff = everyDayFitnessObjects;
+            deferred.resolve(fitnessDataService.fitnessObjectsWithDaysOff);
+
+        }, function errorGet(err) {
+            deferred.reject(err);
+        });
 
         // } else {
         //     console.log('Fetch fitnessObjectsWithDaysOff from FitnessDataService local var');
@@ -165,7 +164,7 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
         var atl = 0;
         var tsb = 0;
         var results = [];
-        _.each(fitnessObjectsWithDaysOff, function(trimpObject, index, activitiesWithHRData) {
+        _.each(fitnessObjectsWithDaysOff, function(trimpObject) {
             ctl = ctl + (trimpObject.trimp - ctl) * (1 - Math.exp(-1 / 42));
             atl = atl + (trimpObject.trimp - atl) * (1 - Math.exp(-1 / 7));
             tsb = ctl - atl;
@@ -173,6 +172,7 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
                 date: trimpObject.date.toLocaleDateString(),
                 timestamp: trimpObject.timestamp,
                 activitiesName: trimpObject.activitiesName,
+                type: trimpObject.type,
                 ctl: parseFloat(ctl.toFixed(3)),
                 atl: parseFloat(atl.toFixed(3)),
                 tsb: parseFloat(tsb.toFixed(3)),

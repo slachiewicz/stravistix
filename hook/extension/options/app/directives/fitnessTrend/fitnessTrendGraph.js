@@ -1,46 +1,89 @@
 app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataService) {
 
-    // var linkFunction = function($scope, element, attrs) {};
-
     var controllerFunction = function($scope) {
 
         fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
+
             $scope.fitnessData = fitnessData;
 
-            setTimeout(function () { // Postpone execution at the end
-                $scope.updateFitnessChartGraph();
+            // Notify parent of data loaded
+            $scope.$parent.fitnessTrendGraphDataLoaded();
+
+            setTimeout(function() { // Postpone execution at the end
+                $scope.updateFitnessChartGraph(true, false);
             });
+
         });
 
         $scope.periodsToWatch = [{
-            days: 7,
+            days: moment.duration(moment().diff(moment().subtract(7, 'days'))).asDays(),
             label: 'Last 7 days'
         }, {
-            days: 30,
-            label: 'Last 30 days'
+            days: moment.duration(moment().diff(moment().subtract(14, 'days'))).asDays(),
+            label: 'Last 14 days'
         }, {
-            days: 90,
-            label: 'Last 90 days'
+            days: moment.duration(moment().diff(moment().subtract(1, 'months'))).asDays(),
+            label: 'Last month'
         }, {
-            days: 180,
-            label: 'Last 180 days'
+            days: moment.duration(moment().diff(moment().subtract(3, 'months'))).asDays(),
+            label: 'Last 3 months'
         }, {
-            days: 365,
-            label: 'Last 365 days'
+            days: moment.duration(moment().diff(moment().subtract(6, 'months'))).asDays(),
+            label: 'Last 6 months'
+        }, {
+            days: moment.duration(moment().diff(moment().subtract(1, 'years'))).asDays(),
+            label: 'Last 12 months'
+        }, {
+            days: moment.duration(moment().diff(moment().subtract(2, 'years'))).asDays(),
+            label: 'Last 24 months'
         }, {
             days: 0,
-            label: 'All time'
+            label: 'From the beginning'
         }];
 
         $scope.periodSelected = $scope.periodsToWatch[2];
 
-        $scope.periodChanged = function() {
-            $scope.updateFitnessChartGraph();
+        $scope.lastMonthsPeriodChanged = function() {
+            $scope.updateFitnessChartGraph(true, false);
         };
 
-        $scope.updateFitnessChartGraph = function() {
+        $scope.fromDateChanged = function() {
+            $scope.updateFitnessChartGraph(false, true);
+        };
 
-            $scope.fitnessChartData = $scope.generateFitnessGraphData($scope.fitnessData);
+        $scope.toDateChanged = function() {
+            $scope.updateFitnessChartGraph(false, true);
+        };
+
+        $scope.updateFitnessChartGraph = function(lastMonthPeriodChange, fromOrToDateChange) {
+
+            // Compute from timestamp
+            var fromTimestamp, toTimestamp;
+
+            $scope.minDate = moment((_.first($scope.fitnessData)).timestamp).startOf('day').toDate();
+            $scope.maxDate = new Date();
+
+            if (lastMonthPeriodChange) {
+
+                if ($scope.periodSelected.days === 0) {
+                    fromTimestamp = $scope.minDate.getTime();
+                } else {
+                    fromTimestamp = moment().startOf('day').subtract($scope.periodSelected.days, 'days').toDate().getTime();
+                }
+
+                toTimestamp = $scope.maxDate.getTime();
+
+                // Update datepickers
+                $scope.fromDate = new Date(fromTimestamp);
+                $scope.toDate = new Date(toTimestamp);
+            }
+
+            if (fromOrToDateChange) {
+                fromTimestamp = $scope.fromDate.getTime();
+                toTimestamp = moment($scope.toDate).endOf('day').toDate();
+            }
+
+            $scope.fitnessChartData = $scope.generateFitnessGraphData($scope.fitnessData, fromTimestamp, toTimestamp);
 
             $scope.generateGraph();
         };
@@ -50,7 +93,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
             $scope.fitnessChartOptions = {
                 chart: {
                     type: 'lineWithFocusChart',
-                    height: 750,
+                    height: '650',
                     // height2: 500,
                     // clipEdge: true,
                     // rescaleY: true,
@@ -103,17 +146,17 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                             return 'branch name: ' + d.data.branch;
                         }
                     },*/
-                    /*
-                    useInteractiveGuideline: true,
-                    interactiveGuideline: {
-                        tooltip: {
-                            enabled: true,
-                            contentGenerator: function(d) {
-                                console.log(d);
-                                return '<h3>HELLO WORLD</h3>';
-                            }
-                        },
-                    },*/
+
+                    // useInteractiveGuideline: true,
+                    // interactiveGuideline: {
+                    //     tooltip: {
+                    //         enabled: true,
+                    //         contentGenerator: function(d) {
+                    //             console.log(d);
+                    //             return '<h3>HELLO WORLD</h3>';
+                    //         }
+                    //     },
+                    // },
 
                     // interactive: true,
                     /*
@@ -180,24 +223,16 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                     callback: function(chart) {
                         console.log("!!! lineChart callback !!!");
                     },
-                },
-                title: {
-                    enable: true,
-                    text: 'Chronic Training Load (Fitness), Acute Training Load (Fatigue) & Training Stress Balance (Form)'
                 }
+                // title: {
+                //     enable: true,
+                //     text: 'Chronic Training Load (Fitness), Acute Training Load (Fatigue) & Training Stress Balance (Form)'
+                // }
             };
 
         };
 
-        $scope.generateFitnessGraphData = function(fitnessData) {
-
-            // Compute from timstamp
-            var fromTimestamp;
-            if ($scope.periodSelected.days === 0) {
-                fromTimestamp = (_.first(fitnessData)).timestamp;
-            } else {
-                fromTimestamp = new Date().getTime() - $scope.periodSelected.days * fitnessDataService.const.DAY_LONG_MILLIS;
-            }
+        $scope.generateFitnessGraphData = function(fitnessData, fromTimestamp, toTimestamp) {
 
             var ctlValues = [];
             var atlValues = [];
@@ -205,7 +240,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
             _.each(fitnessData, function(fitData) {
 
-                if (fitData.timestamp >= fromTimestamp) {
+                if (fitData.timestamp >= fromTimestamp && fitData.timestamp <= toTimestamp) {
 
                     ctlValues.push({
                         x: fitData.timestamp,
@@ -255,15 +290,15 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
             return {
                 curves: [{
-                    key: "Chronic Training Load",
+                    key: "Fitness/CTL",
                     values: ctlValues,
                     color: '#007fe7'
                 }, {
-                    key: "Acute Training Load",
+                    key: "Fatigue/ATL",
                     values: atlValues,
                     color: '#ff53b0'
                 }, {
-                    key: "Training Stress Balance",
+                    key: "Form/TSB",
                     values: tsbValues,
                     color: '#ed9c12',
                     area: true
@@ -276,6 +311,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
     return {
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendGraph.html',
+        scope: {},
         controller: controllerFunction
             // link: linkFunction
     };
