@@ -1,8 +1,24 @@
-app.directive('fitnessTrendGraph', ['$timeout', '$location', 'FitnessDataService', function($timeout, $location, fitnessDataService) {
+app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataService) {
 
     // var linkFunction = function($scope, element, attrs) {};
 
     var controllerFunction = function($scope) {
+
+        $scope.unWatchFitnessData = $scope.$watch('fitnessData', function(newValue, oldValue) {
+
+            if (newValue !== oldValue) {
+
+                // ... Fitness data just get updated
+                $scope.fitnessData = angular.fromJson($scope.fitnessData);
+
+                console.log('unwatch $scope.fitnessData');
+                $scope.unWatchFitnessData();
+
+                console.log('$scope.fitnessData just get updated');
+                $scope.updateFitnessChartGraph();
+
+            }
+        });
 
         $scope.periodsToWatch = [{
             days: 7,
@@ -29,11 +45,6 @@ app.directive('fitnessTrendGraph', ['$timeout', '$location', 'FitnessDataService
         $scope.periodChanged = function() {
             $scope.updateFitnessChartGraph();
         };
-
-        fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
-            $scope.fitnessData = fitnessData;
-            $scope.updateFitnessChartGraph();
-        });
 
         $scope.updateFitnessChartGraph = function() {
 
@@ -273,16 +284,10 @@ app.directive('fitnessTrendGraph', ['$timeout', '$location', 'FitnessDataService
 
     return {
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendGraph.html',
-        // scope: {
-            // zoneId: '@zoneId',
-            // xtdZone: '=',
-            // xtdDataSelected: "=",
-            // previousFrom: '@previousFrom',
-            // nextTo: '@nextTo',
-            // xtdZoneFirst: '@xtdZoneFirst',
-            // xtdZoneLast: '@xtdZoneLast'
-        // },
+        scope: {
+            fitnessData: '@fitnessData'
+        },
         controller: controllerFunction
-        // link: linkFunction
+            // link: linkFunction
     };
 }]);

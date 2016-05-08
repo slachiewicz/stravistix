@@ -1,4 +1,6 @@
-app.directive('fitnessTrendTable', ['$timeout', '$location', 'FitnessDataService', function($timeout, $location, fitnessDataService) {
+app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataService) {
+
+    // var linkFunction = function($scope, element, attrs) {};
 
     var controllerFunction = function($scope) {
 
@@ -6,32 +8,40 @@ app.directive('fitnessTrendTable', ['$timeout', '$location', 'FitnessDataService
         $scope.const = {};
         $scope.const.fitnessDataForTable = null;
 
-        // Fetching fitness data from fitness service
-        fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
+        $scope.unWatchFitnessData = $scope.$watch('fitnessData', function(newValue, oldValue) {
 
-            var fitnessDataForTable = [];
+            if (newValue !== oldValue) {
 
-            _.each(fitnessData, function(fitnessObj) {
+                console.log('$scope.fitnessData just get updated');
 
-                if (fitnessObj.activitiesName.length) {
+                // ... Fitness data just get updated
+                var fitnessDataForTable = [];
 
-                    var finalName = '';
-                    _.each(fitnessObj.activitiesName, function(name, index) {
-                        finalName += name;
-                        if (index !== 0) {
-                            finalName += ' ; ';
-                        }
-                    });
+                _.each(angular.fromJson($scope.fitnessData), function(fitnessObj) {
 
-                    fitnessObj.activitiesName = finalName;
-                    fitnessDataForTable.push(fitnessObj);
-                }
-            });
+                    if (fitnessObj.activitiesName.length) {
 
-            // Store result
-            $scope.const.fitnessDataForTable = fitnessDataForTable;
+                        var finalName = '';
+                        _.each(fitnessObj.activitiesName, function(name, index) {
+                            finalName += name;
+                            if (index !== 0) {
+                                finalName += ' ; ';
+                            }
+                        });
 
-            $scope.refreshFitnessDataForTable();
+                        fitnessObj.activitiesName = finalName;
+                        fitnessDataForTable.push(fitnessObj);
+                    }
+                });
+
+                $scope.const.fitnessDataForTable = fitnessDataForTable;
+
+                console.log('unwatch $scope.fitnessData');
+                $scope.unWatchFitnessData();
+
+                $scope.refreshFitnessDataForTable();
+            }
+
         });
 
         $scope.limitOptions = [5, 10, 15, 25, 50, 100];
@@ -106,16 +116,10 @@ app.directive('fitnessTrendTable', ['$timeout', '$location', 'FitnessDataService
 
     return {
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendTable.html',
-        // scope: {
-        // zoneId: '@zoneId',
-        // xtdZone: '=',
-        // xtdDataSelected: "=",
-        // previousFrom: '@previousFrom',
-        // nextTo: '@nextTo',
-        // xtdZoneFirst: '@xtdZoneFirst',
-        // xtdZoneLast: '@xtdZoneLast'
-        // },
+        scope: {
+            fitnessData: '@fitnessData'
+        },
         controller: controllerFunction
-            // link: linkFunction
+        // link: linkFunction
     };
 }]);
