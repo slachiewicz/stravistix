@@ -204,7 +204,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
             if ($scope.periodSelected.days === 0) {
                 fromTimestamp = (_.first(fitnessData)).timestamp;
             } else {
-                fromTimestamp = new Date().getTime() - $scope.periodSelected.days * fitnessDataService.static.DAY_LONG_MILLIS;
+                fromTimestamp = new Date().getTime() - $scope.periodSelected.days * fitnessDataService.const.DAY_LONG_MILLIS;
             }
 
             var ctlValues = [];

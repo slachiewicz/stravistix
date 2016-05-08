@@ -1,12 +1,12 @@
 app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, chromeStorageService) {
 
     var fitnessDataService = {};
-    fitnessDataService.static = {};
+    fitnessDataService.const = {};
 
     /**
      * Statics vars
      */
-    fitnessDataService.static.DAY_LONG_MILLIS = 24 * 3600 * 1000;
+    fitnessDataService.const.DAY_LONG_MILLIS = 24 * 3600 * 1000;
 
     /**
      * @return The date at midnight
@@ -105,13 +105,13 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
                 var toDate = new Date(); // Today
 
                 // Inject day off..
-                var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / fitnessDataService.static.DAY_LONG_MILLIS);
+                var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / fitnessDataService.const.DAY_LONG_MILLIS);
 
                 var everyDayFitnessObjects = [];
 
                 for (var i = 0; i < daysDiff; i++) {
 
-                    var timestampOfCurrentDay = fromDate.getTime() + fitnessDataService.static.DAY_LONG_MILLIS * i;
+                    var timestampOfCurrentDay = fromDate.getTime() + fitnessDataService.const.DAY_LONG_MILLIS * i;
 
                     // Seek if current day with have 1 or serveral trimp. then add...
                     var fitnessObjectFoundOnCurrentDay = _.where(cleanedActivitiesWithHRData, {
@@ -228,20 +228,20 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
             lostCtl: {
                 percentageTrigger: 100 - ctlLooseTriggerPercentage,
                 dayCount: dayCountLostCtl,
-                date: new Date((new Date().getTime() + dayCountLostCtl * fitnessDataService.static.DAY_LONG_MILLIS))
+                date: new Date((new Date().getTime() + dayCountLostCtl * fitnessDataService.const.DAY_LONG_MILLIS))
             },
             lostAtl: {
                 percentageTrigger: 100 - atlLooseTriggerPercentage,
                 dayCount: dayCountLostAtl,
-                date: new Date((new Date().getTime() + dayCountLostAtl * fitnessDataService.static.DAY_LONG_MILLIS))
+                date: new Date((new Date().getTime() + dayCountLostAtl * fitnessDataService.const.DAY_LONG_MILLIS))
             },
             gainForm: {
                 dayCount: dayCountInForm,
-                date: new Date((new Date().getTime() + dayCountInForm * fitnessDataService.static.DAY_LONG_MILLIS))
+                date: new Date((new Date().getTime() + dayCountInForm * fitnessDataService.const.DAY_LONG_MILLIS))
             },
             lostForm: {
                 dayCount: dayCountLostForm,
-                date: new Date((new Date().getTime() + dayCountLostForm * fitnessDataService.static.DAY_LONG_MILLIS))
+                date: new Date((new Date().getTime() + dayCountLostForm * fitnessDataService.const.DAY_LONG_MILLIS))
             },
         };
     };

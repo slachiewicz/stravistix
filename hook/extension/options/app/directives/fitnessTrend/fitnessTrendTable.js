@@ -26,7 +26,7 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
                                 finalName += ' ; ';
                             }
                         });
-                        
+
                         fitnessObj.activitiesName = finalName;
                         fitnessDataForTable.push(fitnessObj);
                     }
