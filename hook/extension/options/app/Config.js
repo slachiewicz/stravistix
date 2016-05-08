@@ -5,7 +5,7 @@ var routeMap = {
     commonSettingsRoute: '/commonSettings',
     healthSettingsRoute: '/healthSettings',
     zonesSettingsRoute: '/zonesSettings',
-    fitnessRoute: '/fitness',
+    fitnessTrendRoute: '/fitnessTrend',
     releaseNotesRoute: '/releaseNotes',
     aboutRoute: '/about',
     donateRoute: '/donate',
