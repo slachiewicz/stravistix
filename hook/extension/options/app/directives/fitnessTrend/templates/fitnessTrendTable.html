@@ -11,11 +11,11 @@
         </md-toolbar>
 
         <!-- Search for activities form  -->
-        <md-toolbar class="md-table-toolbar md-default" ng-show="filter.show" aria-hidden="false" style="">
+        <md-toolbar class="md-table-toolbar md-default" ng-show="filter.show" aria-hidden="false">
             <div class="md-toolbar-tools md-block">
                 <md-icon>search</md-icon>
                 <form flex name="filter.form" class="ng-valid ng-valid-parse">
-                    <input type="text" ng-model="query.filter" ng-model-options="filter.options" placeholder="Search for activities" class="ng-valid ng-valid-parse ng-touched ng-pristine" aria-invalid="false" style="">
+                    <input type="text" ng-model="query.filter" ng-model-options="filter.options" placeholder="Search for activities" class="ng-valid ng-valid-parse ng-touched ng-pristine" aria-invalid="false"  style="width: 100%; margin: 0; border: none;">
                 </form>
                 <button class="md-icon-button md-button" ng-click="removeFilter()" aria-label="close">
                     <md-icon>close</md-icon>
