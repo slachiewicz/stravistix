@@ -1,7 +1,5 @@
 app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataService) {
 
-    // var linkFunction = function($scope, element, attrs) {};
-
     var controllerFunction = function($scope) {
 
         // Init directives constants
@@ -120,6 +118,5 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
             fitnessData: '@fitnessData'
         },
         controller: controllerFunction
-        // link: linkFunction
     };
 }]);

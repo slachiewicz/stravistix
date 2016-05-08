@@ -39,7 +39,7 @@
                 <tbody md-body>
                     <tr md-row md-select="dessert" md-on-select="logItem" md-auto-select="options.autoSelect" ng-repeat="fitnessObj in fitnessDataForTableFiltered | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
 
-                        <td md-cell>{{fitnessObj.date}}</td>
+                        <td md-cell>{{fitnessObj.timestamp | date:'mediumDate'}}</td>
                         <td md-cell>{{fitnessObj.activitiesName}}</td>
                         <td md-cell>{{fitnessObj.ctl}}</td>
                         <td md-cell>{{fitnessObj.atl}}</td>
