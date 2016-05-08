@@ -6,7 +6,10 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
         fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
             $scope.fitnessData = fitnessData;
-            $scope.updateFitnessChartGraph();
+
+            setTimeout(function () { // Postpone execution at the end
+                $scope.updateFitnessChartGraph();
+            });
         });
 
         $scope.periodsToWatch = [{
