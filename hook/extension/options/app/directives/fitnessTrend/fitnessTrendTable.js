@@ -6,39 +6,32 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
         $scope.const = {};
         $scope.const.fitnessDataForTable = null;
 
-        $scope.unWatchFitnessData = $scope.$watch('fitnessData', function(newValue, oldValue) {
+        fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
 
-            if (newValue !== oldValue) {
+            var fitnessDataForTable = [];
 
-                console.log('$scope.fitnessData just get updated');
+            _.each(fitnessData, function(fitnessObj) {
 
-                // ... Fitness data just get updated
-                var fitnessDataForTable = [];
+                var newFitnessObj = _.clone(fitnessObj);
 
-                _.each(angular.fromJson($scope.fitnessData), function(fitnessObj) {
+                if (newFitnessObj.activitiesName.length) {
 
-                    if (fitnessObj.activitiesName.length) {
+                    var finalName = '';
+                    _.each(newFitnessObj.activitiesName, function(name, index) {
+                        finalName += name;
+                        if (index !== 0) {
+                            finalName += ' ; ';
+                        }
+                    });
 
-                        var finalName = '';
-                        _.each(fitnessObj.activitiesName, function(name, index) {
-                            finalName += name;
-                            if (index !== 0) {
-                                finalName += ' ; ';
-                            }
-                        });
+                    newFitnessObj.activitiesName = finalName;
+                    fitnessDataForTable.push(newFitnessObj);
+                }
+            });
 
-                        fitnessObj.activitiesName = finalName;
-                        fitnessDataForTable.push(fitnessObj);
-                    }
-                });
+            $scope.const.fitnessDataForTable = fitnessDataForTable;
 
-                $scope.const.fitnessDataForTable = fitnessDataForTable;
-
-                console.log('unwatch $scope.fitnessData');
-                $scope.unWatchFitnessData();
-
-                $scope.refreshFitnessDataForTable();
-            }
+            $scope.refreshFitnessDataForTable();
 
         });
 
@@ -114,9 +107,6 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
 
     return {
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendTable.html',
-        scope: {
-            fitnessData: '@fitnessData'
-        },
         controller: controllerFunction
     };
 }]);

@@ -4,20 +4,9 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
     var controllerFunction = function($scope) {
 
-        $scope.unWatchFitnessData = $scope.$watch('fitnessData', function(newValue, oldValue) {
-
-            if (newValue !== oldValue) {
-
-                // ... Fitness data just get updated
-                $scope.fitnessData = angular.fromJson($scope.fitnessData);
-
-                console.log('unwatch $scope.fitnessData');
-                $scope.unWatchFitnessData();
-
-                console.log('$scope.fitnessData just get updated');
-                $scope.updateFitnessChartGraph();
-
-            }
+        fitnessDataService.getFitnessData().then(function successGet(fitnessData) {
+            $scope.fitnessData = fitnessData;
+            $scope.updateFitnessChartGraph();
         });
 
         $scope.periodsToWatch = [{
@@ -284,9 +273,6 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
 
     return {
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendGraph.html',
-        scope: {
-            fitnessData: '@fitnessData'
-        },
         controller: controllerFunction
             // link: linkFunction
     };
