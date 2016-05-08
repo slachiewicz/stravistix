@@ -1,20 +1,28 @@
 <md-content class="md-padding" ng-cloak>
     <md-card>
-        <!-- <md-toolbar class="md-table-toolbar md-default" ng-hide="options.rowSelection && selected.length">
+        <md-toolbar class="md-table-toolbar md-default" ng-hide="filter.show" aria-hidden="true">
             <div class="md-toolbar-tools">
-                <span>Nutrition</span>
+                <span>Training Load Table</span>
                 <div flex></div>
-                <md-button class="md-icon-button" ng-click="loadStuff()">
-                    <md-icon>refresh</md-icon>
+                <md-button class="md-icon-button" ng-click="filter.show=true" aria-label="filter_list">
+                    <md-icon>filter_list</md-icon>
                 </md-button>
             </div>
-        </md-toolbar> -->
+        </md-toolbar>
 
-        <!-- <md-toolbar class="md-table-toolbar alternate" ng-show="options.rowSelection && selected.length">
-            <div class="md-toolbar-tools">
-                <span>{{selected.length}} {{selected.length > 1 ? 'items' : 'item'}} selected</span>
+        <!-- Search for activities form  -->
+        <md-toolbar class="md-table-toolbar md-default" ng-show="filter.show" aria-hidden="false" style="">
+            <div class="md-toolbar-tools md-block">
+                <md-icon>search</md-icon>
+                <form flex name="filter.form" class="ng-valid ng-valid-parse">
+                    <input type="text" ng-model="query.filter" ng-model-options="filter.options" placeholder="Search for activities" class="ng-valid ng-valid-parse ng-touched ng-pristine" aria-invalid="false" style="">
+                </form>
+                <button class="md-icon-button md-button" ng-click="removeFilter()" aria-label="close">
+                    <md-icon>close</md-icon>
+                    <div class="md-ripple-container"></div>
+                </button>
             </div>
-        </md-toolbar> -->
+        </md-toolbar>
 
         <md-table-container>
             <table md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}">
@@ -26,23 +34,10 @@
                         <th md-column md-numeric show-gt-md><span>Acute Training Load</span></th>
                         <th md-column md-numeric show-gt-md><span>Training Stress Balance</span></th>
                         <th md-column md-numeric show-gt-md><span>Link</span></th>
-                        <!-- <th md-column md-order-by="name"><span>Dessert (100g serving)</span></th>
-                        <th md-column md-order-by="type"><span>Type</span></th>
-                        <th md-column md-numeric md-order-by="calories.value" md-desc><span>Calories</span></th>
-                        <th md-column md-numeric md-order-by="fat.value"><span>Fat (g)</span></th>
-                        <th md-column md-numeric md-order-by="carbs.value"><span>Carbs (g)</span></th>
-                        <th md-column md-numeric md-order-by="protein.value"><span>Protein (g)</span></th>
-                        <th md-column md-numeric md-order-by="sodium.value" hide-gt-xs show-gt-md><span>Sodium (mg)</span></th>
-                        <th md-column md-numeric md-order-by="calcium.value" hide-gt-xs show-gt-lg><span>Calcium (%)</span></th>
-                        <th md-column md-numeric md-order-by="iron.value" hide-gt-xs show-gt-lg><span>Iron (%)</span></th>
-                        <th md-column md-order-by="comment">
-                            <md-icon>comments</md-icon>
-                            <span>Comments</span>
-                        </th> -->
                     </tr>
                 </thead>
                 <tbody md-body>
-                    <tr md-row md-select="dessert" md-on-select="logItem" md-auto-select="options.autoSelect" ng-repeat="fitnessObj in fitnessDataForTable | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
+                    <tr md-row md-select="dessert" md-on-select="logItem" md-auto-select="options.autoSelect" ng-repeat="fitnessObj in fitnessDataForTableFiltered | filter: filter.search | orderBy: query.order | limitTo: query.limit : (query.page -1) * query.limit">
 
                         <td md-cell>{{fitnessObj.date}}</td>
                         <td md-cell>{{fitnessObj.activitiesName}}</td>
@@ -54,28 +49,11 @@
                                 <md-icon>insert_link</md-icon>
                             </a>
                         </td>
-
-                        <!-- <td md-cell>{{dessert.name}}</td>
-                        <td md-cell>
-                            <md-select ng-model="dessert.type" placeholder="Other">
-                                <md-option ng-value="type" ng-repeat="type in getTypes()">{{type}}</md-option>
-                            </md-select>
-                        </td>
-                        <td md-cell>{{dessert.calories.value}}</td>
-                        <td md-cell>{{dessert.fat.value | number: 2}}</td>
-                        <td md-cell>{{dessert.carbs.value}}</td>
-                        <td md-cell>{{dessert.protein.value | number: 2}}</td>
-                        <td md-cell hide-gt-xs show-gt-md>{{dessert.sodium.value}}</td>
-                        <td md-cell hide-gt-xs show-gt-lg>{{dessert.calcium.value}}%</td>
-                        <td md-cell hide-gt-xs show-gt-lg>{{dessert.iron.value}}%</td>
-                        <td md-cell ng-click="editComment($event, dessert)" ng-class="{'md-placeholder': !dessert.comment}">
-                            {{dessert.comment || 'Add a comment'}}
-                        </td> -->
                     </tr>
                 </tbody>
             </table>
         </md-table-container>
 
-        <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{fitnessDataForTable.length}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
+        <md-table-pagination md-limit="query.limit" md-limit-options="limitOptions" md-page="query.page" md-total="{{fitnessDataForTableFiltered.length}}" md-page-select="options.pageSelect" md-boundary-links="options.boundaryLinks" md-on-paginate="logPagination"></md-table-pagination>
     </md-card>
 </md-content>
