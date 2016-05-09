@@ -131,12 +131,12 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                     // pointRange: [-1,-0.5,0.5,1],
                     // padData: true,
                     // useInteractiveGuideline: true,
-                    pointActive: function(d) {
+                    /*pointActive: function(d) {
                         var activitiesFound = (_.findWhere($scope.fitnessData, {
                             timestamp: d.x
                         })).activitiesName.length;
                         return activitiesFound;
-                    },
+                    },*/
                     // showValues: true,
                     // duration: 500,
                     /*tooltip: {
@@ -150,7 +150,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                     // useInteractiveGuideline: true,
                     // interactiveGuideline: {
                     //     tooltip: {
-                    //         enabled: true,
+                    // //         enabled: false,
                     //         contentGenerator: function(d) {
                     //             console.log(d);
                     //             return '<h3>HELLO WORLD</h3>';
@@ -158,14 +158,58 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                     //     },
                     // },
 
+                    // "tooltip": {
+                    //     duration: 0,
+                    //     gravity: w,
+                    //     distance: 25,
+                    //     snapDistance: 0,
+                    //     classes: null,
+                    //     chartContainer: null,
+                    //     enabled: true,
+                    //     hideDelay: 0,
+                    //     headerEnabled: true,
+                    //     fixedTop: null,
+                    //     offset: {
+                    //         left: 0,
+                    //         top: 0
+                    //     },
+                    //     hidden: false,
+                    //     data: null,
+                    //     id: nvtooltip-32413
+                    // },
+
                     // interactive: true,
-                    /*
+
                     tooltip: {
+                        // distance: {
+                        //     left: 0,
+                        //     top: 0
+                        // },
+                        // snapDistance: 25,
                         enabled: true,
+                        // headerEnabled: true,
+                        hideDelay: 500,
+                        // classes: 'md-padding',
                         contentGenerator: function(d) {
-                            return '<h3>HELLO WORLD</h3>';
+
+                            var fitnessObject = (_.findWhere($scope.fitnessData, {
+                                timestamp: d.value
+                            }));
+
+                            console.log(d, fitnessObject);
+
+                            var html = '';
+                            html += '<div style="padding: 5px;">';
+                            // html += '   <span width="auto">Name</span>';
+                            html += '   <div><strong>' + ((fitnessObject.activitiesName.length) ? fitnessObject.activitiesName : 'Resting...') + '</strong></div>';
+                            html += '   <div>On <strong>' + (new Date(d.point.x)).toLocaleDateString() + '</strong></div>';
+                            html += '   <div style="padding: 5px;"></div>';
+                            html += '   <div>' + d.series[0].key + ': ' + d.series[0].value + '</div>';
+                            html += '   <div>Training Impulse' + ': ' + '...' + '</div>';
+                            html += '</div>';
+                            return html;
                         }
-                    },*/
+                    },
                     /*
                     interactive: true,
                     tooltips: true,
@@ -221,7 +265,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                         // height: 150
                     },
                     callback: function(chart) {
-                        console.log("!!! lineChart callback !!!");
+                        console.log("callback");
                     },
                 }
                 // title: {
@@ -292,15 +336,15 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                 curves: [{
                     key: "Fitness/CTL",
                     values: ctlValues,
-                    color: '#007fe7'
+                    color: '#1d1d1d'
                 }, {
                     key: "Fatigue/ATL",
                     values: atlValues,
-                    color: '#ff53b0'
+                    color: '#676767'
                 }, {
                     key: "Form/TSB",
                     values: tsbValues,
-                    color: '#ed9c12',
+                    color: '#c7c7c7',
                     area: true
                 }],
                 yDomain: [yDomainMin * 1.05, yDomainMax * 1.05]

@@ -103,14 +103,12 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
 
             var fromDate = new Date((_.first(cleanedActivitiesWithHRData)).date);
 
-            var toDate = new Date(); // Today
-
             // Inject day off..
-            var daysDiff = Math.ceil(Math.abs(toDate.getTime() - fromDate.getTime()) / fitnessDataService.const.DAY_LONG_MILLIS);
+            var daysDiffWithToday = moment.duration(moment().diff(moment(fromDate))).asDays();
 
             var everyDayFitnessObjects = [];
 
-            for (var i = 0; i < daysDiff; i++) {
+            for (var i = 0; i < daysDiffWithToday; i++) {
 
                 var timestampOfCurrentDay = fromDate.getTime() + fitnessDataService.const.DAY_LONG_MILLIS * i;
 
@@ -128,7 +126,7 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
                 };
 
                 if (fitnessObjectFoundOnCurrentDay.length) {
-                  
+
                     // Some trimp have beed found for that day
                     for (var j = 0; j < fitnessObjectFoundOnCurrentDay.length; j++) {
                         fitnessObjectOnCurrentDay.trimp += parseFloat(fitnessObjectFoundOnCurrentDay[j].trimp);

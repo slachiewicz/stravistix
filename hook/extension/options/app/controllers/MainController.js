@@ -39,12 +39,12 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
         toolbar: {
             buttons: [{
                 name: 'Button 1',
-                icon: 'add',
+                icon: 'sync',
                 link: 'Button 1'
             }],
             menus: [{
                 name: 'Menu 1',
-                icon: 'message',
+                icon: 'more_vert',
                 width: '4',
                 actions: [{
                     name: 'Action 1',

@@ -9,20 +9,20 @@
             </md-button>
         </md-card-title>
         <md-card-content ng-cloak>
-            <div layout="row">
+            <div layout="row" layout-align="end start">
                 <div flex>
                     <nvd3 options="fitnessChartOptions" config="{deepWatchDataDepth: 0}" data="fitnessChartData.curves" class="with-3d-shadow with-transitions"></nvd3>
                 </div>
                 <div class="md-padding">
                     <div flex-gt-sm class="md-block">
-                        <label class="md-body-2">View</label>
+                        <label class="md-body-2">Period selection</label>
                         <md-select ng-model="periodSelected" ng-change="lastMonthsPeriodChanged()" aria-label="Period to watch">
                             <md-option ng-repeat="period in periodsToWatch" ng-value="period">{{ period.label }}</md-option>
                         </md-select>
-                    </div>
+                    <!-- </div>
 
-                    <div flex-gt-sm class="md-block">
-                        <label class="md-body-2">Or</label>
+                    <div flex-gt-sm class="md-block"> -->
+                        <!-- <label class="md-body-2">Or</label> -->
                         <div layout="row" layout-align="end center">
                             <label class="md-body-1">From</label>
                             <md-datepicker ng-model="fromDate" md-placeholder="Enter date" md-min-date="minDate" md-max-date="toDate" ng-change="fromDateChanged()"></md-datepicker>
