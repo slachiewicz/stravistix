@@ -1,4 +1,4 @@
-app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataService) {
+app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fitnessDataService, $colors) {
 
     var controllerFunction = function($scope) {
 
@@ -336,15 +336,15 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', function(fitnessDataSe
                 curves: [{
                     key: "Fitness/CTL",
                     values: ctlValues,
-                    color: '#1d1d1d'
+                    color: $colors.strava
                 }, {
                     key: "Fatigue/ATL",
                     values: atlValues,
-                    color: '#676767'
+                    color: '#525252'
                 }, {
                     key: "Form/TSB",
                     values: tsbValues,
-                    color: '#c7c7c7',
+                    color: '#cdcdcd',
                     area: true
                 }],
                 yDomain: [yDomainMin * 1.05, yDomainMax * 1.05]
