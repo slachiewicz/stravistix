@@ -15,11 +15,14 @@
                 </div>
                 <div class="md-padding">
                     <div flex-gt-sm class="md-block">
-                        <label class="md-body-2">Period selection</label>
+                        <label class="md-body-2">Filter options</label>
+                        
                         <md-select ng-model="periodSelected" ng-change="lastMonthsPeriodChanged()" aria-label="Period to watch">
                             <md-option ng-repeat="period in periodsToWatch" ng-value="period">{{ period.label }}</md-option>
                         </md-select>
-                    <!-- </div>
+
+                        <!-- <md-divider/> -->
+                        <!-- </div>
 
                     <div flex-gt-sm class="md-block"> -->
                         <!-- <label class="md-body-2">Or</label> -->
@@ -34,6 +37,14 @@
                                 <md-datepicker ng-model="toDate" md-placeholder="Enter date" md-min-date="fromDate" md-max-date="maxDate" ng-change="toDateChanged()"></md-datepicker>
                             </div>
                         </div>
+
+                        <!-- <label class="md-body-2">Period selection</label> -->
+                        <md-select ng-model="selectedToppings" aria-label="Activity Types" placeholder="Filter by types" multiple>
+                            <md-optgroup label="Activity Types">
+                                <md-option ng-value="type.name" ng-repeat="type in activityTypes">{{type.name}}</md-option>
+                            </md-optgroup>
+                        </md-select>
+
                     </div>
                     <!-- <div>
                         <div>You will loose {{restLooseGainData.lostCtl.percentageTrigger}}% of your CTL/Fitness in <strong>~{{restLooseGainData.lostCtl.dayCount}} days (on {{restLooseGainData.lostCtl.date.toLocaleDateString()}})</strong></div>

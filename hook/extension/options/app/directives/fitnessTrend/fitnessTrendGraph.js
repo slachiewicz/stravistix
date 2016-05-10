@@ -15,6 +15,14 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
 
         });
 
+        $scope.activityTypes = [{
+            name: 'Ride',
+        }, {
+            name: 'Run',
+        }, {
+            name: 'Virtual ride',
+        }];
+
         $scope.periodsToWatch = [{
             days: moment.duration(moment().diff(moment().subtract(7, 'days'))).asDays(),
             label: 'Last 7 days'
