@@ -1,4 +1,8 @@
-function ActivitiesSynchronizer() {}
+function ActivitiesSynchronizer(appResources, userSettings) {
+    this.appResources_ = appResources;
+    this.userSettings_ = userSettings;
+    this.extensionId_ = this.appResources_.extensionId;
+}
 
 ActivitiesSynchronizer.prototype = {
 
@@ -145,7 +149,7 @@ ActivitiesSynchronizer.prototype = {
                             deferred.resolve(activitiesList);
                         } else {
                             // Continue to fetch
-                            deferred.notify(activitiesList.length /  data.total * 100);
+                            deferred.notify(activitiesList.length / data.total * 100);
                             self.fetchActivitiesRecursive(lastSyncUserDateTime, page + 1, deferred, activitiesList);
                         }
 
@@ -205,6 +209,131 @@ ActivitiesSynchronizer.prototype = {
         });
 
         return deferred.promise;
-    }
+    },
 
+    clearSyncCache: function() {
+
+        var self = this;
+
+        var promise = Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities').then(function() {
+            console.log('computedActivities removed from local storage');
+            return Helper.removeFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime');
+        }).then(function() {
+            console.log('lastSyncDateTime removed from local storage');
+        });
+
+        return promise;
+    },
+
+    computeNewActivities: function() {
+
+        var self = this;
+
+        var deferred = Q.defer();
+
+        Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime').then(function getLastSyncDateTimeSuccess(savedLastSyncDateTime) {
+
+            if (savedLastSyncDateTime.data) {
+                console.log('Last sync date time found: ', new Date(savedLastSyncDateTime.data));
+            } else {
+                console.log('No last sync date time found, starting full sync');
+            }
+
+            return self.fetchWithStream(new Date(savedLastSyncDateTime.data));
+
+        }).then(function fetchWithStreamSuccess(activitiesWithStreams) {
+
+            var activitiesProcessor = new ActivitiesProcessor(self.appResources_, self.userSettings_);
+            return activitiesProcessor.compute(activitiesWithStreams);
+
+        }, function fetchWithStreamError(err) {
+
+            deferred.reject(err);
+
+        }, function fetchWithStreamProgress(progress) {
+
+            if (progress) deferred.notify(progress);
+
+        }).then(function computeSuccess(computedActivities) {
+
+            deferred.resolve(computedActivities);
+
+        }, function computeError(err) {
+
+            deferred.reject(err);
+
+        }, function computeProgress(progress) {
+
+            if (progress) deferred.notify(progress);
+
+        });
+
+        return deferred.promise;
+    },
+
+    sync: function() {
+
+        var deferred = Q.defer();
+
+        var self = this;
+
+        this.newComputedActivities = null;
+
+        this.computeNewActivities().then(function computeSuccess(newComputedActivities) {
+
+            self.newComputedActivities = newComputedActivities;
+            console.log(self.newComputedActivities.length + ' new activities computed.');
+            return Helper.getFromStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities');
+
+        }, function computeError(err) {
+
+            deferred.reject(err);
+
+        }, function computeProgress(progress) {
+
+            deferred.notify(progress);
+
+        }).then(function successGetFromStorage(computedActivitiesStored) {
+
+            if (_.isEmpty(computedActivitiesStored) || _.isEmpty(computedActivitiesStored.data)) {
+                computedActivitiesStored = {};
+                computedActivitiesStored.data = [];
+            }
+
+            var mergedActivities = _.flatten(_.union(self.newComputedActivities, computedActivitiesStored.data));
+
+            // Sort mergedActivities ascending before save
+            mergedActivities = _.sortBy(mergedActivities, function(item) {
+                return (new Date(item.start_time)).getTime();
+            });
+
+            // TODO Check activities unicity
+            console.log('// TODO Check activities id unicity here...');
+
+            console.log('Now saving them to extension local storage...');
+
+            // Save to chrome storage
+            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'computedActivities', mergedActivities);
+
+        }).then(function saveChromeLocalStorageSuccess(savedData) {
+
+            // Helper.setToStorage promise resolved here
+            console.log(savedData.data.computedActivities.length + ' activities were saved to extension local storage');
+
+            return Helper.setToStorage(self.extensionId_, StorageManager.storageLocalType, 'lastSyncDateTime', (new Date()).getTime());
+
+        }).then(function saveLastSyncDateTimeSuccess(saved) {
+
+            console.log('Last sync date time saved: ', new Date(saved.data.lastSyncDateTime));
+            deferred.resolve(saved.data);
+        });
+
+        return deferred.promise;
+    },
+
+    forceSync: function() {
+        return this.clearSyncCache().then(function() {
+            return this.sync();
+        }.bind(this));
+    }
 };
