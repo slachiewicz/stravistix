@@ -3,8 +3,17 @@
  */
 var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize']);
 
-app.config(function($mdThemingProvider) {
-    $mdThemingProvider.theme('default').primaryPalette('deep-orange');
+app.constant('$colors', {
+    strava: '#e94e1b'
+});
+
+app.config(function($mdThemingProvider, $colors) {
+    var stravaOrange = $mdThemingProvider.extendPalette('orange', {
+        '500': $colors.strava,
+        'contrastDefaultColor': 'light'
+    });
+    $mdThemingProvider.definePalette('stravaOrange', stravaOrange);
+    $mdThemingProvider.theme('default').primaryPalette('stravaOrange');
 });
 
 app.config(['$routeProvider', function($routeProvider) {
