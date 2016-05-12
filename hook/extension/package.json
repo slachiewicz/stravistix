@@ -29,6 +29,7 @@
     "angular-material": "^1.0.7",
     "angular-material-icons": "^0.7.0",
     "angular-messages": "^1.5.5",
+    "angular-mocks": "^1.5.5",
     "angular-route": "1.5.5",
     "angular-sanitize": "^1.5.5",
     "chart.js": "1.0.*",
