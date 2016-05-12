@@ -3,6 +3,24 @@
  */
 app.controller('MainController', function($scope, $location, $mdSidenav, $mdToast) {
 
+
+
+    function buildToggler(navID) {
+        return function() {
+            $mdSidenav(navID)
+                .toggle()
+                .then(function() {
+                    $log.debug("toggle " + navID + " is done");
+                });
+        };
+    }
+
+    $scope.toggleRight = buildToggler('right');
+
+
+
+
+
     $scope.toggleSidenav = function(menu) {
         $mdSidenav(menu).toggle();
     };
@@ -29,11 +47,11 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
     };
 
     $scope.data = {
-        title: 'Dashboard',
+        title: 'stravistix',
         user: {
-            name: 'Angular Ninja',
-            email: 'angular@ninja.com',
-            icon: 'face'
+            // name: 'StravistiX',
+            // email: 'angular@ninja.com',
+            // icon: 'face'
         },
         toolbar: {
             buttons: [{
@@ -104,7 +122,7 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                     name: 'Cycling Power',
                     icon: 'flash_on',
                     link: 'Action 2'
-                },{
+                }, {
                     name: 'Cycling Cadence',
                     icon: 'autorenew',
                     link: 'Action 2'
