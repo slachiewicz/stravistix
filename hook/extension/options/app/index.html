@@ -20,16 +20,29 @@
 <body class="md-body-1">
     <div ng-app="App" ng-controller="MainController" layout="row" layout-fill ng-cloak>
 
-        <md-sidenav class="md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
-         <!-- <md-toolbar> -->
-             <md-button ng-click="close()" >
-               <md-icon>menu</md-icon>
-             </md-button>
-         <!-- </md-toolbar> -->
-         <md-content layout-padding>
-
-         </md-content>
-       </md-sidenav>
+        <md-sidenav class="md-sidenav-left md-whiteframe-20dp" md-component-id="left">
+            <md-content layout-padding>
+                <div layout="column" layout-align="center center">
+                    <img src="img/logo_stravistix_no_circle.svg" width="90%" />
+                </div>
+                <md-divider></md-divider>
+                <div>
+                    <md-list ng-repeat="section in data.sidenav.sections">
+                        <md-list-item ng-click="(section.actions.length) ? section.expand=!section.expand : forward(section.link)">
+                            <md-icon>{{section.icon}}</md-icon>
+                            <p>{{section.name}}</p>
+                            <md-icon class="md-primary md-icon-button">{{ (section.actions.length) ? (section.expand ? 'expand_less' : 'expand_more') : ''}}</md-icon>
+                        </md-list-item>
+                        <md-list-item ng-show="!section.expand" ng-repeat="action in section.actions" ng-click="forward(action.link)">
+                            <span flex="10"></span>
+                            <md-icon size="10">{{action.icon}}</md-icon>
+                            <span flex="10"></span>
+                            <p class="md-body-1">{{action.name}}</p>
+                        </md-list-item>
+                    </md-list>
+                </div>
+            </md-content>
+        </md-sidenav>
 
         <!-- <md-sidenav class="md-sidenav-left md-whiteframe-z2" role="sidenav" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
             <md-toolbar class="md-tall" layout-align="end end">
@@ -60,22 +73,13 @@
             </md-content>
         </md-sidenav> -->
 
-
-
         <section layout="column" role="main" flex>
             <md-toolbar role="toolbar">
                 <div class="md-toolbar-tools">
-
-                    <!-- <md-button ng-click="toggleRight()"
-                           ng-hide="isOpenRight()"
-                           class="md-primary">
-                           Toggle right
-                         </md-button> -->
-
-                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" hide-gt-md aria-label="Menu">
+                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" aria-label="Menu">
                         <md-icon>menu</md-icon>
                     </md-button>
-                    <h4 class="md-title">{{data.title}}</h4>
+                    <span class="md-title ng-binding">{{data.title}}</span>
                     <span flex></span>
                     <md-button class="md-icon-button" ng-repeat="button in data.toolbar.buttons" aria-label={{button.name}} ng-click="toast(button.link)">
                         <md-icon>{{button.icon}}</md-icon>
