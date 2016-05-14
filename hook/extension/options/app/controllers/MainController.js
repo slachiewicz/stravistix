@@ -95,7 +95,7 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                 }, {
                     name: 'Zone Settings',
                     icon: 'format_line_spacing',
-                    expand: false,
+                    expand: true,
                     link: 'link',
                     actions: [{
                         name: 'Heart rate',
