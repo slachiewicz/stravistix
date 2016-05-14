@@ -24,7 +24,7 @@ var gulp = require('gulp');
 var plugins = require('gulp-load-plugins')();
 var util = require('gulp-util');
 var exec = require('child_process').exec;
-var options = require('./modules/gulp-options');
+var options = require('gulp-options');
 
 /**
  * Global folder variable
