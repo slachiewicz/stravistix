@@ -1,6 +1,6 @@
 [![Stories in Ready](https://badge.waffle.io/thomaschampagne/stravistix.png?label=ready&title=Ready)](http://waffle.io/thomaschampagne/stravistix)
 [![Join the chat at https://gitter.im/thomaschampagne/stravistix](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/thomaschampagne/stravistix?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
-1 /Install StravistiX from Chrome Store
+1/ Install StravistiX from Chrome Store
 ==========
 Go to http://thomaschampagne.github.io/stravistix/
 
@@ -63,17 +63,17 @@ To save time, you can automatically copy files changes from **hook/extension/** 
 gulp watch
 ```
 
-### 3.2/ Create a release archive
+### 3.2/ Create a package archive
 ```
-gulp release
+gulp package
 ```
-This will create zip archive of **dist/** folder in **release/StravistiX\_vX.X.X\_[date].zip**
+This will create zip archive of **dist/** folder in **package/StravistiX\_vX.X.X\_[date].zip**
 
 ### 3.3/ Clean the project
 ```
 gulp clean
 ```
-This will clean **dist/**, **release/** & **hook/extension/node_modules/** folders
+This will clean **dist/**, **package/** & **hook/extension/node_modules/** folders
 
 4/ Code Editor and Indentation plugin used
 ==========
