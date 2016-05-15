@@ -2,8 +2,8 @@
  * * * * * * * * *
  * TASKS GRAPH
  * * * * * * * * *
- * clean        => cleanRelease => cleanDistAll => cleanExtNodeModules
- * cleanAll     => cleanRelease => cleanDistAll => cleanExtNodeModules => cleanRootNodeModules
+ * clean        => cleanPackage => cleanDistAll => cleanExtNodeModules
+ * cleanAll     => cleanPackage => cleanDistAll => cleanExtNodeModules => cleanRootNodeModules
  * build        => cleanDistSrcOnly => installExtNpmDependencies
  * makeArchive  => build
  * package      => clean => makeArchive
@@ -25,6 +25,7 @@ var plugins = require('gulp-load-plugins')();
 var util = require('gulp-util');
 var exec = require('child_process').exec;
 var options = require('gulp-options');
+var ftp = require('vinyl-ftp');
 
 /**
  * Global folder variable
@@ -34,6 +35,7 @@ var HOOK_FOLDER = ROOT_FOLDER + '/hook/';
 var EXT_FOLDER = HOOK_FOLDER + '/extension/';
 var DIST_FOLDER = ROOT_FOLDER + '/dist/';
 var PACKAGE_FOLDER = ROOT_FOLDER + '/package/';
+var PACKAGE_NAME = null; // No value at the moment, dynamically set by "package" task
 
 /**
  * Global folder variable
@@ -90,7 +92,7 @@ if (DEBUG_MODE) {
 /**
  * Gulp Tasks
  */
-gulp.task('build', ['cleanDistSrcOnly', 'installExtNpmDependencies'], function() {
+gulp.task('build', ['installExtNpmDependencies'], function() {
 
     util.log('Start extension core and options files copy');
 
@@ -167,27 +169,19 @@ gulp.task('installExtNpmDependencies', function(initDone) {
  */
 gulp.task('makeArchive', ['build'], function() {
 
-    util.log('Now creating package archive');
+    PACKAGE_NAME = 'stravistix_v' + JSON.parse(fs.readFileSync(DIST_FOLDER + '/manifest.json')).version + '_' + (new Date().toISOString().replace(/T/, '_').replace(/\..+/, '').replace(/:/g, '.')) + '.zip';
 
-    var generateReleaseName = function(manifestFile) {
-        var manifestData = JSON.parse(fs.readFileSync(manifestFile).toString());
-        var d = new Date();
-        return 'StravistiX_v' + manifestData.version + '_' + d.toDateString().split(' ').join('_') + '_' + d.toLocaleTimeString().split(':').join('_') + '.zip';
-    };
-
-    var buildName = generateReleaseName(DIST_FOLDER + '/manifest.json');
+    util.log('Now creating package archive: ' + PACKAGE_NAME);
 
     return gulp.src(DIST_FOLDER + '/**')
-        .pipe(plugins.zip(buildName))
+        .pipe(plugins.zip(PACKAGE_NAME))
         .pipe(gulp.dest(PACKAGE_FOLDER));
 
 });
 
-
 /**
  * Cleaning task
  */
-
 gulp.task('cleanDistSrcOnly', function() {
 
     util.log('Cleaning dist/ folder, except dist/node_modules folder');
@@ -209,7 +203,7 @@ gulp.task('cleanDistAll', function() {
         }));
 });
 
-gulp.task('cleanRelease', function() {
+gulp.task('cleanPackage', function() {
 
     util.log('Cleaning package/ folder');
     return gulp.src(PACKAGE_FOLDER)
@@ -248,10 +242,69 @@ gulp.task('default', ['build']);
 gulp.task('package', ['clean', 'makeArchive']);
 
 gulp.task('watch', function() {
-    gulp.watch('hook/extension/**/*', ['build']);
+    gulp.watch('hook/extension/**/*', ['cleanDistSrcOnly', 'build']);
 });
 
 // Clean dist/, package/, hook/extension/node_modules/
-gulp.task('clean', ['cleanRelease', 'cleanDistAll', 'cleanExtNodeModules']);
-
+gulp.task('clean', ['cleanPackage', 'cleanDistAll', 'cleanExtNodeModules']);
 gulp.task('cleanAll', ['clean', 'cleanRootNodeModules']);
+
+// FTP publish
+gulp.task('ftpPublish', ['package'], function() {
+
+    if (PACKAGE_NAME) {
+
+        util.log('FTP Publish of ' + PACKAGE_NAME);
+
+        var ftpConfig = {
+            host: 'yours',
+            user: 'yours',
+            pass: 'yours',
+            remotePath: '/'
+        };
+
+        if (!options.has('env') && !options.has('json')) {
+
+            throw new Error('Make sure to specify option "--json" or "--env"');
+
+        } else if (options.has('json')) {
+
+            if (fs.existsSync('./ftpConfig.json')) {
+                util.log('Using ftp config from ./ftpConfig.json file');
+                ftpConfig = JSON.parse(fs.readFileSync('./ftpConfig.json'));
+            } else {
+                throw new Error('Make sure to create ./ftpConfig.json with following config: ' + JSON.stringify(ftpConfig));
+            }
+
+        } else if (options.has('env')) {
+
+            if (process.env.FTP_HOST && process.env.FTP_USER && process.env.FTP_PASSWORD) {
+                ftpConfig.host = process.env.FTP_HOST;
+                ftpConfig.user = process.env.FTP_USER;
+                ftpConfig.pass = process.env.FTP_PASSWORD;
+                ftpConfig.remotePath = process.env.FTP_REMOTE_PATH;
+            } else {
+                throw new Error('Missing FTP_HOST, FTP_USER or FTP_PASSWORD environnement variables. FTP_REMOTE_PATH can be also specified');
+            }
+        }
+
+        util.log('FTP Upload in progress...');
+
+        var globs = [PACKAGE_FOLDER + '/' + PACKAGE_NAME];
+
+        var conn = ftp.create({
+            host: ftpConfig.host,
+            user: ftpConfig.user,
+            password: ftpConfig.pass,
+            log: util.log
+        });
+
+        return gulp.src(globs, {
+                base: './package/',
+                buffer: false
+            }).pipe(conn.dest(ftpConfig.remotePath));
+
+    } else {
+        throw new Error('No package name found. Unable to publish');
+    }
+});
