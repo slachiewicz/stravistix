@@ -2,5 +2,6 @@
 */.gitignore
 **/node_modules/
 dist/
-builds/
+package/
 chrome-win32/
+ftpConfig.json

@@ -3,13 +3,25 @@
  */
 app.controller('MainController', function($scope, $location, $mdSidenav, $mdToast) {
 
+    // function buildToggler(navID) {
+    //     return function() {
+    //         $mdSidenav(navID)
+    //             .toggle()
+    //             .then(function() {
+    //                 $log.debug("toggle " + navID + " is done");
+    //             });
+    //     };
+    // }
+    //
+    // $scope.toggleRight = buildToggler('right');
+
     $scope.toggleSidenav = function(menu) {
         $mdSidenav(menu).toggle();
     };
 
-    $scope.forward = function(action) {
-        $scope.data.title = action.name;
-        $location.path(action.link);
+    $scope.forward = function(route) {
+        console.log('fwd to ' + route);
+        $location.path(route);
     };
 
     $scope.toast = function(message) {
@@ -29,12 +41,144 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
         else list.push(item);
     };
 
+    /*
+        Fitness Trend
+        Activities Grid
+        Targets
+        Year progression
+        Athlete Settings
+
+        Zones Settings
+            Heartrate
+            Speed
+            Power
+            Cadence
+            ...
+            ...
+
+
+
+
+    */
+
+
+
     $scope.data = {
-        title: 'Dashboard',
+        title: 'Stravistix',
         user: {
-            name: 'Angular Ninja',
-            email: 'angular@ninja.com',
-            icon: 'face'
+            // name: 'StravistiX',
+            // email: 'angular@ninja.com',
+            // icon: 'face'
+        },
+
+        sidenav: {
+            sections: [{
+                    name: 'Fitness Trend',
+                    icon: 'fitness_center',
+                    link: routeMap.fitnessTrendRoute
+                }, {
+                    name: 'Activities Grid',
+                    icon: 'grid_on',
+                    link: 'link',
+                }, {
+                    name: 'Targets',
+                    icon: 'adjust',
+                    link: 'link'
+                }, {
+                    name: 'Year progression',
+                    icon: 'show_chart',
+                    link: 'link'
+                }, {
+                    name: 'Athlete Settings',
+                    icon: 'accessibility',
+                    link: 'link'
+                }, {
+                    name: 'Zone Settings',
+                    icon: 'format_line_spacing',
+                    expand: true,
+                    link: 'link',
+                    actions: [{
+                        name: 'Heart rate',
+                        icon: 'favorite',
+                        link: routeMap.healthSettingsRoute
+                    }, {
+                        name: 'Cycling Speed',
+                        icon: 'directions_bike',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Runing Pace',
+                        icon: 'directions_walk',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Cycling Power',
+                        icon: 'flash_on',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Cycling Cadence',
+                        icon: 'autorenew',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Running Cadence',
+                        icon: 'transfer_within_a_station',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Grade',
+                        icon: 'trending_up',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Elevation',
+                        icon: 'terrain',
+                        link: 'Action 2'
+                    }, {
+                        name: 'Ascent speed',
+                        icon: 'call_made',
+                        link: 'Action 2'
+                    }]
+                }
+
+
+                /*{
+                               name: 'Zones settings md-icon:poll ou equalizer',
+                               expand: false,
+                               actions: [{
+                                   name: 'HR Reserve',
+                                   icon: 'favorite',
+                                   link: routeMap.healthSettingsRoute
+                               }, {
+                                   name: 'Cycling Speed',
+                                   icon: 'directions_bike',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Runing Pace',
+                                   icon: 'directions_walk',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Cycling Power',
+                                   icon: 'flash_on',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Cycling Cadence',
+                                   icon: 'autorenew',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Running Cadence',
+                                   icon: 'transfer_within_a_station',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Grade',
+                                   icon: 'trending_up',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Elevation',
+                                   icon: 'terrain',
+                                   link: 'Action 2'
+                               }, {
+                                   name: 'Ascent speed',
+                                   icon: 'call_made',
+                                   link: 'Action 2'
+                               }]
+                           }*/
+            ]
         },
         toolbar: {
             buttons: [{
@@ -61,70 +205,6 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
                     message: 'Action 3',
                     completed: true,
                     error: true
-                }]
-            }]
-        },
-        sidenav: {
-            sections: [{
-                name: 'Insights',
-                expand: false,
-                actions: [{
-                    name: 'Fitness Trend',
-                    icon: 'fitness_center',
-                    link: routeMap.fitnessTrendRoute
-                }, {
-                    name: 'Activity Grid',
-                    icon: 'grid_on',
-                    link: 'Action 3'
-                }]
-            }, {
-                name: 'Health settings',
-                expand: false,
-                icon: 'accessibility',
-                actions: [{
-                    name: 'Health',
-                    icon: 'accessibility',
-                    link: 'Action 3'
-                }]
-            }, {
-                name: 'Zones settings md-icon:poll ou equalizer',
-                expand: false,
-                actions: [{
-                    name: 'HR Reserve',
-                    icon: 'favorite',
-                    link: routeMap.healthSettingsRoute
-                }, {
-                    name: 'Cycling Speed',
-                    icon: 'directions_bike',
-                    link: 'Action 2'
-                }, {
-                    name: 'Runing Pace',
-                    icon: 'directions_walk',
-                    link: 'Action 2'
-                }, {
-                    name: 'Cycling Power',
-                    icon: 'flash_on',
-                    link: 'Action 2'
-                },{
-                    name: 'Cycling Cadence',
-                    icon: 'autorenew',
-                    link: 'Action 2'
-                }, {
-                    name: 'Running Cadence',
-                    icon: 'transfer_within_a_station',
-                    link: 'Action 2'
-                }, {
-                    name: 'Grade',
-                    icon: 'trending_up',
-                    link: 'Action 2'
-                }, {
-                    name: 'Elevation',
-                    icon: 'terrain',
-                    link: 'Action 2'
-                }, {
-                    name: 'Ascent speed',
-                    icon: 'call_made',
-                    link: 'Action 2'
                 }]
             }]
         },
@@ -158,57 +238,4 @@ app.controller('MainController', function($scope, $location, $mdSidenav, $mdToas
             }]
         }
     };
-    /*
-        // Bootstrap active class name for active menu
-        $scope.headerActiveClassName = 'active';
-
-        // Clear healthSettings fields on call
-        $scope.resetFields = function() {
-            $scope.CommonSettingsActive = null;
-            $scope.healthSettingsActive = null;
-            $scope.zonesSettingsActive = null;
-            $scope.releaseNotesActive = null;
-            $scope.aboutActive = null;
-            $scope.donateActive = null;
-            $scope.shareActive = null;
-        };
-
-        // Watch for location changes
-        $scope.location = $location;
-        $scope.$watch('location.path()', function(path) {
-
-            // Reset header li element classes on watch path change
-            $scope.resetFields();
-
-            // Apply proper
-            if (path === routeMap.commonSettingsRoute) {
-
-                $scope.CommonSettingsActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.healthSettingsRoute) {
-
-                $scope.healthSettingsActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.zonesSettingsRoute) {
-
-                $scope.zonesSettingsActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.releaseNotesRoute) {
-
-                $scope.releaseNotesActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.aboutRoute) {
-
-                $scope.aboutActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.donateRoute) {
-
-                $scope.donateActive = $scope.headerActiveClassName;
-
-            } else if (path === routeMap.shareRoute) {
-
-                $scope.shareActive = $scope.headerActiveClassName;
-            }
-        });*/
-
 });

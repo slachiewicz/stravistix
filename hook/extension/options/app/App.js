@@ -5,7 +5,7 @@ var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize', 'nvd3', 
 
 app.constant('$colors', {
     strava: '#e94e1b'
-});
+}); 
 
 app.config(function($mdThemingProvider, $colors) {
     var stravaOrange = $mdThemingProvider.extendPalette('orange', {
