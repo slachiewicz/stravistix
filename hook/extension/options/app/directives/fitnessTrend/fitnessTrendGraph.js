@@ -102,11 +102,6 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
                 chart: {
                     type: 'lineWithFocusChart',
                     height: '650',
-                    // height2: 500,
-                    // clipEdge: true,
-                    // rescaleY: true,
-                    // clipVoronoi: false,
-                    // "duration": 500,
                     margin: {
                         top: 20,
                         right: 50,
@@ -276,10 +271,6 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
                         console.log("callback");
                     },
                 }
-                // title: {
-                //     enable: true,
-                //     text: 'Chronic Training Load (Fitness), Acute Training Load (Fatigue) & Training Stress Balance (Form)'
-                // }
             };
 
         };
@@ -365,6 +356,5 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
         templateUrl: 'directives/fitnessTrend/templates/fitnessTrendGraph.html',
         scope: {},
         controller: controllerFunction
-            // link: linkFunction
     };
 }]);
