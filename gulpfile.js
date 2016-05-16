@@ -284,7 +284,7 @@ gulp.task('ftpPublish', ['package'], function() {
                 ftpConfig.pass = process.env.FTP_PASSWORD;
                 ftpConfig.remotePath = process.env.FTP_REMOTE_PATH;
             } else {
-                throw new Error('Missing FTP_HOST, FTP_USER or FTP_PASSWORD environnement variables. FTP_REMOTE_PATH can be also specified');
+                throw new Error('Missing FTP_HOST, FTP_USER or FTP_PASSWORD environnment variables. FTP_REMOTE_PATH can be also specified.');
             }
         }
 
