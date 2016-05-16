@@ -109,7 +109,6 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
                         left: 50
                     },
                     yDomain: $scope.fitnessChartData.yDomain,
-                    // y2Domain: $scope.fitnessChartData.yDomain,
                     x: function(d) {
                         return d.x;
                     },
