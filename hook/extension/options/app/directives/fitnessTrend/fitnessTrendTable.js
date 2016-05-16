@@ -34,8 +34,13 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
 
                     newFitnessObj.activitiesName = finalActivityName;
                     newFitnessObj.type = finalTypeName;
-                    fitnessDataForTable.push(newFitnessObj);
+                } else {
+                    newFitnessObj.activitiesName = '-';
+                    newFitnessObj.type = '-';
+                    newFitnessObj.trimp = '-';
                 }
+
+                fitnessDataForTable.push(newFitnessObj);
             });
 
             $scope.const.fitnessDataForTable = fitnessDataForTable;
