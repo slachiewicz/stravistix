@@ -29,10 +29,10 @@
 <body class="md-body-1">
     <div ng-app="App" ng-controller="MainController" layout="row" layout-fill ng-cloak>
 
-        <md-sidenav class="md-sidenav-left md-whiteframe-20dp" md-component-id="left">
+        <md-sidenav class="md-sidenav-left md-whiteframe-5dp" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
             <md-content layout-padding>
-                <div layout="column" layout-align="center center">
-                    <img src="img/logo_stravistix_no_circle.svg" width="90%" />
+                <div layout="column" layout-align="center start">
+                    <img src="img/logo_stravistix_no_circle.svg" width="40%" />
                 </div>
                 <md-divider></md-divider>
                 <div>
@@ -85,7 +85,7 @@
         <section layout="column" role="main" flex>
             <md-toolbar role="toolbar">
                 <div class="md-toolbar-tools">
-                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" aria-label="Menu">
+                    <md-button class="md-icon-button" hide-gt-md ng-click="toggleSidenav('left')" aria-label="Menu">
                         <md-icon>menu</md-icon>
                     </md-button>
                     <span class="md-title ng-binding">{{data.title}}</span>
