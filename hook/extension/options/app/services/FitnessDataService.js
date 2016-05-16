@@ -171,6 +171,7 @@ app.factory('FitnessDataService', ['$q', 'ChromeStorageService', function($q, ch
                 timestamp: trimpObject.timestamp,
                 activitiesName: trimpObject.activitiesName,
                 type: trimpObject.type,
+                trimp: trimpObject.trimp,
                 ctl: parseFloat(ctl.toFixed(3)),
                 atl: parseFloat(atl.toFixed(3)),
                 tsb: parseFloat(tsb.toFixed(3)),

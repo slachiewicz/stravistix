@@ -33,13 +33,14 @@
             <table md-table md-row-select="options.rowSelection" multiple="{{options.multiSelect}}">
                 <thead ng-if="!options.decapitate" md-head md-order="query.order" md-on-reorder="logOrder">
                     <tr md-row>
-                        <th md-column md-order-by="timestamp" show-gt-md><span>Date</span></th>
-                        <th md-column md-order-by="activitiesName" show-gt-md><span>Activity</span></th>
-                        <th md-column md-order-by="type" show-gt-md><span>Type</span></th>
-                        <th md-column md-numeric md-order-by="ctl" show-gt-md><span>Chronic Training Load</span></th>
-                        <th md-column md-numeric md-order-by="atl" show-gt-md><span>Acute Training Load</span></th>
-                        <th md-column md-numeric md-order-by="tsb" show-gt-md><span>Training Stress Balance</span></th>
-                        <th md-column md-numeric show-gt-md><span>Link</span></th>
+                        <th md-column md-order-by="timestamp"><span>Date</span></th>
+                        <th md-column md-order-by="activitiesName"><span>Activity</span></th>
+                        <th md-column md-order-by="type"><span>Type</span></th>
+                        <th md-column md-numeric md-order-by="trimp"><span>Training Impulse</span></th>
+                        <th md-column md-numeric md-order-by="ctl"><span>Chronic Training Load</span></th>
+                        <th md-column md-numeric md-order-by="atl"><span>Acute Training Load</span></th>
+                        <th md-column md-numeric md-order-by="tsb"><span>Training Stress Balance</span></th>
+                        <th md-column md-numeric><span>Link</span></th>
                     </tr>
                 </thead>
                 <tbody md-body>
@@ -48,6 +49,7 @@
                         <td md-cell>{{fitnessObj.timestamp | date:'mediumDate'}}</td>
                         <td md-cell ng-bind-html="fitnessObj.activitiesName"></td>
                         <td md-cell ng-bind-html="fitnessObj.type"></td>
+                        <td md-cell>{{fitnessObj.trimp}}</td>
                         <td md-cell>{{fitnessObj.ctl}}</td>
                         <td md-cell>{{fitnessObj.atl}}</td>
                         <td md-cell>
