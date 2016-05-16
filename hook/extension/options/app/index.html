@@ -3,8 +3,11 @@
 
 <head>
     <title>StravistiX settings</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="../../node_modules/angular-material/angular-material.css">
     <link rel="stylesheet" href="../../node_modules/angular-material-icons/angular-material-icons.css">
+    <link href="../../node_modules/angular-material-data-table/dist/md-data-table.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="../../node_modules/nvd3/build/nv.d3.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="../../node_modules/angular/angular.js"></script>
     <script src="../../node_modules/angular-route/angular-route.js"></script>
@@ -14,16 +17,22 @@
     <script src="../../node_modules/angular-messages/angular-messages.js"></script>
     <script src="../../node_modules/angular-material/angular-material.js"></script>
     <script src="../../node_modules/angular-material-icons/angular-material-icons.js"></script>
+    <script src="../../node_modules/angular-material-data-table/dist/md-data-table.min.js"></script>
+    <script src="../../node_modules/d3/d3.js"></script>
+    <script src="../../node_modules/nvd3/build/nv.d3.min.js"></script>
+    <script src="../../node_modules/angular-nvd3/dist/angular-nvd3.min.js"></script>
+    <script src="../../node_modules/moment/moment.js"></script>
+    <script src="../../node_modules/angular-moment/angular-moment.js"></script>
     <script src="../../node_modules/underscore/underscore-min.js"></script>
 </head>
 
 <body class="md-body-1">
     <div ng-app="App" ng-controller="MainController" layout="row" layout-fill ng-cloak>
 
-        <md-sidenav class="md-sidenav-left md-whiteframe-20dp" md-component-id="left">
+        <md-sidenav class="md-sidenav-left md-whiteframe-5dp" md-component-id="left" md-is-locked-open="$mdMedia('gt-md')">
             <md-content layout-padding>
-                <div layout="column" layout-align="center center">
-                    <img src="img/logo_stravistix_no_circle.svg" width="90%" />
+                <div layout="column" layout-align="center start">
+                    <img src="img/logo_stravistix_no_circle.svg" width="40%" />
                 </div>
                 <md-divider></md-divider>
                 <div>
@@ -76,7 +85,7 @@
         <section layout="column" role="main" flex>
             <md-toolbar role="toolbar">
                 <div class="md-toolbar-tools">
-                    <md-button class="md-icon-button" ng-click="toggleSidenav('left')" aria-label="Menu">
+                    <md-button class="md-icon-button" hide-gt-md ng-click="toggleSidenav('left')" aria-label="Menu">
                         <md-icon>menu</md-icon>
                     </md-button>
                     <span class="md-title ng-binding">{{data.title}}</span>
@@ -120,6 +129,11 @@
     <script src="controllers/MainController.js"></script>
     <script src="controllers/CommonSettingsController.js"></script>
     <script src="controllers/HealthSettingsController.js"></script>
+
+    <script src="controllers/FitnessTrendController.js"></script>
+    <script src="controllers/XtdZonesSettingsController.js"></script>
+    <script src="controllers/DonateController.js"></script>
+
     <!--<script src="controllers/XtdZonesSettingsController.js"></script>
     <script src="controllers/DonateController.js"></script> -->
 
@@ -129,6 +143,7 @@
     <script src="services/AvoidInputKeysService.js"></script>
     <script src="services/CommonSettingsService.js"></script>
     <script src="services/ChromeStorageService.js"></script>
+    <script src="services/FitnessDataService.js"></script>
 
     <!-- Angular directives -->
     <!-- <script src="directives/uiCheckbox.js"></script>-->
@@ -136,6 +151,8 @@
     <script src="directives/hrZones/HrZone.js"></script>
     <script src="directives/xtdZones/xtdZones.js"></script>
     <script src="directives/xtdZones/xtdZone.js"></script>
+    <script src="directives/fitnessTrend/fitnessTrendGraph.js"></script>
+    <script src="directives/fitnessTrend/fitnessTrendTable.js"></script>
 
     <!-- Angular filters -->
     <script src="filters/HrrToBpmFilter.js"></script>

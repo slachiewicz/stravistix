@@ -1,0 +1,59 @@
+<md-content class="md-padding" ng-cloak>
+    <md-card ng-show="fitnessData.length">
+        <!-- Title -->
+        <md-card-title>
+            <span class="md-headline">Heartrate Fitness Graph</span>
+            <div flex></div>
+            <md-button class="md-icon-button" ng-click="filter.show=true" aria-label="filter_list">
+                <md-icon>help</md-icon>
+            </md-button>
+        </md-card-title>
+        <md-card-content ng-cloak>
+            <div layout="row" layout-align="end start">
+                <div flex>
+                    <nvd3 options="fitnessChartOptions" config="{deepWatchDataDepth: 0}" data="fitnessChartData.curves" class="with-3d-shadow with-transitions"></nvd3>
+                </div>
+                <div class="md-padding">
+                    <div flex-gt-sm class="md-block">
+                        <label class="md-body-2">Filter options</label>
+
+                        <md-select ng-model="periodSelected" ng-change="lastMonthsPeriodChanged()" aria-label="Period to watch">
+                            <md-option ng-repeat="period in periodsToWatch" ng-value="period">{{ period.label }}</md-option>
+                        </md-select>
+
+                        <!-- <md-divider/> -->
+                        <!-- </div>
+
+                    <div flex-gt-sm class="md-block"> -->
+                        <!-- <label class="md-body-2">Or</label> -->
+                        <div layout="row" layout-align="end center">
+                            <label class="md-body-1">From</label>
+                            <md-datepicker ng-model="fromDate" md-placeholder="Enter date" md-min-date="minDate" md-max-date="toDate" ng-change="fromDateChanged()"></md-datepicker>
+                        </div>
+
+                        <div layout="row" layout-align="end center">
+                            <span class="md-body-1">To</span>
+                            <div>
+                                <md-datepicker ng-model="toDate" md-placeholder="Enter date" md-min-date="fromDate" md-max-date="maxDate" ng-change="toDateChanged()"></md-datepicker>
+                            </div>
+                        </div>
+
+                        <!-- <label class="md-body-2">Period selection</label> -->
+                        <md-select ng-model="selectedToppings" aria-label="Activity Types" placeholder="Filter by types" multiple>
+                            <md-optgroup label="Activity Types">
+                                <md-option ng-value="type" ng-repeat="type in activityTypes">{{type}}</md-option>
+                            </md-optgroup>
+                        </md-select>
+
+                    </div>
+                    <!-- <div>
+                        <div>You will loose {{restLooseGainData.lostCtl.percentageTrigger}}% of your CTL/Fitness in <strong>~{{restLooseGainData.lostCtl.dayCount}} days (on {{restLooseGainData.lostCtl.date.toLocaleDateString()}})</strong></div>
+                        <div>You will loose {{restLooseGainData.lostAtl.percentageTrigger}}% of your ATL/Fatigue in <strong>~{{restLooseGainData.lostAtl.dayCount}} days (on {{restLooseGainData.lostAtl.date.toLocaleDateString()}})</strong></div>
+                        <div>You will get in form (positive TSB) in <strong>~{{restLooseGainData.gainForm.dayCount}} days (on {{restLooseGainData.gainForm.date.toLocaleDateString()}})</strong></div>
+                        <div>When in form, you will lost this form (negative TSB) after<strong>~{{restLooseGainData.lostForm.dayCount}} days (on {{restLooseGainData.lostForm.date.toLocaleDateString()}})</strong></div>
+                    </div> -->
+                </div>
+            </div>
+        </md-card-content>
+    </md-card>
+</md-content>

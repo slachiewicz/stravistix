@@ -183,6 +183,7 @@ var appResources = {
 
 var jsDependencies = [
     'config/env.js',
+    'node_modules/q/q.js',
     'node_modules/chart.js/Chart.min.js',
     'node_modules/fiber/src/fiber.min.js',
     'node_modules/fancybox/dist/js/jquery.fancybox.pack.js',
@@ -192,8 +193,10 @@ var jsDependencies = [
     'modules/qrcode.min.js',
     'modules/vv.mapFlipper.js',
     'modules/jquery.appear.js',
+    'js/synchronizer/ActivitiesSynchronizer.js',
     'js/processors/VacuumProcessor.js',
     'js/processors/ActivityProcessor.js',
+    'js/processors/ActivitiesProcessor.js',
     'js/processors/BikeOdoProcessor.js',
     'js/processors/SegmentProcessor.js',
     'js/Helper.js',

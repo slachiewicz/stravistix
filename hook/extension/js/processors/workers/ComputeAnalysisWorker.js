@@ -45,6 +45,10 @@ function ComputeAnalysisWorker() {
 
                 compute: function() {
 
+                    if (!this.params.activityStream) {
+                        return null;
+                    }
+
                     // Append altitude_smooth to fetched strava activity stream before compute analysis data
                     this.params.activityStream.altitude_smooth = this.smoothAltitudeStream(this.params.activityStream, this.params.activityStatsMap);
 
@@ -339,7 +343,7 @@ function ComputeAnalysisWorker() {
 
                     // Finalize compute of Speed
                     var genuineAvgSpeed = genuineAvgSpeedSum / genuineAvgSpeedSumCount;
-                    var varianceSpeed = (speedVarianceSum / speedsNonZero.length) - Math.pow(activityStatsMap.averageSpeed, 2);
+                    var varianceSpeed = (speedVarianceSum / speedsNonZero.length) - Math.pow(genuineAvgSpeed, 2);
                     var standardDeviationSpeed = (varianceSpeed > 0) ? Math.sqrt(varianceSpeed) : 0;
                     var percentiles = Helper.weightedPercentiles(speedsNonZero, speedsNonZeroDuration, [0.25, 0.5, 0.75]);
 
@@ -510,8 +514,8 @@ function ComputeAnalysisWorker() {
                     // Update zone distribution percentage
                     this.userSettings.userHrrZones = this.finalizeDistribComputationZones(this.userSettings.userHrrZones);
 
-                    activityStatsMap.averageHeartRate = hrSum / hrrSecondsCount;
-                    activityStatsMap.maxHeartRate = heartRateArraySorted[heartRateArraySorted.length - 1];
+                    var averageHeartRate = hrSum / hrrSecondsCount;
+                    var maxHeartRate = heartRateArraySorted[heartRateArraySorted.length - 1];
 
                     var TRIMPPerHour = TRIMP / hrrSecondsCount * 60 * 60;
                     var percentiles = Helper.weightedPercentiles(heartRateArrayMoving, heartRateArrayMovingDuration, [0.25, 0.5, 0.75]);
@@ -523,10 +527,10 @@ function ComputeAnalysisWorker() {
                         'lowerQuartileHeartRate': percentiles[0],
                         'medianHeartRate': percentiles[1],
                         'upperQuartileHeartRate': percentiles[2],
-                        'averageHeartRate': activityStatsMap.averageHeartRate,
-                        'maxHeartRate': activityStatsMap.maxHeartRate,
-                        'activityHeartRateReserve': Helper.heartRateReserveFromHeartrate(activityStatsMap.averageHeartRate, userMaxHr, userRestHr) * 100,
-                        'activityHeartRateReserveMax': Helper.heartRateReserveFromHeartrate(activityStatsMap.maxHeartRate, userMaxHr, userRestHr) * 100
+                        'averageHeartRate': averageHeartRate,
+                        'maxHeartRate': maxHeartRate,
+                        'activityHeartRateReserve': Helper.heartRateReserveFromHeartrate(averageHeartRate, userMaxHr, userRestHr) * 100,
+                        'activityHeartRateReserveMax': Helper.heartRateReserveFromHeartrate(maxHeartRate, userMaxHr, userRestHr) * 100
                     };
 
                 },
@@ -555,7 +559,7 @@ function ComputeAnalysisWorker() {
                     var movingSampleCount = 0;
 
                     var cadenceZoneTyped;
-                    if (this.activityType === 'Ride') {
+                    if (this.activityType === 'Ride' || this.activityType === 'VirtualRide') {
                         cadenceZoneTyped = this.userSettings.zones.cyclingCadence;
                     } else if (this.activityType === 'Run') {
                         cadenceZoneTyped = this.userSettings.zones.runningCadence;
@@ -891,7 +895,7 @@ function ComputeAnalysisWorker() {
                  */
                 smoothAltitude: function(activityStream, stravaElevation) {
 
-                    if (!activityStream.altitude) {
+                    if (!activityStream.altitude || !activityStream.distance) {
                         return null;
                     }
 
@@ -934,9 +938,9 @@ function ComputeAnalysisWorker() {
                     // http://phrogz.net/js/framerate-independent-low-pass-filter.html
                     // value += (currentValue - value) / (smoothing / timeSinceLastSample);
                     // it is adapted for stability - if (smoothing / timeSinceLastSample) is less then 1, set it to 1 -> no smoothing for that sample
+                    var result = [];
                     if (data && distance) {
                         var smooth_factor = 0;
-                        var result = [];
                         result[0] = data[0];
                         for (i = 1, max = data.length; i < max; i++) {
                             if (smoothing === 0) {
@@ -966,6 +970,7 @@ function ComputeAnalysisWorker() {
 
         // Result to main thread
         postMessage(result);
+        self.close();
     };
 
     this.importRequiredLibraries = function(libsFromExtensionPath, chromeExtensionId) {

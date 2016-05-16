@@ -58,7 +58,10 @@ Helper.weightedPercentiles = function(values, weights, percentiles) {
     var list = [];
     var tot = 0;
     for (var i = 0; i < values.length; i++) {
-        list.push({ value : values[i], weight : weights[i]});
+        list.push({
+            value: values[i],
+            weight: weights[i]
+        });
         tot += weights[i];
     }
     list.sort(function(a, b) {
@@ -86,7 +89,7 @@ Helper.weightedPercentiles = function(values, weights, percentiles) {
 // Use abstract equality == for "is number" test
 Helper.isEven = function(n) {
     return n == parseFloat(n) ? !(n % 2) : void 0;
-}
+};
 
 
 Helper.heartrateFromHeartRateReserve = function(hrr, maxHr, restHr) {
@@ -100,6 +103,8 @@ Helper.heartRateReserveFromHeartrate = function(hr, maxHr, restHr) {
 
 Helper.setToStorage = function(extensionId, storageType, key, value, callback) {
 
+    var deferred = Q.defer();
+
     // Sending message to background page
     chrome.runtime.sendMessage(extensionId, {
             method: StravistiX.setToStorageMethod,
@@ -110,12 +115,18 @@ Helper.setToStorage = function(extensionId, storageType, key, value, callback) {
             }
         },
         function(response) {
-            callback(response);
+            if (callback) callback(response);
+            deferred.resolve(response);
         }
     );
+
+    return deferred.promise;
 };
 
 Helper.getFromStorage = function(extensionId, storageType, key, callback) {
+
+    var deferred = Q.defer();
+
     // Sending message to background page
     chrome.runtime.sendMessage(extensionId, {
             method: StravistiX.getFromStorageMethod,
@@ -125,9 +136,33 @@ Helper.getFromStorage = function(extensionId, storageType, key, callback) {
             }
         },
         function(response) {
-            callback(response);
+            if (callback) callback(response);
+            deferred.resolve(response);
         }
     );
+
+    return deferred.promise;
+};
+
+Helper.removeFromStorage = function(extensionId, storageType, key, callback) {
+
+    var deferred = Q.defer();
+
+    // Sending message to background page
+    chrome.runtime.sendMessage(extensionId, {
+            method: StravistiX.removeFromStorageMethod,
+            params: {
+                storage: storageType,
+                'key': key
+            }
+        },
+        function(response) {
+            if (callback) callback(response);
+            deferred.resolve(response);
+        }
+    );
+
+    return deferred.promise;
 };
 
 Helper.includeJs = function(scriptUrl) {

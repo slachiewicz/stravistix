@@ -161,10 +161,6 @@ VacuumProcessor.prototype = {
             $('[data-glossary-term*=definition-weighted-average-power]').parent().parent().children().first().text(),
             false, false, false, false);
 
-        // Get Energy Output
-        var energyOutput = this.formatActivityDataValue_(
-            actStatsContainer.find('.inline-stats.section.secondary-stats').children().first().next().children().first().text(),
-            false, false, false, true);
 
         // Get Elapsed Time
         var elapsedTime = this.formatActivityDataValue_(
@@ -204,14 +200,6 @@ VacuumProcessor.prototype = {
             averageSpeed = averageSpeed / speedFactor; // Always give PKH here
         }
 
-        var averageHeartRate = this.formatActivityDataValue_(
-            actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().next().children().first().children().first().next().has('abbr').text(),
-            false, false, false, false);
-
-        var maxHeartRate = this.formatActivityDataValue_(
-            actStatsContainer.find('.section.more-stats').find('.unstyled').children().first().next().next().children().first().children().first().next().next().text(),
-            false, false, false, false);
-
         // Create activityData Map
         return {
             'distance': distance,
@@ -219,11 +207,8 @@ VacuumProcessor.prototype = {
             'elevation': elevation,
             'avgPower': avgPower,
             'weightedPower': weightedPower,
-            'energyOutput': energyOutput,
             'elapsedTime': elapsedTime,
-            'averageSpeed': averageSpeed,
-            'averageHeartRate': averageHeartRate,
-            'maxHeartRate': maxHeartRate
+            'averageSpeed': averageSpeed
         };
     },
 
@@ -232,7 +217,7 @@ VacuumProcessor.prototype = {
      */
     formatActivityDataValue_: function formatActivityDataValue_(dataIn, parsingTime, parsingElevation, parsingDistance, parsingEnergy) {
 
-        if (dataIn == "") {
+        if (dataIn === "") {
             return null;
         }
         // Common clean
@@ -430,4 +415,5 @@ VacuumProcessor.prototype = {
         var activityName = $(".activity-summary-container").find('.marginless.activity-name').text().trim();
         return (activityName) ? activityName : null;
     },
+
 };

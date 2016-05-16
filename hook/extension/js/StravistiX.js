@@ -24,6 +24,7 @@ function StravistiX(userSettings, appResources) {
  */
 StravistiX.getFromStorageMethod = 'getFromStorage';
 StravistiX.setToStorageMethod = 'setToStorage';
+StravistiX.removeFromStorageMethod = 'removeFromStorage';
 StravistiX.defaultIntervalTimeMillis = 750;
 
 /**
@@ -91,6 +92,23 @@ StravistiX.prototype = {
         // Must be done at the end
         this.handleTrackTodayIncommingConnection_();
         this.handleGoogleMapsComeBackModifier();
+
+        var activitiesSynchronizer = new ActivitiesSynchronizer(this.appResources_, this.userSettings_);
+        activitiesSynchronizer.sync().then(function syncSuccess(syncData) {
+        // activitiesSynchronizer.forceSync().then(function syncSuccess(syncData) {
+
+            console.log('Sync finished, saved data: ', syncData);
+
+        }, function syncError(err) {
+
+            console.error('Sync error', err);
+
+        }, function syncProgress(progress) {
+
+            console.debug(progress);
+
+        });
+
     },
 
     /**

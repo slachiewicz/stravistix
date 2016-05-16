@@ -48,14 +48,37 @@ StorageManager.prototype = {
                 callback(result);
             });
 
-        }
-        //TODO handle getFromStorage local storage in StorageManager
-        else if (this.storageType == 'local') {
+        } else if (this.storageType == 'local') {
 
             chrome.storage.local.get([key], function(value) {
                 value = value[key];
                 value = (typeof value == 'undefined') ? null : value;
                 callback(value);
+            });
+
+        } else {
+            console.error('Storage type not available');
+        }
+
+    },
+
+    removeFromStorage: function removeFromStorage(key, callback) {
+
+        this.hasChromeLastError();
+
+        if (this.storageType == 'sync') {
+            chrome.storage.sync.remove([key], function(userSettingsResponseData) {
+                console.log(userSettingsResponseData);
+                var result = userSettingsResponseData[key];
+                result = (typeof result === 'undefined') ? null : result;
+                callback(result);
+            });
+
+        } else if (this.storageType == 'local') {
+
+            chrome.storage.local.remove([key], function() {
+                console.log('removed local ' + key);
+                callback();
             });
 
         } else {
@@ -98,6 +121,7 @@ StorageManager.prototype = {
         }
         //TODO handle setToStorage local storage in StorageManager
         else if (this.storageType == 'local') {
+
 
             chrome.storage.local.get(null, function(allData) {
                 allData[key] = value;

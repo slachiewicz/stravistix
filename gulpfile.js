@@ -12,8 +12,8 @@
  * COMMANDS
  * * * * * * * * *
  * gulp clean
- * gulp build [--debug, --release]
- * gulp package [--debug, --release]
+ * gulp build [--debug, --release] // Options no handled at the moment
+ * gulp package [--debug, --release] // Options no handled at the moment
  */
 
 /**
@@ -43,6 +43,7 @@ var PACKAGE_NAME = null; // No value at the moment, dynamically set by "package"
 var EXT_SCRIPTS = [
     'hook/extension/config/env.js',
     'hook/extension/modules/*.js',
+    'hook/extension/node_modules/q/q.js',
     'hook/extension/node_modules/chart.js/Chart.min.js',
     'hook/extension/node_modules/fiber/src/fiber.min.js',
     'hook/extension/node_modules/fancybox/dist/js/jquery.fancybox.pack.js',
@@ -64,6 +65,8 @@ var EXT_RESSOURCES = [
 var OPT_FILES = [
     'hook/extension/node_modules/angular-material/angular-material.css',
     'hook/extension/node_modules/angular-material-icons/angular-material-icons.css',
+    'hook/extension/node_modules/angular-material-data-table/dist/md-data-table.min.css',
+    'hook/extension/node_modules/nvd3/build/nv.d3.min.css',
     'hook/extension/node_modules/angular/angular.js',
     'hook/extension/node_modules/angular-route/angular-route.js',
     'hook/extension/node_modules/angular-sanitize/angular-sanitize.js',
@@ -72,23 +75,30 @@ var OPT_FILES = [
     'hook/extension/node_modules/angular-messages/angular-messages.js',
     'hook/extension/node_modules/angular-material/angular-material.js',
     'hook/extension/node_modules/angular-material-icons/angular-material-icons.js',
+    'hook/extension/node_modules/angular-material-data-table/dist/md-data-table.min.js',
+    'hook/extension/node_modules/d3/d3.js',
+    'hook/extension/node_modules/nvd3/build/nv.d3.min.js',
+    'hook/extension/node_modules/angular-nvd3/dist/angular-nvd3.min.js',
+    'hook/extension/node_modules/moment/moment.js',
+    'hook/extension/node_modules/angular-moment/angular-moment.js',
     'hook/extension/node_modules/underscore/underscore-min.js'
 ];
 
 /**
  * Detect DEBUG & REALEASE MODES
  */
-var REALEASE_MODE = (options.has('release')) ? true : false;
+ /*
+var RELEASE_MODE = (options.has('release')) ? true : false;
 
-var DEBUG_MODE = !REALEASE_MODE;
+var DEBUG_MODE = !RELEASE_MODE;
 
-if (REALEASE_MODE) {
+if (RELEASE_MODE) {
     util.log('RELEASE MODE ENABLED.');
 }
 if (DEBUG_MODE) {
     util.log('DEBUG MODE ENABLED.');
 }
-
+*/
 /**
  * Gulp Tasks
  */
@@ -102,8 +112,8 @@ gulp.task('build', ['installExtNpmDependencies'], function() {
     gulp.src(EXT_SCRIPTS, {
             base: 'hook/extension'
         })
-        // .pipe(plugins.if(REALEASE_MODE, plugins.concat('script.js'))) // Concat if release
-        // .pipe(plugins.if(REALEASE_MODE, gulp.dest(DIST_FOLDER + '/js/'), gulp.dest(DIST_FOLDER)));
+        // .pipe(plugins.if(RELEASE_MODE, plugins.concat('script.js'))) // Concat if release
+        // .pipe(plugins.if(RELEASE_MODE, gulp.dest(DIST_FOLDER + '/js/'), gulp.dest(DIST_FOLDER)));
         .pipe(gulp.dest(DIST_FOLDER));
 
     gulp.src(EXT_STYLESHEETS, {
@@ -284,7 +294,7 @@ gulp.task('ftpPublish', ['package'], function() {
                 ftpConfig.pass = process.env.FTP_PASSWORD;
                 ftpConfig.remotePath = process.env.FTP_REMOTE_PATH;
             } else {
-                throw new Error('Missing FTP_HOST, FTP_USER or FTP_PASSWORD environnement variables. FTP_REMOTE_PATH can be also specified');
+                throw new Error('Missing FTP_HOST, FTP_USER or FTP_PASSWORD environnment variables. FTP_REMOTE_PATH can be also specified.');
             }
         }
 
@@ -300,9 +310,9 @@ gulp.task('ftpPublish', ['package'], function() {
         });
 
         return gulp.src(globs, {
-                base: './package/',
-                buffer: false
-            }).pipe(conn.dest(ftpConfig.remotePath));
+            base: './package/',
+            buffer: false
+        }).pipe(conn.dest(ftpConfig.remotePath));
 
     } else {
         throw new Error('No package name found. Unable to publish');

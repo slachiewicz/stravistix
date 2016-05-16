@@ -8,8 +8,8 @@ chrome.runtime.onMessageExternal.addListener(
         switch (request.method) {
             case StravistiX.getFromStorageMethod:
 
-                storageManager.storageType = request.params['storage'];
-                storageManager.getFromStorage(request.params['key'], function(returnedValue) {
+                storageManager.storageType = request.params.storage;
+                storageManager.getFromStorage(request.params.key, function(returnedValue) {
                     sendResponse({
                         data: returnedValue
                     });
@@ -19,8 +19,19 @@ chrome.runtime.onMessageExternal.addListener(
 
             case StravistiX.setToStorageMethod:
 
-                storageManager.storageType = request.params['storage'];
-                storageManager.setToStorage(request.params['key'], request.params['value'], function(returnAllData) {
+                storageManager.storageType = request.params.storage;
+                storageManager.setToStorage(request.params.key, request.params.value, function(returnAllData) {
+                    sendResponse({
+                        data: returnAllData
+                    });
+                });
+
+                break;
+
+            case StravistiX.removeFromStorageMethod:
+
+                storageManager.storageType = request.params.storage;
+                storageManager.removeFromStorage(request.params.key, function(returnAllData) {
                     sendResponse({
                         data: returnAllData
                     });
@@ -30,7 +41,7 @@ chrome.runtime.onMessageExternal.addListener(
 
             default:
                 return false;
-                break;
+                // break;
         }
         return true;
     }
@@ -41,11 +52,13 @@ chrome.runtime.onInstalled.addListener(function(details) {
 
     var thisVersion = chrome.runtime.getManifest().version;
 
+    var storageManager;
+
     if (details.reason == "install") {
 
         // On install too: persist that extension has been updated.
         // This force local storage clear on install
-        var storageManager = new StorageManager();
+        storageManager = new StorageManager();
         storageManager.storageType = StorageManager.storageSyncType;
         storageManager.setToStorage(
             'extensionHasJustUpdated',
@@ -70,7 +83,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
         console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
 
         // Persist that extension has been updated.
-        var storageManager = new StorageManager();
+        storageManager = new StorageManager();
         storageManager.storageType = StorageManager.storageSyncType;
         storageManager.setToStorage(
             'extensionHasJustUpdated',

@@ -1,11 +1,11 @@
 /**
  * Declaring Angular App
  */
-var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize']);
+var app = angular.module("App", ['ngRoute', 'ngMaterial', 'ngSanitize', 'nvd3', 'md.data.table', 'angularMoment']);
 
 app.constant('$colors', {
     strava: '#e94e1b'
-});
+}); 
 
 app.config(function($mdThemingProvider, $colors) {
     var stravaOrange = $mdThemingProvider.extendPalette('orange', {
@@ -31,6 +31,11 @@ app.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when(routeMap.zonesSettingsRoute, {
         templateUrl: 'views/zonesSettings.html',
         controller: 'XtdZonesSettingsController'
+    });
+
+    $routeProvider.when(routeMap.fitnessTrendRoute, {
+        templateUrl: 'views/fitnessTrend.html',
+        controller: 'FitnessTrendController'
     });
 
     $routeProvider.when(routeMap.releaseNotesRoute, {
