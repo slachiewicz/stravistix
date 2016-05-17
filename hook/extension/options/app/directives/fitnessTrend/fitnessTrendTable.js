@@ -110,7 +110,7 @@ app.directive('fitnessTrendTable', ['FitnessDataService', function(fitnessDataSe
             filter = filter.trim();
 
             $scope.fitnessDataForTableFiltered = _.filter($scope.const.fitnessDataForTable, function(item) {
-                return item.activitiesName.match(new RegExp(filter, 'ig'));
+                return (item.activitiesName + item.type).match(new RegExp(filter, 'ig'));
             });
         };
     };
