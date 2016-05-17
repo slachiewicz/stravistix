@@ -207,7 +207,7 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
                             html += '   <div>On <strong>' + (new Date(d.point.x)).toLocaleDateString() + '</strong></div>';
                             html += '   <div style="padding: 5px;"></div>';
                             html += '   <div>' + d.series[0].key + ': ' + d.series[0].value + '</div>';
-                            html += '   <div>Training Impulse' + ': ' + '...' + '</div>';
+                            html += '   <div>Training Impulse' + ': ' + fitnessObject.trimp + '</div>';
                             html += '</div>';
                             return html;
                         }
