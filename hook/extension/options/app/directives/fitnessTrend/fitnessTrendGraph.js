@@ -9,19 +9,16 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
             // Notify parent of data loaded
             $scope.$parent.fitnessTrendGraphDataLoaded();
 
+            // Handle uniques activity types for selection in UI
+            $scope.activityTypes = _.uniq(_.flatten(_.pluck($scope.fitnessData, 'type')));
+
             setTimeout(function() { // Postpone execution at the end
                 $scope.updateFitnessChartGraph(true, false);
             });
 
         });
 
-        $scope.activityTypes = [{
-            name: 'Ride',
-        }, {
-            name: 'Run',
-        }, {
-            name: 'Virtual ride',
-        }];
+
 
         $scope.periodsToWatch = [{
             days: moment.duration(moment().diff(moment().subtract(7, 'days'))).asDays(),
@@ -199,6 +196,20 @@ app.directive('fitnessTrendGraph', ['FitnessDataService', '$colors', function(fi
                             }));
 
                             console.log(d, fitnessObject);
+
+                            /*
+                            <div style="width: 150px; height: 150px;">
+                                <div style="color: {{$colors.strava}}; text-align: center;">
+                                    ACTIVE
+                                </div>
+                                <div class="">
+                                    Variante apres une bonne choucroute
+                                </div>
+                                <div class="background: grey;">
+                                    Fitness/CTL
+                                </div>
+                            </div>
+                            */
 
                             var html = '';
                             html += '<div style="padding: 5px;">';

@@ -16,7 +16,7 @@
                 <div class="md-padding">
                     <div flex-gt-sm class="md-block">
                         <label class="md-body-2">Filter options</label>
-                        
+
                         <md-select ng-model="periodSelected" ng-change="lastMonthsPeriodChanged()" aria-label="Period to watch">
                             <md-option ng-repeat="period in periodsToWatch" ng-value="period">{{ period.label }}</md-option>
                         </md-select>
@@ -41,7 +41,7 @@
                         <!-- <label class="md-body-2">Period selection</label> -->
                         <md-select ng-model="selectedToppings" aria-label="Activity Types" placeholder="Filter by types" multiple>
                             <md-optgroup label="Activity Types">
-                                <md-option ng-value="type.name" ng-repeat="type in activityTypes">{{type.name}}</md-option>
+                                <md-option ng-value="type" ng-repeat="type in activityTypes">{{type}}</md-option>
                             </md-optgroup>
                         </md-select>
 
