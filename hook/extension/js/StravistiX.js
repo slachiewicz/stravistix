@@ -141,20 +141,24 @@ StravistiX.prototype = {
      */
     handleUpdatePopup_: function() {
 
+        var previewBuild = false;
+        if (this.appResources_.extVersionName.startsWith('preview@')) {
+            previewBuild = true;
+        }
+
         var updateMessageObj = {
             logo: '<img src="' + this.appResources_.logoStravistix + '"></img>',
             title: 'Update <strong>v' + this.appResources_.extVersion + '</strong>',
-            hotFixes: [
-                'Hotfixed disappearance of "My year progressions to current month/day". Bug introduced few hours before in 3.5.0. Sry :/.'
-            ],
+            hotFixes: [],
             features: [
-                'Globally improved segment time comparaison for cycling activities. See also related fixes in "fixes" section below.',
-                'Removed useless stravistix highlight feature. It\'s not a feature... it\'s not a bug... it\'s a cleaning ;)',
-                'Invisible improvements (gulpjs task runner). Nothing for you ! A lot for me ;)',
+                'Added "% rank" next to "rank labels" in segments list on cycling activity pages. Quick view on where you\'re ranked!',
+                'Added back "jonathanokeeffe" segment details on segment pages',
+                'Added back "veloviewer" segment details on segment pages',
             ],
             fixes: [
-                'Fixed segment time comparaison "-0s" when activity beats year\'s record on a segment',
-                'Fixed segment time comparaison "-0s" when the year record beats global previous record',
+                'Fixed weather maps initialised with no maps. (Available on cycling activities)',
+                'Fixed "Last 30 days" comparaison chart in year progression stats to get the end of each day, rather than the beginning. This avoids the issue where activities from today are not included in the graph',
+                'Fixed not displayed "Distance last year" comparaison chart in year progression stats for some people',
             ],
             upcommingFixes: [],
             upcommingFeatures: [
@@ -181,32 +185,38 @@ StravistiX.prototype = {
         var baseVersion = this.appResources_.extVersion.split('.');
         baseVersion = baseVersion[0] + '.' + baseVersion[1] + '.x';
 
-        if (!_.isEmpty(updateMessageObj.features)) {
+        if (!_.isEmpty(updateMessageObj.features) && !previewBuild) {
             message += '<h5><strong>NEW in ' + baseVersion + ':</strong></h5>';
             _.each(updateMessageObj.features, function(feature) {
                 message += '<h6>- ' + feature + '</h6>';
             });
         }
 
-        if (!_.isEmpty(updateMessageObj.fixes)) {
+        if (!_.isEmpty(updateMessageObj.fixes) && !previewBuild) {
             message += '<h5><strong>FIXED in ' + baseVersion + ':</strong></h5>';
             _.each(updateMessageObj.fixes, function(fix) {
                 message += '<h6>- ' + fix + '</h6>';
             });
         }
 
-        if (!_.isEmpty(updateMessageObj.upcommingFixes)) {
+        if (!_.isEmpty(updateMessageObj.upcommingFixes) && !previewBuild) {
             message += '<h5><strong>Upcomming Fixes:</strong></h5>';
             _.each(updateMessageObj.upcommingFixes, function(upcommingFixes) {
                 message += '<h6>- ' + upcommingFixes + '</h6>';
             });
         }
 
-        if (!_.isEmpty(updateMessageObj.upcommingFeatures)) {
+        if (!_.isEmpty(updateMessageObj.upcommingFeatures) && !previewBuild) {
             message += '<h5><strong>Upcomming Features:</strong></h5>';
             _.each(updateMessageObj.upcommingFeatures, function(upcommingFeatures) {
                 message += '<h6>- ' + upcommingFeatures + '</h6>';
             });
+        }
+
+        if (previewBuild) {
+            updateMessageObj.title = this.appResources_.extVersionName;
+            var shortSha1Commit = this.appResources_.extVersionName.slice(this.appResources_.extVersionName.indexOf('@') + 1);
+            message += '<a href="https://github.com/thomaschampagne/stravistix/compare/master...' + shortSha1Commit + '" target="_blank">Git diff between ' + this.appResources_.extVersionName + ' and master (code in production)</a></br></br> ';
         }
 
         // Donate button
