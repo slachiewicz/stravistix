@@ -262,7 +262,7 @@ VacuumProcessor.prototype = {
     /**
      * @returns activity stream in callback
      */
-    getActivityStream: function getActivityStream(callback) {
+    getActivityStream: function(callback) {
 
         var cache = localStorage.getItem(VacuumProcessor.cachePrefix + this.getActivityId());
         if (cache) {
